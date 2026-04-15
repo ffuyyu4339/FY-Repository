@@ -275,7 +275,7 @@
   - 当前环境缺少可用 `docker` CLI，导致无法在本机会话中直接完成 Compose 启停与浏览器手工验收
   - `/jobs/new` 页面真实浏览器验证仍需在实际 Codespaces 访问环境中完成，但前端自动回填链路已由组件测试覆盖，后端 `POST /api/analyze-jd` 已由 API 测试覆盖
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b4e3a01`
 
 ---
 
@@ -305,7 +305,7 @@
 | 003 | 2026-04-15 20:39 | 328beed | feat(frontend): wire jobs workflow and dashboard | E-05, F-01 ~ F-10, G-01 ~ G-10, H-01 ~ H-04, I-01 ~ I-06, J-04 | 完成前端主链联调与 lint/test 验证 |
 | 004 | 2026-04-16 00:36 | a1d5f1d | docs(project): sync governance records with git history | K-05, K-06 | 回填历史 commit 记录并同步治理文档 |
 | 005 | 2026-04-16 00:48 | b8cb514 | fix(frontend): repair codespaces jd analyzer request flow | J-06, E-05, G-01 ~ G-10 | 修复前端类型收窄与 Codespaces JD 解析请求链路 |
-| 006 | 2026-04-16 02:59 | PENDING | fix(frontend): support codespaces backend forwarding | E-02, F-10 | 修复 Codespaces 8000 转发地址识别与后端 CORS 配置 |
+| 006 | 2026-04-16 02:59 | b4e3a01 | fix(frontend): support codespaces backend forwarding | E-02, F-10 | 修复 Codespaces 8000 转发地址识别与后端 CORS 配置 |
 
 ---
 
