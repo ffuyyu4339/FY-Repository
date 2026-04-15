@@ -31,7 +31,9 @@ async def handle_http_exception(_: Request, exc: HTTPException) -> JSONResponse:
 
 
 @app.exception_handler(RequestValidationError)
-async def handle_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+async def handle_validation_error(
+    _: Request, exc: RequestValidationError
+) -> JSONResponse:
     return JSONResponse(
         status_code=422,
         content={"detail": "请求参数校验失败", "errors": exc.errors()},

@@ -7,7 +7,12 @@ from fastapi.testclient import TestClient
 
 from app.api.deps import get_job_repository
 from app.main import app
-from app.schemas.dashboard import DashboardSummary, SkillFrequency, StatusCount, TrackCount
+from app.schemas.dashboard import (
+    DashboardSummary,
+    SkillFrequency,
+    StatusCount,
+    TrackCount,
+)
 from app.schemas.job import JobCreate, JobRead, JobUpdate
 
 
@@ -120,14 +125,27 @@ class FakeJobRepository:
         counter_skill = Counter()
         for job in self.jobs:
             counter_skill.update(job.get("skills_extracted") or [])
-        top_jobs = sorted(self.jobs, key=lambda item: item["match_score"], reverse=True)[:top_n]
+        top_jobs = sorted(
+            self.jobs, key=lambda item: item["match_score"], reverse=True
+        )[:top_n]
         return DashboardSummary(
             total_jobs=len(self.jobs),
-            status_counts=[StatusCount(status=key, count=value) for key, value in counter_status.items()],
-            track_counts=[TrackCount(track=key, count=value) for key, value in counter_track.items()],
-            shanghai_jobs=sum(1 for job in self.jobs if "上海" in str(job.get("city") or "")),
+            status_counts=[
+                StatusCount(status=key, count=value)
+                for key, value in counter_status.items()
+            ],
+            track_counts=[
+                TrackCount(track=key, count=value)
+                for key, value in counter_track.items()
+            ],
+            shanghai_jobs=sum(
+                1 for job in self.jobs if "上海" in str(job.get("city") or "")
+            ),
             top_jobs=[JobRead.model_validate(job) for job in top_jobs],
-            top_skills=[SkillFrequency(skill=key, count=value) for key, value in counter_skill.items()],
+            top_skills=[
+                SkillFrequency(skill=key, count=value)
+                for key, value in counter_skill.items()
+            ],
         )
 
 

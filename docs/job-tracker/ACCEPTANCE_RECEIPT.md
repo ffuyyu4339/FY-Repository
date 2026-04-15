@@ -63,10 +63,10 @@
 
 | 编号 | 验收项 | 状态 | 验收说明 |
 |---|---|---|---|
-| D-01 | Jobs CRUD API 可用 | PENDING | 尚未实现 |
-| D-02 | Analyzer API 可用 | PENDING | 尚未实现 |
-| D-03 | Dashboard API 可用 | PENDING | 尚未实现 |
-| D-04 | API 错误处理基础可用 | PENDING | 尚未实现 |
+| D-01 | Jobs CRUD API 可用 | PASS | 已实现列表、创建、详情、更新、删除接口 |
+| D-02 | Analyzer API 可用 | PASS | 已实现 JD 解析、字段抽取、匹配分与匹配等级返回 |
+| D-03 | Dashboard API 可用 | PASS | 已实现总数、状态分布、方向分布、上海岗位数、Top N、高频技能词汇总 |
+| D-04 | API 错误处理基础可用 | PASS | 已补充 404、422、500 级别基础错误响应 |
 
 ---
 
@@ -127,8 +127,8 @@
 | 编号 | 验收项 | 状态 | 验收说明 |
 |---|---|---|---|
 | I-01 | 前端 lint 通过 | PENDING | 尚未执行 |
-| I-02 | 后端 lint 通过 | PENDING | 尚未执行 |
-| I-03 | 后端 pytest 通过 | PENDING | 尚未执行 |
+| I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
+| I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，覆盖 API 与分析逻辑 |
 | I-04 | 前端 build 通过 | PENDING | 尚未执行 |
 | I-05 | Docker Compose 联调通过 | PENDING | 尚未执行 |
 | I-06 | README 完整 | PASS | 已覆盖安装、本地开发、Docker、Linux 部署 |
@@ -138,8 +138,8 @@
 ## 验收证据
 - Docker 启动命令：待补充
 - 前端 lint 输出：待补充
-- 后端 lint 输出：待补充
-- pytest 输出：待补充
+- 后端 lint 输出：`ruff check .`、`black --check .` 通过
+- pytest 输出：8 项测试通过
 - 前端 build 输出：待补充
 - 页面截图：待补充
 - Linux 部署说明：已写入 `README.md`
@@ -150,12 +150,12 @@
 
 | 编号 | 问题 | 严重程度 | 是否阻塞验收 | 状态 |
 |---|---|---|---|---|
-| BUG-001 | 当前仅完成初始化与结构重构，业务功能尚未开始 | medium | 否 | open |
+| BUG-001 | 前端 lint / test / build 尚未全部通过，Docker Compose 联调未完成 | medium | 是 | open |
 
 ---
 
 ## 最终验收结论
 - 是否达到 MVP 发布条件：否
 - 验收人：Codex / 你本人
-- 验收时间：2026-04-15 18:31
-- 最终说明：当前已完成治理与工程初始化，尚需继续实现业务功能与运行验证。
+- 验收时间：2026-04-15 20:23
+- 最终说明：当前已完成后端 API 主链与后端测试验证，尚需完成前端验证、数据库联通与 Docker Compose 联调。

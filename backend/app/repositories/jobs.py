@@ -54,7 +54,9 @@ class JobRepository:
             query = query.where(Job.status == status)
 
         sort_column = Job.match_score if sort_by == "match_score" else Job.updated_at
-        query = query.order_by(sort_column if sort_order == "asc" else desc(sort_column))
+        query = query.order_by(
+            sort_column if sort_order == "asc" else desc(sort_column)
+        )
         return list(self.db.scalars(query).all())
 
     def get_job(self, job_id: int) -> Job | None:
@@ -83,10 +85,14 @@ class JobRepository:
     def get_dashboard_summary(self, *, top_n: int = 5) -> DashboardSummary:
         total_jobs = self.db.scalar(select(func.count()).select_from(Job)) or 0
         status_rows = self.db.execute(
-            select(Job.status, func.count()).group_by(Job.status).order_by(func.count().desc())
+            select(Job.status, func.count())
+            .group_by(Job.status)
+            .order_by(func.count().desc())
         ).all()
         track_rows = self.db.execute(
-            select(Job.track, func.count()).group_by(Job.track).order_by(func.count().desc())
+            select(Job.track, func.count())
+            .group_by(Job.track)
+            .order_by(func.count().desc())
         ).all()
         shanghai_jobs = (
             self.db.scalar(
@@ -96,7 +102,9 @@ class JobRepository:
         )
         top_jobs = list(
             self.db.scalars(
-                select(Job).order_by(desc(Job.match_score), desc(Job.updated_at)).limit(top_n)
+                select(Job)
+                .order_by(desc(Job.match_score), desc(Job.updated_at))
+                .limit(top_n)
             ).all()
         )
         all_skills = self.db.scalars(select(Job.skills_extracted)).all()
@@ -110,9 +118,13 @@ class JobRepository:
         return DashboardSummary(
             total_jobs=total_jobs,
             status_counts=[
-                StatusCount(status=status_key, count=count) for status_key, count in status_rows
+                StatusCount(status=status_key, count=count)
+                for status_key, count in status_rows
             ],
-            track_counts=[TrackCount(track=track_key, count=count) for track_key, count in track_rows],
+            track_counts=[
+                TrackCount(track=track_key, count=count)
+                for track_key, count in track_rows
+            ],
             shanghai_jobs=shanghai_jobs,
             top_jobs=top_jobs,
             top_skills=[

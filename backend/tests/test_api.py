@@ -46,7 +46,10 @@ def test_analyzer_endpoint(client) -> None:
     response = client.post(
         "/api/analyze-jd",
         json={
-            "jd_raw_text": "公司：星图智能\n岗位：AI 应用开发工程师\n地点：上海\n要求：1-3年，本科，熟悉Python、LLM、RAG、Agent。"
+            "jd_raw_text": (
+                "公司：星图智能\n岗位：AI 应用开发工程师\n地点：上海\n"
+                "要求：1-3年，本科，熟悉Python、LLM、RAG、Agent。"
+            )
         },
     )
     assert response.status_code == 200

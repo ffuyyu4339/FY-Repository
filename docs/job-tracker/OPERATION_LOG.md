@@ -94,6 +94,52 @@
 
 ---
 
+### LOG-002
+- 时间：2026-04-15 20:23
+- 任务：TASK-D / 后端 API 主链实现
+- 目标：完成 Jobs CRUD、JD Analyzer、Dashboard API，并补齐输入输出模型、错误处理和后端测试验证
+- 修改文件：
+  - `backend/app/api/deps.py`
+  - `backend/app/api/router.py`
+  - `backend/app/api/routes/jobs.py`
+  - `backend/app/api/routes/analyzer.py`
+  - `backend/app/api/routes/dashboard.py`
+  - `backend/app/core/config.py`
+  - `backend/app/core/database.py`
+  - `backend/app/main.py`
+  - `backend/app/models/job.py`
+  - `backend/app/repositories/jobs.py`
+  - `backend/app/schemas/job.py`
+  - `backend/app/schemas/analyzer.py`
+  - `backend/app/schemas/dashboard.py`
+  - `backend/app/services/analyzer.py`
+  - `backend/pyproject.toml`
+  - `backend/tests/conftest.py`
+  - `backend/tests/test_api.py`
+  - `backend/tests/test_analyzer.py`
+  - `backend/tests/test_health.py`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\.venv\\Scripts\\ruff check . --fix`
+  - `.\\.venv\\Scripts\\ruff check .`
+  - `.\\.venv\\Scripts\\black --check .`
+  - `.\\.venv\\Scripts\\pytest`
+- 执行结果：
+  - 已完成 Jobs CRUD API
+  - 已完成 `POST /api/analyze-jd`
+  - 已完成 `GET /api/dashboard/summary`
+  - 已补充 API schema、基础异常处理与后端分析测试
+  - 后端 `ruff`、`black --check`、`pytest` 已通过
+- 风险/备注：
+  - `pytest` 存在 `datetime.utcnow()` 的弃用警告，当前不影响结果，但后续可统一替换为时区感知时间
+  - 当前尚未完成真实 PostgreSQL 联通验证与 Docker Compose 联调
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -117,6 +163,7 @@
 |---|---|---|---|---|---|
 | 001 | 2026-04-15 18:31 | PENDING | docs(project): initialize governance docs | A-01 ~ A-08 | 初始化治理文档 |
 | 002 | 2026-04-15 18:31 | PENDING | chore(project): restructure repository scaffold | B-01 ~ B-07, B-09, C-01 ~ C-05 | 完成基础目录与脚手架重组 |
+| 003 | 2026-04-15 20:23 | PENDING | feat(backend): implement jobs analyzer and dashboard api | D-01 ~ D-09, J-01, J-05 | 完成后端 API 主链与测试验证 |
 
 ---
 
@@ -129,8 +176,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：工程脚手架初始化
-- 已完成任务数：21
-- 未完成任务数：46
-- 当前风险：尚未完成基础运行验证
-- 下一步：安装依赖并验证 Docker Compose、lint、build、pytest
+- 当前阶段：后端 API 已完成
+- 已完成任务数：32
+- 未完成任务数：35
+- 当前风险：前端工具链验证和 Docker Compose 联调尚未完成
+- 下一步：完成前端 API 接入页面验证并推进 Docker Compose 联调

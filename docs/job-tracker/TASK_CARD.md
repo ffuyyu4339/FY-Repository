@@ -50,15 +50,15 @@
 ---
 
 ## D. 后端 API
-- [ ] 实现 `GET /api/jobs`
-- [ ] 实现 `POST /api/jobs`
-- [ ] 实现 `GET /api/jobs/{id}`
-- [ ] 实现 `PUT /api/jobs/{id}`
-- [ ] 实现 `DELETE /api/jobs/{id}`
-- [ ] 实现 `POST /api/analyze-jd`
-- [ ] 实现 `GET /api/dashboard/summary`
-- [ ] 补充 API 输入输出模型
-- [ ] 补充基础错误处理
+- [x] ~~实现 `GET /api/jobs`~~
+- [x] ~~实现 `POST /api/jobs`~~
+- [x] ~~实现 `GET /api/jobs/{id}`~~
+- [x] ~~实现 `PUT /api/jobs/{id}`~~
+- [x] ~~实现 `DELETE /api/jobs/{id}`~~
+- [x] ~~实现 `POST /api/analyze-jd`~~
+- [x] ~~实现 `GET /api/dashboard/summary`~~
+- [x] ~~补充 API 输入输出模型~~
+- [x] ~~补充基础错误处理~~
 
 ---
 
@@ -119,11 +119,11 @@
 ---
 
 ## J. 质量保障
-- [ ] 为后端分析逻辑补充 pytest 单元测试
+- [x] ~~为后端分析逻辑补充 pytest 单元测试~~
 - [x] ~~为后端 API 补充基础测试~~
 - [x] ~~为前端页面补充基础测试~~
 - [ ] 确保前端 lint 通过
-- [ ] 确保后端 lint 通过
+- [x] ~~确保后端 lint 通过~~
 - [ ] 确保前端 build 通过
 - [ ] 确保 Docker Compose 联调通过
 - [ ] 确保关键功能可手工验证
@@ -142,6 +142,6 @@
 ---
 
 ## 当前状态
-- 当前阶段：工程脚手架初始化
+- 当前阶段：后端 API 已完成，前端联调与质量验证中
 - 当前阻塞：无
-- 最新更新时间：2026-04-15 18:31
+- 最新更新时间：2026-04-15 20:23

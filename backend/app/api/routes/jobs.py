@@ -50,7 +50,9 @@ def create_job(
 
 
 @router.get("/jobs/{job_id}", response_model=JobRead)
-def get_job(job_id: int, repository: JobRepository = Depends(get_job_repository)) -> JobRead:
+def get_job(
+    job_id: int, repository: JobRepository = Depends(get_job_repository)
+) -> JobRead:
     return get_job_or_404(repository, job_id)
 
 

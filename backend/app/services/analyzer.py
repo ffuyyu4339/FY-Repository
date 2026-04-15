@@ -87,7 +87,9 @@ def infer_track_from_text(text: str) -> str:
 
 def extract_city(text: str) -> tuple[str | None, bool]:
     lowered = text.lower()
-    remote_allowed = any(token in lowered for token in ["远程", "remote", "居家", "hybrid"])
+    remote_allowed = any(
+        token in lowered for token in ["远程", "remote", "居家", "hybrid"]
+    )
     for city in CITY_KEYWORDS:
         if city in text:
             return city, remote_allowed or city == "远程"
