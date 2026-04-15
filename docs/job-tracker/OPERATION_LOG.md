@@ -178,6 +178,68 @@
 
 ---
 
+### LOG-004
+- 时间：2026-04-16 00:24
+- 任务：TASK-J / 前端 build 类型错误修复与构建复验
+- 目标：修复 `frontend/src/components/job-editor.tsx` 中 `jobId` 的类型收窄问题，完成前端 build 复验，并继续尝试执行 `docker compose up --build`
+- 修改文件：
+  - `frontend/src/components/job-editor.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm install`
+  - `npm install lightningcss-win32-x64-msvc --save-dev`
+  - `npm run build`
+  - `docker compose up --build`
+- 执行结果：
+  - 已在 `fetchJob(jobId)` 前增加显式守卫，并同步修复保存分支中的 `jobId` 收窄
+  - 前端 `npm run build` 已通过
+  - `docker compose up --build` 未执行成功，当前 PowerShell 会话提示 `docker` 命令不可识别
+- 风险/备注：
+  - 当前阻塞已从前端类型错误转移为本机 Docker CLI 不可用，需先恢复 `docker` 命令再继续容器联调
+  - 本次为恢复本机构建链路，执行了依赖补装
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
+### LOG-005
+- 时间：2026-04-16 00:48
+- 任务：TASK-E/G / Codespaces 前端请求后端链路修复
+- 目标：修复 Codespaces 浏览器仍请求 `http://localhost:8000` 导致 `/jobs/new` 出现 `Failed to fetch`、JD 解析结果无法回填的问题
+- 修改文件：
+  - `frontend/src/lib/api.ts`
+  - `frontend/next.config.ts`
+  - `frontend/Dockerfile`
+  - `docker-compose.yml`
+  - `.env.example`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm run test`
+  - `.\\.venv\\Scripts\\python -m pytest tests/test_api.py -k analyzer -q`
+  - `npm run build`
+  - `npm run build`
+  - `docker compose up --build`
+- 执行结果：
+  - 已将前端请求改为“浏览器同源优先”，当外部访问环境仍注入 `localhost` 基地址时自动退回到前端同源 `/api`
+  - 已在 Next.js 中增加 `/api/:path* -> BACKEND_INTERNAL_URL/api/:path*` 代理转发，适配 Codespaces 下 frontend -> backend 容器访问
+  - 已将 `BACKEND_INTERNAL_URL` 透传到前端 Docker 构建与运行环境，确保 Codespaces `docker compose up --build` 使用容器内后端地址
+  - 前端 `JobEditor` 组件测试已验证点击“解析 JD”后会自动回填字段
+  - 后端 `POST /api/analyze-jd` API 测试已通过
+  - 前端 `npm run build` 已通过
+  - 本次方案不需要额外修改 FastAPI CORS
+- 风险/备注：
+  - 首次 `npm run build` 受本机 `.next` 缓存目录状态影响出现 `ENOENT: mkdir '\\\\?'`，重试后通过
+  - 当前本地 PowerShell 会话无法识别 `docker` 命令，无法在本地继续执行容器联调复验
+  - `/jobs/new` 不再出现 `Failed to fetch`、点击“解析 JD”可自动回填字段的最终验证需在实际 Codespaces 浏览器页面完成
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -202,6 +264,8 @@
 | 001 | 2026-04-15 18:31 | b6dea80 | chore: initialize repository | A-01 ~ A-08, B-01 ~ B-07, B-09, C-01 ~ C-05 | 初始化治理文档并完成基础目录与脚手架重组 |
 | 002 | 2026-04-15 20:23 | c24d1df | feat(backend): implement jobs analyzer and dashboard api | D-01 ~ D-09, J-01, J-05 | 完成后端 API 主链与测试验证 |
 | 003 | 2026-04-15 20:39 | 328beed | feat(frontend): wire jobs workflow and dashboard | E-05, F-01 ~ F-10, G-01 ~ G-10, H-01 ~ H-04, I-01 ~ I-06, J-04 | 完成前端主链联调与 lint/test 验证 |
+| 004 | 2026-04-16 00:24 | PENDING | fix(frontend): guard job editor id handling | J-06 | 修复前端 build 类型错误并完成构建复验 |
+| 005 | 2026-04-16 00:48 | PENDING | fix(frontend): proxy api requests for codespaces | E-05, G-01 ~ G-10 | 修复 Codespaces 下前端请求后端链路 |
 
 ---
 
@@ -209,14 +273,15 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | Docker Desktop 服务未就绪，无法执行 Docker Compose 联调 | 高 | open | 当前会话无权限启动 `com.docker.service` |
-| ISSUE-002 | Windows 本机 `next build` 受 Next 原生绑定异常影响 | 中 | open | 可优先在 Linux / Docker 环境继续验证构建 |
+| ISSUE-001 | 当前 PowerShell 会话无法识别 `docker` 命令，无法执行 Docker Compose 联调 | 高 | open | 需先恢复 Docker CLI 或重新打开正确环境 |
+| ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
+| ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端的问题已修复 | 低 | closed | 前端已改为同源代理 + Next 转发 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：前端主链已完成
-- 已完成任务数：58
-- 未完成任务数：9
-- 当前风险：前端 build 与 Docker Compose 联调仍受本机环境限制
-- 下一步：在可用 Docker / Linux 环境完成前端 build、数据库联通、容器联调与手工验收
+- 当前阶段：Codespaces 前后端请求链路已修复
+- 已完成任务数：59
+- 未完成任务数：8
+- 当前风险：Docker Compose 联调仍受当前本机 Docker CLI 环境限制
+- 下一步：恢复 `docker` 命令可用后执行 `docker compose up --build`，继续完成数据库联通与手工验收

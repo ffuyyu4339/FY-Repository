@@ -135,12 +135,13 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
       return;
     }
 
+    const currentJobId = jobId;
     let cancelled = false;
 
     async function loadJob() {
       try {
         setLoading(true);
-        const job = await fetchJob(jobId);
+        const job = await fetchJob(currentJobId);
         if (!cancelled) {
           setFormState(toFormState(job));
         }
@@ -199,15 +200,28 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (mode === "edit" && !jobId) {
+      setError("缺少岗位 ID，无法保存修改。");
+      return;
+    }
+
     try {
       setSaving(true);
       setError(null);
       setSuccessMessage(null);
       const payload = toPayload(formState);
-      const job =
-        mode === "create"
-          ? await createJob(payload)
-          : await updateJob(jobId as string, payload);
+      let job;
+
+      if (mode === "create") {
+        job = await createJob(payload);
+      } else {
+        if (!jobId) {
+          throw new Error("缺少岗位 ID，无法保存修改。");
+        }
+
+        const currentJobId = jobId;
+        job = await updateJob(currentJobId, payload);
+      }
 
       setFormState(toFormState(job));
       setSuccessMessage(mode === "create" ? "岗位已创建。" : "岗位已更新。");

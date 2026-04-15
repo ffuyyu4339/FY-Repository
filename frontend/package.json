@@ -27,6 +27,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "jsdom": "^27.0.1",
+    "lightningcss-win32-x64-msvc": "^1.32.0",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5",

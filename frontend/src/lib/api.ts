@@ -6,7 +6,27 @@ import type {
   JobPayload,
 } from "@/lib/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const LOCALHOST_API_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+
+function getApiBaseUrl(): string {
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+
+  if (!configuredBaseUrl) {
+    return "";
+  }
+
+  if (typeof window !== "undefined") {
+    const isCodespacesLikeBrowser = !["localhost", "127.0.0.1"].includes(
+      window.location.hostname,
+    );
+
+    if (isCodespacesLikeBrowser && LOCALHOST_API_PATTERN.test(configuredBaseUrl)) {
+      return "";
+    }
+  }
+
+  return configuredBaseUrl.replace(/\/$/, "");
+}
 
 type RequestOptions = RequestInit & {
   parseJson?: boolean;
@@ -14,7 +34,7 @@ type RequestOptions = RequestInit & {
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { parseJson = true, headers, ...init } = options;
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
