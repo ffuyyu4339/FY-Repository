@@ -6,26 +6,62 @@ import type {
   JobPayload,
 } from "@/lib/types";
 
+const LOCALHOST_HOSTNAMES = new Set(["localhost", "127.0.0.1"]);
 const LOCALHOST_API_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+const CODESPACES_PORT_SUFFIX_PATTERN = /-\d+(?=\.)/;
 
-function getApiBaseUrl(): string {
-  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+export function deriveCodespacesApiBaseUrl(browserOrigin: string): string {
+  try {
+    const url = new URL(browserOrigin);
 
-  if (!configuredBaseUrl) {
+    if (LOCALHOST_HOSTNAMES.has(url.hostname)) {
+      return "";
+    }
+
+    if (!CODESPACES_PORT_SUFFIX_PATTERN.test(url.hostname)) {
+      return "";
+    }
+
+    url.hostname = url.hostname.replace(CODESPACES_PORT_SUFFIX_PATTERN, "-8000");
+    return url.origin;
+  } catch {
+    return "";
+  }
+}
+
+export function resolveApiBaseUrl(
+  configuredBaseUrl?: string,
+  browserOrigin?: string,
+): string {
+  const trimmedBaseUrl = configuredBaseUrl?.trim();
+
+  if (!trimmedBaseUrl) {
     return "";
   }
 
-  if (typeof window !== "undefined") {
-    const isCodespacesLikeBrowser = !["localhost", "127.0.0.1"].includes(
-      window.location.hostname,
-    );
-
-    if (isCodespacesLikeBrowser && LOCALHOST_API_PATTERN.test(configuredBaseUrl)) {
-      return "";
-    }
+  if (!browserOrigin) {
+    return trimmedBaseUrl.replace(/\/$/, "");
   }
 
-  return configuredBaseUrl.replace(/\/$/, "");
+  try {
+    const browserUrl = new URL(browserOrigin);
+    const isCodespacesLikeBrowser = !LOCALHOST_HOSTNAMES.has(browserUrl.hostname);
+
+    if (isCodespacesLikeBrowser && LOCALHOST_API_PATTERN.test(trimmedBaseUrl)) {
+      return deriveCodespacesApiBaseUrl(browserOrigin) || "";
+    }
+  } catch {
+    return trimmedBaseUrl.replace(/\/$/, "");
+  }
+
+  return trimmedBaseUrl.replace(/\/$/, "");
+}
+
+function getApiBaseUrl(): string {
+  return resolveApiBaseUrl(
+    process.env.NEXT_PUBLIC_API_BASE_URL,
+    typeof window !== "undefined" ? window.location.origin : undefined,
+  );
 }
 
 type RequestOptions = RequestInit & {

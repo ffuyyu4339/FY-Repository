@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildJobsQuery } from "./api";
+import {
+  buildJobsQuery,
+  deriveCodespacesApiBaseUrl,
+  resolveApiBaseUrl,
+} from "./api";
 import { formatTrackLabel, textToList } from "./types";
 
 describe("frontend helpers", () => {
@@ -27,5 +31,22 @@ describe("frontend helpers", () => {
         sort_order: "desc",
       }),
     ).toBe("?q=AI&city=%E4%B8%8A%E6%B5%B7&status=ready_to_apply&sort_by=match_score&sort_order=desc");
+  });
+
+  it("derives the forwarded backend url in Codespaces", () => {
+    expect(
+      deriveCodespacesApiBaseUrl(
+        "https://fuzzy-space-guide-abc123-3000.app.github.dev",
+      ),
+    ).toBe("https://fuzzy-space-guide-abc123-8000.app.github.dev");
+  });
+
+  it("rewrites localhost api base to the forwarded Codespaces backend", () => {
+    expect(
+      resolveApiBaseUrl(
+        "http://localhost:8000",
+        "https://fuzzy-space-guide-abc123-3000.app.github.dev",
+      ),
+    ).toBe("https://fuzzy-space-guide-abc123-8000.app.github.dev");
   });
 });

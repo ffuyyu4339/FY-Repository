@@ -200,7 +200,7 @@
   - 当前阻塞已从前端类型错误转移为本机 Docker CLI 不可用，需先恢复 `docker` 命令再继续容器联调
   - 本次为恢复本机构建链路，执行了依赖补装
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b8cb514`
 
 ---
 
@@ -236,6 +236,45 @@
   - 当前本地 PowerShell 会话无法识别 `docker` 命令，无法在本地继续执行容器联调复验
   - `/jobs/new` 不再出现 `Failed to fetch`、点击“解析 JD”可自动回填字段的最终验证需在实际 Codespaces 浏览器页面完成
 - 对应提交：
+  - `b8cb514`
+
+---
+
+### LOG-006
+- 时间：2026-04-16 02:59
+- 任务：TASK-E/G / Codespaces 8000 转发地址与后端 CORS 收口修复
+- 目标：确保 Codespaces 浏览器侧请求不再落到 `localhost:8000`，而是自动命中当前 8000 转发地址，并允许对应前端来源跨域访问 FastAPI
+- 修改文件：
+  - `frontend/src/lib/api.ts`
+  - `frontend/src/lib/project.test.ts`
+  - `backend/app/core/config.py`
+  - `backend/app/main.py`
+  - `docker-compose.yml`
+  - `.env.example`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm run lint`
+  - `npm run test`
+  - `.\\.venv\\Scripts\\ruff check .`
+  - `.\\.venv\\Scripts\\black --check .`
+  - `.\\.venv\\Scripts\\python -m pytest -q`
+  - `npm run build`
+  - `docker compose down`
+  - `docker compose up --build`
+- 执行结果：
+  - 已新增 Codespaces 地址推导逻辑，当浏览器运行在 `*.app.github.dev` / `*.githubpreview.dev` 且前端环境变量仍为 `http://localhost:8000` 时，会自动改写为当前工作区的 8000 转发地址
+  - 已补充前端单测，验证 `localhost:8000` 会被解析为 Codespaces 的 `-8000` 域名
+  - 已在 FastAPI 中补充 `allow_origin_regex`，允许当前 Codespaces 前端来源跨域访问
+  - 已将 `FRONTEND_ORIGINS` 与 `FRONTEND_ORIGIN_REGEX` 写入 Compose 与环境变量模板
+  - 前端 `npm run lint`、后端 `ruff check .`、`black --check .` 已通过
+  - 前端 `npm run test`、后端 `pytest -q`、前端 `npm run build` 已通过
+  - `docker compose down` 与 `docker compose up --build` 已按要求执行，但当前 PowerShell 会话无法识别 `docker` 命令，未能完成容器联调复验
+- 风险/备注：
+  - 当前环境缺少可用 `docker` CLI，导致无法在本机会话中直接完成 Compose 启停与浏览器手工验收
+  - `/jobs/new` 页面真实浏览器验证仍需在实际 Codespaces 访问环境中完成，但前端自动回填链路已由组件测试覆盖，后端 `POST /api/analyze-jd` 已由 API 测试覆盖
+- 对应提交：
   - `PENDING_COMMIT`
 
 ---
@@ -264,8 +303,9 @@
 | 001 | 2026-04-15 18:31 | b6dea80 | chore: initialize repository | A-01 ~ A-08, B-01 ~ B-07, B-09, C-01 ~ C-05 | 初始化治理文档并完成基础目录与脚手架重组 |
 | 002 | 2026-04-15 20:23 | c24d1df | feat(backend): implement jobs analyzer and dashboard api | D-01 ~ D-09, J-01, J-05 | 完成后端 API 主链与测试验证 |
 | 003 | 2026-04-15 20:39 | 328beed | feat(frontend): wire jobs workflow and dashboard | E-05, F-01 ~ F-10, G-01 ~ G-10, H-01 ~ H-04, I-01 ~ I-06, J-04 | 完成前端主链联调与 lint/test 验证 |
-| 004 | 2026-04-16 00:24 | PENDING | fix(frontend): guard job editor id handling | J-06 | 修复前端 build 类型错误并完成构建复验 |
-| 005 | 2026-04-16 00:48 | PENDING | fix(frontend): proxy api requests for codespaces | E-05, G-01 ~ G-10 | 修复 Codespaces 下前端请求后端链路 |
+| 004 | 2026-04-16 00:36 | a1d5f1d | docs(project): sync governance records with git history | K-05, K-06 | 回填历史 commit 记录并同步治理文档 |
+| 005 | 2026-04-16 00:48 | b8cb514 | fix(frontend): repair codespaces jd analyzer request flow | J-06, E-05, G-01 ~ G-10 | 修复前端类型收窄与 Codespaces JD 解析请求链路 |
+| 006 | 2026-04-16 02:59 | PENDING | fix(frontend): support codespaces backend forwarding | E-02, F-10 | 修复 Codespaces 8000 转发地址识别与后端 CORS 配置 |
 
 ---
 
@@ -275,13 +315,13 @@
 |---|---|---|---|---|
 | ISSUE-001 | 当前 PowerShell 会话无法识别 `docker` 命令，无法执行 Docker Compose 联调 | 高 | open | 需先恢复 Docker CLI 或重新打开正确环境 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
-| ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端的问题已修复 | 低 | closed | 前端已改为同源代理 + Next 转发 |
+| ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：Codespaces 前后端请求链路已修复
+- 当前阶段：Codespaces 8000 转发地址与后端 CORS 已修复
 - 已完成任务数：59
 - 未完成任务数：8
 - 当前风险：Docker Compose 联调仍受当前本机 Docker CLI 环境限制
-- 下一步：恢复 `docker` 命令可用后执行 `docker compose up --build`，继续完成数据库联通与手工验收
+- 下一步：在可用 Docker 环境中重新执行 `docker compose down && docker compose up --build`，继续完成数据库联通与 Codespaces 手工验收

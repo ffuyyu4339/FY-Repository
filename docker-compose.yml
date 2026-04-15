@@ -29,6 +29,8 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://jobtracker:jobtracker@db:5432/jobtracker}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      FRONTEND_ORIGIN_REGEX: ${FRONTEND_ORIGIN_REGEX:-https://.*\.app\.github\.dev$|https://.*\.githubpreview\.dev$}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
