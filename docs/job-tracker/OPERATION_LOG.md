@@ -60,7 +60,7 @@
 - 风险/备注：
   - 当前尚未进入功能开发
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b6dea80`
 
 ---
 
@@ -90,7 +90,7 @@
   - 当前尚未执行 `docker compose up`、`lint`、`build`、`pytest`
   - 根目录历史 `node_modules` 将在重构收尾时清理
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b6dea80`
 
 ---
 
@@ -136,7 +136,7 @@
   - `pytest` 存在 `datetime.utcnow()` 的弃用警告，当前不影响结果，但后续可统一替换为时区感知时间
   - 当前尚未完成真实 PostgreSQL 联通验证与 Docker Compose 联调
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `c24d1df`
 
 ---
 
@@ -174,7 +174,7 @@
   - `docker compose build frontend` 失败原因是 `dockerDesktopLinuxEngine` 未就绪
   - `Start-Service com.docker.service` 需要更高权限，当前会话无法直接拉起 Docker 服务
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `328beed`
 
 ---
 
@@ -199,10 +199,9 @@
 
 | 序号 | 时间 | Commit Hash | Commit Message | 关联任务 | 说明 |
 |---|---|---|---|---|---|
-| 001 | 2026-04-15 18:31 | PENDING | docs(project): initialize governance docs | A-01 ~ A-08 | 初始化治理文档 |
-| 002 | 2026-04-15 18:31 | PENDING | chore(project): restructure repository scaffold | B-01 ~ B-07, B-09, C-01 ~ C-05 | 完成基础目录与脚手架重组 |
-| 003 | 2026-04-15 20:23 | c24d1df | feat(backend): implement jobs analyzer and dashboard api | D-01 ~ D-09, J-01, J-05 | 完成后端 API 主链与测试验证 |
-| 004 | 2026-04-15 20:39 | PENDING | feat(frontend): wire jobs workflow and dashboard | E-05, F-01 ~ F-10, G-01 ~ G-10, H-01 ~ H-04, I-01 ~ I-06, J-04 | 完成前端主链联调与 lint/test 验证 |
+| 001 | 2026-04-15 18:31 | b6dea80 | chore: initialize repository | A-01 ~ A-08, B-01 ~ B-07, B-09, C-01 ~ C-05 | 初始化治理文档并完成基础目录与脚手架重组 |
+| 002 | 2026-04-15 20:23 | c24d1df | feat(backend): implement jobs analyzer and dashboard api | D-01 ~ D-09, J-01, J-05 | 完成后端 API 主链与测试验证 |
+| 003 | 2026-04-15 20:39 | 328beed | feat(frontend): wire jobs workflow and dashboard | E-05, F-01 ~ F-10, G-01 ~ G-10, H-01 ~ H-04, I-01 ~ I-06, J-04 | 完成前端主链联调与 lint/test 验证 |
 
 ---
 
