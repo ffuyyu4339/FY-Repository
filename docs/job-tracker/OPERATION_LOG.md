@@ -279,6 +279,42 @@
 
 ---
 
+### LOG-007
+- 时间：2026-04-30 18:25
+- 任务：TASK-J / 项目状态复查与运行阻塞定位
+- 目标：确认当前项目“完全用不了”的真实阻塞点，复核 lint / test / build / Docker Compose / 浏览器访问状态
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker --version`
+  - `docker info`
+  - `docker context ls`
+  - `docker compose config`
+  - `docker compose down; docker compose up -d --build`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - Browser 打开 `http://localhost:3000/jobs`
+- 执行结果：
+  - 前端 `lint`、`test`、`build` 均通过
+  - 后端 `ruff`、`black --check`、`pytest` 均通过
+  - `docker compose config` 可解析
+  - `docker compose up -d --build` 失败，原因是无法连接 Docker API：`npipe:////./pipe/dockerDesktopLinuxEngine` 不存在
+  - Browser 打开 `http://localhost:3000/jobs` 返回 `ERR_CONNECTION_REFUSED`，当前无前端服务监听
+  - 本机未发现 `psql` / `postgres` 命令，非 Docker 路径也没有现成 PostgreSQL 可用
+- 风险/备注：
+  - 当前首要阻塞为运行环境缺少可用 Docker daemon / PostgreSQL，而不是前后端 lint/test/build 失败
+  - `rg --files` 在当前 Codex Windows 包路径下被拒绝访问，已改用 PowerShell 文件枚举
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -313,15 +349,15 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | 当前 PowerShell 会话无法识别 `docker` 命令，无法执行 Docker Compose 联调 | 高 | open | 需先恢复 Docker CLI 或重新打开正确环境 |
+| ISSUE-001 | 当前 Windows 环境只有 Docker CLI，Docker daemon / Docker Desktop Linux Engine 未运行或未完整安装，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；需安装或启动 Docker Desktop Linux Engine |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：Codespaces 8000 转发地址与后端 CORS 已修复
+- 当前阶段：本地代码质量检查通过，Docker daemon / PostgreSQL 运行环境待恢复
 - 已完成任务数：59
 - 未完成任务数：8
-- 当前风险：Docker Compose 联调仍受当前本机 Docker CLI 环境限制
-- 下一步：在可用 Docker 环境中重新执行 `docker compose down && docker compose up --build`，继续完成数据库联通与 Codespaces 手工验收
+- 当前风险：Docker Compose 联调仍受当前本机 Docker daemon / Docker Desktop Linux Engine 不可用影响
+- 下一步：安装或启动 Docker Desktop Linux Engine 后重新执行 `docker compose down && docker compose up -d --build`，继续完成数据库联通与浏览器手工验收
