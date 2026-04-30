@@ -315,6 +315,38 @@
 
 ---
 
+### LOG-008
+- 时间：2026-04-30 19:06
+- 任务：TASK-J / Docker Desktop 环境安装尝试
+- 目标：补齐 Docker Desktop / Docker daemon，使 Docker Compose 可用于 PostgreSQL、后端、前端联调
+- 修改文件：
+  - `.env`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `Copy-Item -Path .env.example -Destination .env -Force`
+  - `winget install --id Docker.DockerDesktop --source winget --accept-package-agreements --accept-source-agreements`
+  - `Docker Desktop Installer.exe install --quiet --accept-license`
+  - `Start-Process Docker Desktop Installer.exe -Verb RunAs`
+  - `docker info`
+  - `winget list --id Docker.DockerDesktop`
+  - `Get-Service *docker*`
+- 执行结果：
+  - 已从 `.env.example` 生成本地 `.env`，且 `.env` 被 Git 忽略
+  - `winget install` 下载并释放 Docker Desktop 安装文件，但安装流程长时间卡住
+  - 已确认 `Docker Desktop.exe` 已落盘到 `C:\Program Files\Docker\Docker`
+  - 静默安装命令返回，但 Docker 服务未注册，winget 仍未登记 Docker Desktop
+  - 管理员方式启动安装器触发 UAC，但授权未完成，未能继续注册系统服务
+  - `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+- 风险/备注：
+  - 当前阻塞为 Windows 管理员授权 / 系统级 Docker Desktop 安装未完成
+  - 需要用户在 UAC 中确认管理员权限，或手动以管理员身份运行 `C:\Program Files\Docker\Docker\Docker Desktop Installer.exe install --quiet --accept-license`
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -349,7 +381,7 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | 当前 Windows 环境只有 Docker CLI，Docker daemon / Docker Desktop Linux Engine 未运行或未完整安装，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；需安装或启动 Docker Desktop Linux Engine |
+| ISSUE-001 | Docker Desktop 安装文件已落盘，但管理员授权未完成，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；需以管理员权限完成 Docker Desktop 安装 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
@@ -359,5 +391,5 @@
 - 当前阶段：本地代码质量检查通过，Docker daemon / PostgreSQL 运行环境待恢复
 - 已完成任务数：59
 - 未完成任务数：8
-- 当前风险：Docker Compose 联调仍受当前本机 Docker daemon / Docker Desktop Linux Engine 不可用影响
-- 下一步：安装或启动 Docker Desktop Linux Engine 后重新执行 `docker compose down && docker compose up -d --build`，继续完成数据库联通与浏览器手工验收
+- 当前风险：Docker Compose 联调仍受 Docker Desktop 系统服务未注册影响
+- 下一步：以管理员权限完成 Docker Desktop 安装并启动 Linux Engine 后，重新执行 `docker compose down && docker compose up -d --build`，继续完成数据库联通与浏览器手工验收
