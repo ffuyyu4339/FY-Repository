@@ -696,7 +696,7 @@
   - LLM 仅解析用户主动粘贴的 JD，未配置 API 或 API 失败时自动回退规则引擎
   - Docker Compose 实际联调仍受本机 Docker Desktop / WSL daemon 不可用阻塞
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `925f71d`
 
 ---
 
@@ -737,7 +737,7 @@
 | 014 | 2026-05-02 00:34 | 37591be | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
 | 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
 | 016 | 2026-05-02 00:44 | PENDING_COMMIT | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
-| 017 | 2026-05-02 01:48 | PENDING_COMMIT | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
+| 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 
 ---
 
