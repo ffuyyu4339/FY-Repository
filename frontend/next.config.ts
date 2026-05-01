@@ -1,9 +1,11 @@
 import type { NextConfig } from "next";
 
 const backendInternalUrl =
-  process.env.BACKEND_INTERNAL_URL?.replace(/\/$/, "") || "http://localhost:8000";
+  process.env.BACKEND_INTERNAL_URL?.replace(/\/$/, "") ||
+  "http://localhost:8000";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   async rewrites() {
     return [
       {

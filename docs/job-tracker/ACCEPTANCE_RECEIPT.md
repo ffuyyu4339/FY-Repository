@@ -144,6 +144,8 @@
 | I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 已通过，实际 `docker compose up -d --build` 因 Docker daemon 不可连接失败，尚未完成容器内联调；按用户要求暂时搁置 |
 | I-06 | README 完整 | PASS | 已改为本机 PostgreSQL + FastAPI + Next.js 运行说明，并保留 Docker 状态说明 |
 | I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、事件记录、技能搜索、删除、Dashboard、Sources、Settings、Guide 页面 |
+| I-08 | Codex 内置浏览器验收 | PASS | 已通过内置浏览器验证首页、岗位列表筛选、新增页 JD 解析回填、Dashboard、平台入口与指南页面 |
+| I-09 | 开发调试菜单中文化 | PASS | 已在内置浏览器验证左下角开发工具菜单显示“路由 / 静态 / 打包器 / 路由信息 / 偏好设置”，英文官方菜单不再出现 |
 
 ---
 
@@ -166,6 +168,10 @@
 - 来源预填新增页访问验证：`GET http://localhost:3000/jobs/new?platform=...&job_link=...` 返回 HTTP 200
 - 流程入口访问验证：`GET http://localhost:3000/` 返回 HTTP 200，页面包含“今天的求职工作从这里开始”
 - 列表查询入口验证：`GET http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score` 返回 HTTP 200
+- Codex 内置浏览器验收：`/`、`/jobs`、`/jobs?status=ready_to_apply&sort_by=match_score`、`/jobs/new`、`/dashboard`、`/sources`、`/guide` 均完成可见页面检查
+- Codex 内置浏览器交互验收：岗位列表搜索框可输入，优先投递快捷筛选可点击；新增岗位页使用测试 JD 点击“一键解析 JD”后，公司、岗位、城市、薪资、方向、匹配等级和技能词均成功回填；本轮未保存岗位数据
+- Codex 内置浏览器截图：Dashboard 最终渲染画面已成功捕获，能看到 KPI 卡、状态分布与方向分布进度条
+- 开发调试菜单中文化验收：`next.config.ts` 已关闭 Next.js 官方英文 dev indicator；`NextDevtoolsI18n` 仅在 development 环境显示中文菜单；内置浏览器验证 `Open Next.js Dev Tools` 不再出现，菜单内 `Route Info`、`Preferences`、`Bundler`、`Route Static` 英文文案不再出现
 - 关键功能链路验证：临时调用 `POST /api/analyze-jd` 得到 `ai_app_dev`、`priority_apply`、92 分，随后 `POST /api/jobs` 创建临时岗位、`PUT /api/jobs/{id}` 更新为 `applied`、`DELETE /api/jobs/{id}` 删除成功
 - 本轮关键功能链路验证：临时 `POST /api/analyze-jd` 得到 `ai_app_dev`、`priority_apply`、`analysis_source=rules`；临时岗位创建、状态更新为 `applied`、新增 `applied` 投递事件、事件列表读取、技能搜索 `q=RAG`、岗位删除均成功
 - MVP+ 关键功能链路验证：`GET /api/preferences` 返回默认偏好；`GET /api/source-links` 返回 BOSS直聘、拉勾、猎聘、智联招聘、前程无忧、牛客、脉脉；临时调用 `POST /api/jobs/{id}/events` 成功记录 `applied` 事件；`GET /api/jobs?q=RAG` 可匹配技能数组；临时岗位已删除
@@ -182,7 +188,7 @@
 - 前端 build 输出：`npm run build` 通过
 - 前端 build 路由证据：Next build 生成 `/sources`、`/settings`、`/guide`
 - Codespaces 请求修复：前端会自动推导 8000 转发后端地址，FastAPI 已放行 `*.app.github.dev` / `*.githubpreview.dev` 来源，Compose 与环境模板已同步补齐对应变量
-- 页面截图：Codex 内置浏览器已完成 `/jobs` 当前视图截图复查
+- 页面截图：Codex 内置浏览器已完成 `/jobs` 当前视图截图复查，并完成 `/dashboard` 最终渲染截图
 - Linux 部署说明：已写入 `README.md`
 
 ---
@@ -202,5 +208,5 @@
 - 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 03:05
-- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
+- 验收时间：2026-05-02 03:17
+- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与 Codex 内置浏览器交互验收均已通过；开发模式调试菜单已在内置浏览器验证为中文显示。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。

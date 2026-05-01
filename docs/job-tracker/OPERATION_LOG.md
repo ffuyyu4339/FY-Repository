@@ -822,6 +822,73 @@
 
 ---
 
+### LOG-021
+- 时间：2026-05-02 03:08
+- 任务：TASK-J/K / Codex 内置浏览器验收
+- 目标：使用 Codex 内置浏览器对当前本机前端进行可见页面与关键交互验收
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - Browser 打开 `http://localhost:3000/`
+  - Browser 打开并交互 `http://localhost:3000/jobs`
+  - Browser 打开 `http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score`
+  - Browser 打开并解析测试 JD：`http://localhost:3000/jobs/new`
+  - Browser 打开 `http://localhost:3000/dashboard`
+  - Browser 打开 `http://localhost:3000/sources`
+  - Browser 打开 `http://localhost:3000/guide`
+  - Browser 截取 Dashboard 最终渲染画面
+- 执行结果：
+  - 首页标题、工作流步骤、快捷入口与导航均可见
+  - 岗位列表页标题、统计 Badge、搜索框、下拉筛选、快捷筛选和岗位卡片/空状态均可见
+  - 列表页搜索框可输入，优先投递快捷筛选可点击，筛选后仍可展示结果或空状态
+  - 带 query 的岗位列表入口可保留 URL 参数并正常渲染
+  - 新增岗位页分栏布局、JD 原文区、岗位表单、保存栏均可见
+  - 测试 JD 可通过“一键解析 JD”回填公司、岗位、城市、薪资、方向、匹配等级和技能词；本轮未保存岗位数据
+  - Dashboard KPI、状态分布、方向分布、高分岗位、技能词标签和下一步动作均可见，无加载错误
+  - `/sources` 与 `/guide` 导航目标均非 404
+  - Dashboard 最终渲染截图已在内置浏览器工具中捕获
+- 风险/备注：
+  - 首次 Playwright 截图接口超时，已改用 Browser CUA 截图并成功捕获 Dashboard 画面
+  - Docker Compose 实际启动与容器联调仍按用户要求暂时搁置
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
+### LOG-022
+- 时间：2026-05-02 03:17
+- 任务：TASK-E/J / 开发模式调试菜单中文化
+- 目标：将内置浏览器左下角 Next.js 开发调试菜单从英文显示改为中文显示
+- 修改文件：
+  - `frontend/next.config.ts`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/next-devtools-i18n.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write next.config.ts src/components/next-devtools-i18n.tsx src/app/layout.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - 重启前端 dev server：`scripts/start-frontend.ps1 -Port 3000`
+  - Codex 内置浏览器打开 `http://localhost:3000/dashboard` 并点击左下角开发工具按钮
+- 执行结果：
+  - 已通过 `devIndicators: false` 关闭 Next.js 官方英文 dev indicator
+  - 已新增仅开发环境渲染的中文开发工具菜单，显示“路由 / 静态 / 打包器 / 路由信息 / 偏好设置”
+  - 内置浏览器验证官方英文 `Open Next.js Dev Tools` 按钮不再出现
+  - 内置浏览器验证中文菜单可打开，且 `Route Info`、`Preferences`、`Bundler`、`Route Static` 英文文案不再出现
+  - 前端 `lint`、`test`、`build` 均通过
+- 风险/备注：
+  - 该中文菜单只在 development 环境渲染，生产构建不显示
+  - `Webpack` 为打包器专有名词，保留英文名称
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -863,6 +930,8 @@
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 | 019 | 2026-05-02 02:55 | be704d7 | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
 | 020 | 2026-05-02 03:05 | 02c9ed8 | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
+| 021 | 2026-05-02 03:08 | PENDING_COMMIT | docs(project): record browser acceptance | J-08, K-05 ~ K-07 | 使用 Codex 内置浏览器验收首页、列表、新增解析、Dashboard、平台入口与指南 |
+| 022 | 2026-05-02 03:17 | PENDING_COMMIT | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
 
 ---
 
@@ -878,7 +947,7 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；Codex 内置浏览器页面与交互验收已通过；开发模式调试菜单已中文化；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
 - 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与 MVP+ 合规辅助自动化任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
 - 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
