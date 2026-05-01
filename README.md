@@ -1,6 +1,9 @@
 # Job Tracker + JD Analyzer
 
-个人求职管理系统 MVP。当前本机运行路线已调整为 **PostgreSQL 本机服务 + FastAPI 本机进程 + Next.js 本机进程**，不再依赖 Docker Desktop。
+个人求职管理系统 MVP。当前提供两条运行路线：
+
+- 本机开发：PostgreSQL 本机服务 + FastAPI 本机进程 + Next.js 本机进程。
+- 容器联调：保留 Dockerfile 与 `docker-compose.yml`，用于 Docker daemon 可用的 Linux / Docker Desktop 环境。
 
 ## 技术栈
 
@@ -20,8 +23,8 @@ job-tracker-ai/
 ├─ frontend/                # Next.js 前端
 ├─ scripts/                 # 本机运行脚本
 ├─ .env.example             # 本机运行环境变量模板
-├─ .env.docker.example      # 历史 Docker Compose 环境变量模板
-└─ docker-compose.yml       # 保留但不再作为当前本机主运行入口
+├─ .env.docker.example      # Docker Compose 环境变量模板
+└─ docker-compose.yml       # Docker Compose 联调入口
 ```
 
 ## 本机运行
@@ -144,6 +147,15 @@ npm run test
 npm run build
 ```
 
-## Docker 状态
+## Docker Compose
 
-当前机器 Docker Desktop / WSL 环境不可用，Docker Compose 不再作为本机主运行入口。仓库仍保留 Dockerfile、`docker-compose.yml` 和 `.env.docker.example`，用于未来在可用 Docker 环境中恢复容器化验收。
+当前仓库保留 Docker Compose 联调入口：
+
+```powershell
+Copy-Item .env.docker.example .env.docker -Force
+docker compose --env-file .env.docker up -d --build
+```
+
+如果当前目录存在本机开发用 `.env`，Compose 仍会自动读取其中的通用端口变量。容器内部连接已使用 `DOCKER_DATABASE_URL` 和 `DOCKER_BACKEND_INTERNAL_URL` 隔离，避免本机 `localhost` 数据库地址污染容器网络。
+
+当前这台机器的 Docker Desktop / WSL daemon 仍不可用，`docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`。因此本机可完成本机路线验收，但 Docker Compose 启动项需要在 Docker daemon 正常的环境中复验。

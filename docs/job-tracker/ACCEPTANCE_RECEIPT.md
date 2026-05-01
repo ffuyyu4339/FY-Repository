@@ -10,8 +10,8 @@
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
 - 验收范围：MVP
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：进行中
-- 最终结论：待验收
+- 当前状态：已自主验收，存在阻塞项
+- 最终结论：本机功能验收通过；严格按 PRD 的 Docker Compose 全量验收未通过
 
 ---
 
@@ -43,7 +43,7 @@
 | B-02 | FastAPI 后端初始化完成 | PASS | 已创建 `backend/app` 基础骨架 |
 | B-03 | Dockerfile 已完成 | PASS | 前后端 Dockerfile 均已创建 |
 | B-04 | docker-compose.yml 已完成 | PASS | 已创建根级服务编排文件 |
-| B-05 | Docker Compose 可启动基础服务 | BLOCKED | 用户已明确要求当前机器放弃 Docker 路线；Docker CLI / Compose 插件存在，Compose 配置可解析，但 Docker Desktop 服务未注册 |
+| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Docker CLI / Compose 插件存在，Compose 配置可解析且容器内部地址已修正为 `db:5432` / `backend:8000`，但 Docker Desktop Linux Engine 不可连接 |
 | B-06 | Linux 运行说明完整 | PASS | README 已补充 Linux 部署与运行说明 |
 
 ---
@@ -130,14 +130,15 @@
 | I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
 | I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，覆盖 API 与分析逻辑 |
 | I-04 | 前端 build 通过 | PASS | `npm run build` 已通过，类型错误与本机构建链路已修复 |
-| I-05 | Docker Compose 联调通过 | BLOCKED | 用户已要求当前机器不再使用 Docker；Docker Compose 联调不作为当前本机路线继续推进 |
+| I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 已通过，实际 `docker compose up -d --build` 因 Docker daemon 不可连接失败，尚未完成容器内联调 |
 | I-06 | README 完整 | PASS | 已改为本机 PostgreSQL + FastAPI + Next.js 运行说明，并保留 Docker 状态说明 |
 | I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、状态更新、删除、Dashboard summary 与页面入口 |
 
 ---
 
 ## 验收证据
-- Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞；当前也未发现可替代的本机 PostgreSQL
+- Docker 配置证据：`docker compose config` 已确认后端容器 `DATABASE_URL` 指向 `db:5432`，前端容器 `BACKEND_INTERNAL_URL` 指向 `backend:8000`，本机 `.env` 不再污染容器内部地址
+- Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞
 - 非 Docker 重构证据：已新增 `scripts/check-local-env.ps1`、`scripts/init-local-postgres.ps1`、`scripts/start-backend.ps1`、`scripts/start-frontend.ps1`、`scripts/start-local.ps1`
 - 非 Docker 配置证据：`.env.example` 已指向 `localhost:5432`，`.env.docker.example` 保留 Docker Compose 配置
 - PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
@@ -146,7 +147,7 @@
 - 新增页访问验证：`GET http://localhost:3000/jobs/new` 返回 HTTP 200
 - 流程入口访问验证：`GET http://localhost:3000/` 返回 HTTP 200，页面包含“今天的求职工作从这里开始”
 - 列表查询入口验证：`GET http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score` 返回 HTTP 200
-- 关键功能链路验证：临时调用 `POST /api/analyze-jd` 得到 `ai_app_dev` 与 `priority_apply`，随后 `POST /api/jobs` 创建临时岗位、`PUT /api/jobs/{id}` 更新为 `applied`、`DELETE /api/jobs/{id}` 删除成功
+- 关键功能链路验证：临时调用 `POST /api/analyze-jd` 得到 `ai_app_dev`、`priority_apply`、92 分，随后 `POST /api/jobs` 创建临时岗位、`PUT /api/jobs/{id}` 更新为 `applied`、`DELETE /api/jobs/{id}` 删除成功
 - 流程补齐证据：首页已按“收集岗位 / 解析修正 / 投递跟进 / 复盘决策”组织；Dashboard 统计卡和流程状态可跳转到列表筛选；列表支持 URL query 初始化筛选并展示下一步提示；JD 解析后可自动从 `pending_analysis` 推进到 `ready_to_apply`
 - 前端视觉复查：Codex 内置浏览器已刷新 `http://localhost:3000/jobs`，确认新导航、新标题区、状态条、紧凑筛选区和列表行生效
 - 新增页布局重构证据：`frontend/src/components/job-editor.tsx` 已改为左右分栏工作流，JD 原文输入区 `min-h-[500px]`，右侧表单合并基础信息、分析结果与投递流程，并提供底部 sticky 保存操作栏
@@ -174,7 +175,8 @@
 ---
 
 ## 最终验收结论
-- 是否达到 MVP 发布条件：否
+- 是否达到 MVP 发布条件：否，严格按 PRD 仍缺 Docker Compose 实际启动与联调
+- 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 00:34
-- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；已按用户要求重构为非 Docker 本机运行路线，并完成 PostgreSQL、后端和前端基础联通验证；`/jobs`、`/jobs/new`、`/dashboard` 与首页已补齐 MVP 内求职操作链路；关键功能已通过本机 API 临时数据链路与页面 HTTP 访问验证。Docker Compose 联调仍受本机 Docker Desktop / WSL 环境阻塞，因此原 PRD 容器化验收项仍未关闭。
+- 验收时间：2026-05-02 00:44
+- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证；`/jobs`、`/jobs/new`、`/dashboard` 与首页已补齐 MVP 内求职操作链路；Compose 文件已完成本机 `.env` 与容器内部地址隔离，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞，因此原 PRD 容器化验收项仍未关闭，不能判定为全量 MVP 验收通过。

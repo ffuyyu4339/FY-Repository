@@ -135,13 +135,13 @@
 - [x] ~~完善 README 本地开发说明~~
 - [x] ~~完善 README Docker 启动说明~~
 - [x] ~~完善 README Linux 部署说明~~
-- [ ] 更新操作日志最终记录
-- [ ] 更新验收回执单最终状态
-- [ ] 输出最终交付总结
+- [x] ~~更新操作日志最终记录~~
+- [x] ~~更新验收回执单最终状态~~
+- [x] ~~输出最终交付总结~~
 
 ---
 
 ## 当前状态
-- 当前阶段：非 Docker 本机运行路线已打通，PostgreSQL / FastAPI / Next.js 均已启动验证；入口页、岗位列表、Dashboard 与新增/详情页已按“收集 JD -> 解析修正 -> 投递跟进 -> 统计复盘”补齐操作链路；关键 API 流程已完成临时数据创建、更新与删除验证
-- 当前阻塞：Docker Compose 联调仍不可用；如需正式满足原 PRD Docker Compose 验收项，仍需先修复本机 Docker Desktop / WSL 环境
-- 最新更新时间：2026-05-02 00:34
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 运行路线已打通并完成复验；入口页、岗位列表、Dashboard 与新增/详情页已串成“收集 JD -> 解析修正 -> 投递跟进 -> 统计复盘”的 MVP 流程；关键 API 流程已完成临时数据创建、更新与删除验证
+- 当前阻塞：Docker Compose 配置已修正为容器内部 `db:5432` / `backend:8000` 地址，但实际 `docker compose up -d --build` 仍因本机 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞
+- 最新更新时间：2026-05-02 00:44

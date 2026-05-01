@@ -583,6 +583,54 @@
 
 ---
 
+### LOG-015
+- 时间：2026-05-02 00:44
+- 任务：TASK-J/K / 文件整合、流程复查与自主验收
+- 目标：整合本机运行与 Docker Compose 文件边界，复查质量命令、关键业务流程和最终验收状态
+- 修改文件：
+  - `docker-compose.yml`
+  - `.env.docker.example`
+  - `README.md`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\scripts\\check-local-env.ps1`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score`
+  - 临时调用 `POST /api/analyze-jd`、`POST /api/jobs`、`PUT /api/jobs/{id}`、`DELETE /api/jobs/{id}`
+- 执行结果：
+  - 已将 Compose 容器内部数据库地址改为 `DOCKER_DATABASE_URL`，默认指向 `db:5432`
+  - 已将 Next.js 容器内部后端代理地址改为 `DOCKER_BACKEND_INTERNAL_URL`，默认指向 `backend:8000`
+  - `docker compose config` 已确认本机 `.env` 不再污染容器内部 `DATABASE_URL` / `BACKEND_INTERNAL_URL`
+  - 后端 `ruff`、`black --check`、`pytest` 通过；pytest 仍存在既有 `datetime.utcnow()` 弃用警告
+  - 前端 `lint`、`test`、`build` 通过
+  - 本机环境检查通过，Node.js、npm、Python、psql、PostgreSQL 服务、3000 / 8000 / 5432 端口均满足当前本机路线
+  - `/api/health` 返回 ok，Dashboard summary 可访问
+  - 首页、岗位列表、新增岗位页、带 query 的岗位列表入口均返回 HTTP 200
+  - 临时 JD 解析得到 `ai_app_dev`、`priority_apply`、92 分；临时岗位创建、状态更新为 `applied`、删除均成功
+  - `docker compose up -d --build` 仍失败，错误为无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+- 风险/备注：
+  - 严格按 PRD，Docker Compose 启动仍是阻塞项，不能宣称最终 MVP 全量验收通过
+  - 本机非 Docker 路线已达到可运行、可验证、可回滚状态
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -619,6 +667,7 @@
 | 013 | 2026-05-02 00:25 | b97a17d | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
 | 014 | 2026-05-02 00:34 | 37591be | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
 | 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
+| 016 | 2026-05-02 00:44 | PENDING_COMMIT | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
 
 ---
 
@@ -626,7 +675,7 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
+| ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | Compose 配置已恢复容器内部 `db:5432` / `backend:8000`，但 `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
 | ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | closed | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，后端数据库联通已验证 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
@@ -634,8 +683,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证，`/jobs`、`/jobs/new`、`/dashboard` 与首页已补齐 MVP 内求职操作链路
-- 已完成任务数：60
-- 未完成任务数：7
-- 当前风险：Docker Compose 联调仍不可用，阻塞原 PRD 的容器化验收项
-- 下一步：如需正式关闭 Docker 验收项，需要先修复本机 Docker Desktop / WSL，再执行 `docker compose up -d --build` 联调
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过质量检查、页面访问和关键 API 闭环验证；Compose 配置已完成本机 `.env` 与容器内部地址隔离
+- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与最终治理记录均已完成
+- 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
+- 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项
+- 下一步：修复本机 Docker Desktop / WSL 后，执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard 联调复验
