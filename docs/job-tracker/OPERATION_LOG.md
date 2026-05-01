@@ -532,7 +532,7 @@
   - 当前工作区存在非本轮产生的 `dashboard-client.tsx`、`jobs-list-client.tsx`、`types.ts`、`project.test.ts` 改动，未纳入本次提交范围
   - Docker Compose 联调仍受本机 Docker 环境阻塞，未在本轮复验
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b97a17d`
 
 ---
 
@@ -569,7 +569,7 @@
 | 010 | 2026-05-01 23:06 | 8423bab | refactor(project): support local postgres workflow | C-06, J-07, K-01 ~ K-04 | 按用户要求支持非 Docker 本机 PostgreSQL 运行路线 |
 | 011 | 2026-05-01 23:32 | b7eb6ac | chore(dev): verify local postgres runtime | C-06, J-09 | 安装并验证本机 PostgreSQL、后端和前端联通 |
 | 012 | 2026-05-01 23:53 | 2aa90b5 | style(frontend): polish jobs page layout | E-01, E-05 | 按浏览器备注优化 `/jobs` 列表页、全局导航和状态信息展示 |
-| 013 | 2026-05-02 00:25 | PENDING_COMMIT | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
+| 013 | 2026-05-02 00:25 | b97a17d | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
 
 ---
 
