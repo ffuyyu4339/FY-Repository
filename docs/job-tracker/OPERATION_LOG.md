@@ -347,6 +347,42 @@
 
 ---
 
+### LOG-009
+- 时间：2026-05-01 22:51
+- 任务：TASK-J / Docker 环境复查与非 Docker 路线评估
+- 目标：确认当前 Docker 环境是否可运行，并评估放弃 Docker 后的本地运行前提
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker --version`
+  - `docker compose version`
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+  - `Get-Service *docker*`
+  - `wsl -l -v`
+  - `Get-Command psql/postgres/pg_ctl`
+  - `Get-Service *postgres*`
+  - `Get-NetTCPConnection -LocalPort 3000,8000,5432`
+- 执行结果：
+  - Docker CLI 与 Compose 插件存在
+  - `docker compose config` 可正常解析项目编排文件
+  - `docker info` 与 `docker compose up -d --build` 均失败，无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+  - 未发现 Docker Desktop 系统服务
+  - WSL 当前无可用 Linux 发行版
+  - 未发现本机 PostgreSQL 命令、PostgreSQL 服务或 5432 端口监听
+  - 当前 3000 / 8000 / 5432 均无项目服务监听
+- 风险/备注：
+  - Docker 路线当前不可运行，问题在宿主机 Docker Desktop / WSL 安装状态，不在项目 Compose 文件
+  - 若放弃 Docker，必须先安装并初始化本地 PostgreSQL，再调整后端本地 `.env` 使用 `localhost:5432`
+  - 按 PRD，Docker Compose 仍是正式验收要求；非 Docker 只能作为本机临时开发路线
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -381,15 +417,16 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | Docker Desktop 安装文件已落盘，但管理员授权未完成，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；需以管理员权限完成 Docker Desktop 安装 |
+| ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
+| ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | open | 需安装 PostgreSQL 并创建 `jobtracker` 数据库/用户后，后端本地 `.env` 才能指向 `localhost:5432` |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：本地代码质量检查通过，Docker daemon / PostgreSQL 运行环境待恢复
+- 当前阶段：本地代码质量检查通过，Docker 不可用；非 Docker 运行环境未就绪
 - 已完成任务数：59
 - 未完成任务数：8
-- 当前风险：Docker Compose 联调仍受 Docker Desktop 系统服务未注册影响
-- 下一步：以管理员权限完成 Docker Desktop 安装并启动 Linux Engine 后，重新执行 `docker compose down && docker compose up -d --build`，继续完成数据库联通与浏览器手工验收
+- 当前风险：Docker Compose 联调仍受 Docker Desktop 系统服务未注册影响；非 Docker 路线缺少 PostgreSQL
+- 下一步：若继续 Docker，需修复 Docker Desktop / WSL；若放弃 Docker，需安装本地 PostgreSQL 并补充本地运行配置

@@ -43,7 +43,7 @@
 | B-02 | FastAPI 后端初始化完成 | PASS | 已创建 `backend/app` 基础骨架 |
 | B-03 | Dockerfile 已完成 | PASS | 前后端 Dockerfile 均已创建 |
 | B-04 | docker-compose.yml 已完成 | PASS | 已创建根级服务编排文件 |
-| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Docker Desktop 安装文件已落盘，但管理员授权未完成，Docker 服务未注册，`docker compose up -d --build` 仍无法连接 Docker daemon / Docker Desktop Linux Engine |
+| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Docker CLI / Compose 插件存在，Compose 配置可解析，但 Docker Desktop 服务未注册，`docker compose up -d --build` 仍无法连接 Docker daemon / Docker Desktop Linux Engine |
 | B-06 | Linux 运行说明完整 | PASS | README 已补充 Linux 部署与运行说明 |
 
 ---
@@ -54,7 +54,7 @@
 |---|---|---|---|
 | C-01 | PostgreSQL schema 已实现 | PASS | `jobs` 表结构已在 SQL 与模型中定义 |
 | C-02 | 数据库初始化脚本已完成 | PASS | `db/init.sql` 已创建 |
-| C-03 | FastAPI 数据库连接正常 | BLOCKED | 需依赖 PostgreSQL / Docker 环境做真实联通验证 |
+| C-03 | FastAPI 数据库连接正常 | BLOCKED | 当前 Docker 不可用，且本机未安装 PostgreSQL，需先恢复数据库运行环境 |
 | C-04 | jobs 数据访问层可用 | PASS | 已创建基础仓储与 schema 骨架 |
 
 ---
@@ -130,13 +130,13 @@
 | I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
 | I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，覆盖 API 与分析逻辑 |
 | I-04 | 前端 build 通过 | PASS | `npm run build` 已通过，类型错误与本机构建链路已修复 |
-| I-05 | Docker Compose 联调通过 | BLOCKED | 已尝试安装 Docker Desktop，但系统服务未注册；`docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine` |
+| I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 可解析，但 `docker info` 与 `docker compose up -d --build` 均无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine` |
 | I-06 | README 完整 | PASS | 已覆盖安装、本地开发、Docker、Linux 部署 |
 
 ---
 
 ## 验收证据
-- Docker 启停命令：`docker compose down`、`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞；Docker Desktop 安装需管理员授权完成
+- Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞；当前也未发现可替代的本机 PostgreSQL
 - 前端 lint 输出：`npm run lint` 通过
 - 后端 lint 输出：`ruff check .`、`black --check .` 通过
 - pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过
@@ -153,7 +153,8 @@
 
 | 编号 | 问题 | 严重程度 | 是否阻塞验收 | 状态 |
 |---|---|---|---|---|
-| BUG-001 | Docker Desktop 安装文件已落盘，但管理员授权未完成，Docker 服务未注册，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | open |
+| BUG-001 | Docker Desktop 服务未注册，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | open |
+| BUG-004 | 本机未安装 PostgreSQL，放弃 Docker 后也不能立即运行数据层 | high | 是 | open |
 | BUG-002 | 前端 build 类型错误已修复，问题已关闭 | low | 否 | closed |
 | BUG-003 | Codespaces 下前端错误请求 `localhost:8000` 且 FastAPI 未显式允许 Codespaces 来源跨域的问题已修复 | low | 否 | closed |
 
@@ -162,5 +163,5 @@
 ## 最终验收结论
 - 是否达到 MVP 发布条件：否
 - 验收人：Codex / 你本人
-- 验收时间：2026-04-30 19:06
-- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；已尝试补齐 Docker Desktop，但管理员授权未完成导致 Docker 服务未注册，尚需完成 Docker Compose 联调、数据库联通与手工验收。
+- 验收时间：2026-05-01 22:51
+- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；Docker 当前不可用，非 Docker 路线也缺少本机 PostgreSQL，尚需恢复数据库运行环境后完成联调与手工验收。
