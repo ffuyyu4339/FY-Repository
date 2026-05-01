@@ -818,7 +818,7 @@
   - Docker Compose 实际启动与容器内联调仍未验收，原因是用户已要求暂时搁置 Docker 问题
   - 本次验收后，非 Docker MVP+ 可试用状态成立
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `02c9ed8`
 
 ---
 
@@ -862,7 +862,7 @@
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 | 019 | 2026-05-02 02:55 | be704d7 | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
-| 020 | 2026-05-02 03:05 | PENDING_COMMIT | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
+| 020 | 2026-05-02 03:05 | 02c9ed8 | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
 
 ---
 
