@@ -116,6 +116,7 @@
 | G-02 | 简历版本字段可用 | PASS | 详情页已支持维护简历版本字段 |
 | G-03 | 备注字段可用 | PASS | 详情页已支持备注字段维护 |
 | G-04 | 投递事件时间线可用 | PASS | 详情页已支持新增和查看打开来源、复制 JD、已投递、笔试、面试、Offer、拒绝等事件 |
+| G-05 | 默认简历版本预填可用 | PASS | 新增岗位页已读取偏好配置中的 `default_resume_version` 并自动填入简历版本字段 |
 
 ---
 
@@ -172,7 +173,7 @@
 - 前端 lint 输出：`npm run lint` 通过
 - 后端 lint 输出：`ruff check .`、`black --check .` 通过
 - pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过，14 项测试通过
-- 前端页面交互测试：`npm run test` 通过，11 项测试通过，包含 JobEditor 点击“解析 JD”自动回填、来源页、设置页验证
+- 前端页面交互测试：`npm run test` 通过，12 项测试通过，包含 JobEditor 点击“解析 JD”自动回填、默认简历版本预填、来源页、设置页验证
 - 前端 Codespaces 地址测试：已验证 `http://localhost:8000` 在 Codespaces 浏览器环境下会自动解析为当前工作区的 8000 转发地址
 - 前端 build 输出：`npm run build` 通过
 - 前端 build 路由证据：Next build 生成 `/sources`、`/settings`、`/guide`

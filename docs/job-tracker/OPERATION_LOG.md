@@ -700,6 +700,46 @@
 
 ---
 
+### LOG-018
+- 时间：2026-05-02 02:45
+- 任务：TASK-L / 默认简历版本接入与 Docker 阻塞复查
+- 目标：补齐偏好设置中的默认简历版本在新增岗位页的实际使用，并再次确认 Docker Compose 阻塞原因
+- 修改文件：
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/job-editor.test.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker context ls`
+  - `Get-Service *docker*`
+  - `Start-Process "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe" -WindowStyle Hidden`
+  - `docker info`
+  - `wsl -l -v`
+  - `winget list --id Docker.DockerDesktop`
+  - `Get-Content "$env:LOCALAPPDATA\\Docker\\log\\host\\Docker Desktop.exe.log" -Tail 120`
+  - `npm run test`
+  - `npm run lint`
+  - `npm run build`
+- 执行结果：
+  - 已在新增岗位页读取 `GET /api/preferences`，当存在 `default_resume_version` 时自动填入简历版本字段
+  - 已补充前端测试覆盖默认简历版本预填，并修复测试文件缺少 cleanup 导致多渲染残留的问题
+  - 前端 `npm run test` 通过，12 项测试通过
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run build` 通过
+  - Docker Desktop 启动后 `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+  - Docker Desktop 日志显示缺少注册表键 `SOFTWARE\\Docker Inc.\\Docker Desktop`
+  - Docker 安装日志显示安装器曾尝试 UAC 提权，当前会话无法完成系统级安装注册
+  - `wsl -l -v` 显示无可用 Linux 发行版
+  - `winget list --id Docker.DockerDesktop` 未识别 Docker Desktop 为已安装程序包
+- 风险/备注：
+  - Docker Compose 联调仍阻塞在宿主机 Docker Desktop / WSL 系统级安装状态，需要用户完成管理员授权或手动安装 Docker Desktop 与 WSL 发行版
+  - 本轮仅补齐前端偏好接入，不改变后端 API 或数据库结构
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -738,6 +778,7 @@
 | 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
 | 016 | 2026-05-02 00:44 | PENDING_COMMIT | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
+| 018 | 2026-05-02 02:45 | PENDING_COMMIT | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 
 ---
 

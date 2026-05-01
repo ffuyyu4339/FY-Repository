@@ -9,6 +9,7 @@ import {
   createJobEvent,
   createJob,
   deleteJob,
+  fetchPreferences,
   fetchJobEvents,
   fetchJob,
   updateJob,
@@ -250,15 +251,35 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
     const params = new URLSearchParams(window.location.search);
     const platform = params.get("platform");
     const jobLink = params.get("job_link");
-    if (!platform && !jobLink) {
-      return;
-    }
 
     setFormState((current) => ({
       ...current,
       platform: platform || current.platform,
       job_link: jobLink || current.job_link,
     }));
+
+    let cancelled = false;
+
+    async function loadDefaultPreferences() {
+      try {
+        const preferences = await fetchPreferences();
+        if (!cancelled && preferences.default_resume_version) {
+          setFormState((current) => ({
+            ...current,
+            resume_version:
+              current.resume_version || preferences.default_resume_version || "",
+          }));
+        }
+      } catch {
+        // 偏好加载失败不阻塞岗位录入。
+      }
+    }
+
+    loadDefaultPreferences();
+
+    return () => {
+      cancelled = true;
+    };
   }, [mode]);
 
   useEffect(() => {

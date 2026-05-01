@@ -1,8 +1,14 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { JobEditor } from "./job-editor";
 
@@ -13,6 +19,7 @@ const {
   deleteJobMock,
   fetchJobEventsMock,
   fetchJobMock,
+  fetchPreferencesMock,
   updateJobMock,
   pushMock,
 } = vi.hoisted(() => ({
@@ -22,6 +29,7 @@ const {
   deleteJobMock: vi.fn(),
   fetchJobEventsMock: vi.fn(),
   fetchJobMock: vi.fn(),
+  fetchPreferencesMock: vi.fn(),
   updateJobMock: vi.fn(),
   pushMock: vi.fn(),
 }));
@@ -39,10 +47,15 @@ vi.mock("@/lib/api", () => ({
   deleteJob: deleteJobMock,
   fetchJobEvents: fetchJobEventsMock,
   fetchJob: fetchJobMock,
+  fetchPreferences: fetchPreferencesMock,
   updateJob: updateJobMock,
 }));
 
 describe("JobEditor", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   beforeEach(() => {
     analyzeJDMock.mockReset();
     createJobEventMock.mockReset();
@@ -50,8 +63,12 @@ describe("JobEditor", () => {
     deleteJobMock.mockReset();
     fetchJobEventsMock.mockReset();
     fetchJobMock.mockReset();
+    fetchPreferencesMock.mockReset();
     updateJobMock.mockReset();
     pushMock.mockReset();
+    fetchPreferencesMock.mockResolvedValue({
+      default_resume_version: "v-default",
+    });
   });
 
   it("fills form fields after clicking analyze JD", async () => {
@@ -105,5 +122,15 @@ describe("JobEditor", () => {
         "JD 解析完成（规则引擎），结果已写入表单，你可以继续人工修正。",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("prefills default resume version from preferences", async () => {
+    render(<JobEditor mode="create" />);
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("简历版本")).toHaveValue("v-default");
+    });
+
+    expect(fetchPreferencesMock).toHaveBeenCalledTimes(1);
   });
 });
