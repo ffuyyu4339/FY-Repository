@@ -54,7 +54,7 @@
 |---|---|---|---|
 | C-01 | PostgreSQL schema 已实现 | PASS | `jobs` 表结构已在 SQL 与模型中定义 |
 | C-02 | 数据库初始化脚本已完成 | PASS | `db/init.sql` 已创建 |
-| C-03 | FastAPI 数据库连接正常 | BLOCKED | 已补充非 Docker 初始化脚本，但当前本机未安装 PostgreSQL / `psql`，需先安装数据库 |
+| C-03 | FastAPI 数据库连接正常 | PASS | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，`/api/jobs` 已通过真实数据库返回空列表 |
 | C-04 | jobs 数据访问层可用 | PASS | 已创建基础仓储与 schema 骨架 |
 
 ---
@@ -139,6 +139,9 @@
 - Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞；当前也未发现可替代的本机 PostgreSQL
 - 非 Docker 重构证据：已新增 `scripts/check-local-env.ps1`、`scripts/init-local-postgres.ps1`、`scripts/start-backend.ps1`、`scripts/start-frontend.ps1`、`scripts/start-local.ps1`
 - 非 Docker 配置证据：`.env.example` 已指向 `localhost:5432`，`.env.docker.example` 保留 Docker Compose 配置
+- PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
+- 后端真实联通：`GET /api/health` 返回 `{"status":"ok"}`，`GET /api/jobs` 返回 `[]`
+- 前端真实访问：`GET http://localhost:3000/jobs` 返回 HTTP 200
 - 前端 lint 输出：`npm run lint` 通过
 - 后端 lint 输出：`ruff check .`、`black --check .` 通过
 - pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过
@@ -156,7 +159,7 @@
 | 编号 | 问题 | 严重程度 | 是否阻塞验收 | 状态 |
 |---|---|---|---|---|
 | BUG-001 | Docker Desktop 服务未注册，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | open |
-| BUG-004 | 本机未安装 PostgreSQL，放弃 Docker 后也不能立即运行数据层 | high | 是 | open |
+| BUG-004 | 本机未安装 PostgreSQL，放弃 Docker 后也不能立即运行数据层 | high | 是 | closed |
 | BUG-002 | 前端 build 类型错误已修复，问题已关闭 | low | 否 | closed |
 | BUG-003 | Codespaces 下前端错误请求 `localhost:8000` 且 FastAPI 未显式允许 Codespaces 来源跨域的问题已修复 | low | 否 | closed |
 
@@ -165,5 +168,5 @@
 ## 最终验收结论
 - 是否达到 MVP 发布条件：否
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-01 23:06
-- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；已按用户要求重构为非 Docker 本机运行路线，尚需安装本机 PostgreSQL 后完成数据库实连与手工验收。
+- 验收时间：2026-05-01 23:32
+- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；已按用户要求重构为非 Docker 本机运行路线，并完成 PostgreSQL、后端和前端基础联通验证；完整功能手工验收仍待执行。

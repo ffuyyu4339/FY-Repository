@@ -16,11 +16,38 @@ function Test-Tool {
     return $false
 }
 
+function Find-PostgresTool {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    $command = Get-Command $Name -ErrorAction SilentlyContinue
+    if ($command) {
+        return $command.Source
+    }
+
+    $matches = Get-ChildItem "C:\Program Files\PostgreSQL" -Recurse -Filter "$Name.exe" -ErrorAction SilentlyContinue |
+        Sort-Object @{ Expression = { $_.FullName -like "*\pgAdmin 4\*" } }, FullName
+    if ($matches) {
+        return $matches[0].FullName
+    }
+
+    return $null
+}
+
 $ok = $true
 $ok = (Test-Tool "node") -and $ok
 $ok = (Test-Tool "npm") -and $ok
 $ok = (Test-Tool "python") -and $ok
-$ok = (Test-Tool "psql") -and $ok
+
+$psql = Find-PostgresTool "psql"
+if ($psql) {
+    Write-Host "[OK] psql -> $psql"
+} else {
+    Write-Host "[MISS] psql"
+    $ok = $false
+}
 
 $postgresServices = Get-Service | Where-Object {
     $_.Name -like "*postgres*" -or $_.DisplayName -like "*postgres*"

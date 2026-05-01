@@ -14,7 +14,7 @@ try {
 
     $env:NEXT_PUBLIC_API_BASE_URL = $ApiBaseUrl
     $env:PORT = "$Port"
-    npm run dev
+    npm run dev -- --webpack --port $Port
 } finally {
     Pop-Location
 }

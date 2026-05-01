@@ -5,7 +5,7 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
 
-Start-Process powershell -ArgumentList @(
+Start-Process powershell -WindowStyle Hidden -ArgumentList @(
     "-NoExit",
     "-ExecutionPolicy",
     "Bypass",
@@ -15,7 +15,7 @@ Start-Process powershell -ArgumentList @(
     $DatabaseUrl
 )
 
-Start-Process powershell -ArgumentList @(
+Start-Process powershell -WindowStyle Hidden -ArgumentList @(
     "-NoExit",
     "-ExecutionPolicy",
     "Bypass",

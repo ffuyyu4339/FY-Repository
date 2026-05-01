@@ -427,6 +427,45 @@
 
 ---
 
+### LOG-011
+- 时间：2026-05-01 23:32
+- 任务：TASK-C/J / 本机 PostgreSQL 安装与非 Docker 联通验证
+- 目标：安装 PostgreSQL，初始化项目数据库，并验证本机前后端可访问
+- 修改文件：
+  - `README.md`
+  - `scripts/check-local-env.ps1`
+  - `scripts/init-local-postgres.ps1`
+  - `scripts/start-frontend.ps1`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `winget install --id PostgreSQL.PostgreSQL.16 --source winget --accept-package-agreements --accept-source-agreements`
+  - `.\\scripts\\check-local-env.ps1`
+  - `.\\scripts\\init-local-postgres.ps1`
+  - `.\\scripts\\start-local.ps1`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+- 执行结果：
+  - PostgreSQL 16.13-3 已安装
+  - PostgreSQL Windows 服务 `postgresql-x64-16` 已启动并设置为自动启动
+  - 5432 端口已监听
+  - 已创建 / 更新 `jobtracker` 数据库用户
+  - 已创建 `jobtracker` 数据库并执行 `db/init.sql`
+  - 已验证 `jobs` 表存在
+  - 后端 8000 已启动，`/api/health` 返回 `{"status":"ok"}`，`/api/jobs` 返回空列表
+  - 前端 3000 已启动，`/jobs` 返回 HTTP 200
+  - 已将前端启动脚本改为 `next dev --webpack`，规避当前 Windows 环境下 Turbopack dev 首次页面请求长时间挂起
+- 风险/备注：
+  - PostgreSQL 管理员连接已验证；项目应用库使用 `jobtracker` / `jobtracker`
+  - 完整 CRUD / JD Analyzer / Dashboard 仍需浏览器手工验收
+  - Docker Compose 联调仍不作为当前本机路线继续推进
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -462,15 +501,15 @@
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
 | ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
-| ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | open | 已补充本机初始化脚本；需安装 PostgreSQL 并运行 `scripts/init-local-postgres.ps1` |
+| ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | closed | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，后端数据库联通已验证 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：非 Docker 本机运行路线已完成代码与文档重构
+- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证
 - 已完成任务数：59
 - 未完成任务数：8
-- 当前风险：非 Docker 路线缺少本机 PostgreSQL，无法完成数据库实连与手工验收
-- 下一步：安装本地 PostgreSQL，执行 `scripts/init-local-postgres.ps1`，再运行 `scripts/start-local.ps1` 做浏览器验收
+- 当前风险：完整 CRUD / JD Analyzer / Dashboard 浏览器手工验收待执行；Docker Compose 联调仍不可用
+- 下一步：在 `http://localhost:3000` 执行新增、解析、编辑、删除和 Dashboard 浏览器验收

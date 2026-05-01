@@ -41,6 +41,8 @@ createdb --version
 C:\Program Files\PostgreSQL\16\bin
 ```
 
+项目脚本也会自动查找 `C:\Program Files\PostgreSQL\*\bin` 下的 PostgreSQL 命令。
+
 ### 2. 创建环境变量
 
 ```powershell
@@ -65,6 +67,12 @@ DATABASE_URL=postgresql+psycopg://jobtracker:jobtracker@localhost:5432/jobtracke
 
 ```powershell
 .\scripts\init-local-postgres.ps1 -AdminUser your_admin_user
+```
+
+如果管理员用户需要密码，可临时传入：
+
+```powershell
+.\scripts\init-local-postgres.ps1 -AdminPassword your_admin_password
 ```
 
 该脚本会：
