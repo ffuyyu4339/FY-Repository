@@ -75,7 +75,7 @@
 | 编号 | 验收项 | 状态 | 验收说明 |
 |---|---|---|---|
 | E-01 | `/jobs` 页面可用 | PASS | 已接入岗位列表请求，支持筛选、排序与详情跳转；已按浏览器备注优化导航、头部、筛选区、状态信息与空状态视觉 |
-| E-02 | `/jobs/new` 页面可用 | PASS | 已接入新增岗位表单与 JD 解析入口；当 Codespaces 浏览器仍注入 `http://localhost:8000` 时，前端会自动改写为当前工作区的 8000 转发地址 |
+| E-02 | `/jobs/new` 页面可用 | PASS | 已接入新增岗位表单与 JD 解析入口；已重构为左侧 JD 原文与解析、右侧结构化表单的 split-pane 工作流布局；当 Codespaces 浏览器仍注入 `http://localhost:8000` 时，前端会自动改写为当前工作区的 8000 转发地址 |
 | E-03 | `/jobs/[id]` 页面可用 | PASS | 已接入详情编辑、状态维护与删除操作 |
 | E-04 | `/dashboard` 页面可用 | PASS | 已接入统计汇总、高分岗位与技能词展示 |
 | E-05 | 页面基础导航可用 | PASS | 已提供首页入口、全局导航与页面布局 |
@@ -142,7 +142,9 @@
 - PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
 - 后端真实联通：`GET /api/health` 返回 `{"status":"ok"}`，`GET /api/jobs` 返回 `[]`
 - 前端真实访问：`GET http://localhost:3000/jobs` 返回 HTTP 200
+- 新增页访问验证：`GET http://localhost:3000/jobs/new` 返回 HTTP 200
 - 前端视觉复查：Codex 内置浏览器已刷新 `http://localhost:3000/jobs`，确认新导航、新标题区、状态条、紧凑筛选区和列表行生效
+- 新增页布局重构证据：`frontend/src/components/job-editor.tsx` 已改为左右分栏工作流，JD 原文输入区 `min-h-[500px]`，右侧表单合并基础信息、分析结果与投递流程，并提供底部 sticky 保存操作栏
 - 前端 lint 输出：`npm run lint` 通过
 - 后端 lint 输出：`ruff check .`、`black --check .` 通过
 - pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过
@@ -169,5 +171,5 @@
 ## 最终验收结论
 - 是否达到 MVP 发布条件：否
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-01 23:53
-- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；已按用户要求重构为非 Docker 本机运行路线，并完成 PostgreSQL、后端和前端基础联通验证；`/jobs` 列表页视觉已按浏览器备注优化并在 Codex 内置浏览器复查；完整功能手工验收仍待执行。
+- 验收时间：2026-05-02 00:25
+- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、Codespaces 8000 转发地址修复与 FastAPI CORS 配置补强；已按用户要求重构为非 Docker 本机运行路线，并完成 PostgreSQL、后端和前端基础联通验证；`/jobs` 列表页视觉已按浏览器备注优化并在 Codex 内置浏览器复查；`/jobs/new` 新增岗位页已重构为左右分栏工作流布局并通过前端 lint/test/build；完整功能手工验收仍待执行。

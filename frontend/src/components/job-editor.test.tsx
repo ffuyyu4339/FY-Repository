@@ -73,7 +73,7 @@ describe("JobEditor", () => {
       },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
+    fireEvent.click(screen.getByRole("button", { name: "一键解析 JD" }));
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("公司名称")).toHaveValue("星图智能");
@@ -87,9 +87,12 @@ describe("JobEditor", () => {
       expect(screen.getByPlaceholderText("技能关键词，逗号分隔")).toHaveValue(
         "Python, LLM, RAG",
       );
+      expect(screen.getByLabelText("投递状态")).toHaveValue("ready_to_apply");
     });
 
     expect(analyzeJDMock).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("JD 解析完成，结果已写入表单，你可以继续人工修正。")).toBeInTheDocument();
+    expect(
+      screen.getByText("JD 解析完成，结果已写入表单，你可以继续人工修正。"),
+    ).toBeInTheDocument();
   });
 });

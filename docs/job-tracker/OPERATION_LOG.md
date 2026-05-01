@@ -500,6 +500,42 @@
 
 ---
 
+### LOG-013
+- 时间：2026-05-02 00:25
+- 任务：TASK-E / `/jobs/new` 新增岗位页分栏布局重构
+- 目标：按现代 SaaS 效率工具风格重构新增岗位页，将 JD 原文区与结构化表单拆为左右分栏工作流，并统一浅色工作台视觉规范
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/job-editor.test.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/components/job-editor.tsx src/components/job-editor.test.tsx src/app/globals.css src/app/layout.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+- 执行结果：
+  - 已将 `JobEditor` 改为左侧 JD 原文与解析、右侧岗位表单的 split-pane 布局
+  - JD 输入区已设置 `min-h-[500px]`，并将解析按钮调整为右上角主操作
+  - 右侧表单已合并岗位基础信息、分析结果与投递流程，短字段使用两列网格，长字段独占一行
+  - 已增加底部 sticky 保存操作栏，编辑模式保留删除岗位操作
+  - 已统一输入框、下拉框、文本域的细边框、浅阴影、`focus:ring-2 focus:ring-orange-500/20` 风格
+  - 已将全局背景从偏暖渐变收敛为 `#f8fafc` 浅灰工作台
+  - 前端 `lint`、`test`、`build` 均通过
+  - `GET http://localhost:3000/jobs/new` 返回 HTTP 200
+- 风险/备注：
+  - 本次仅改前端布局与样式，不改变 API、数据库或 JD Analyzer 业务逻辑
+  - 当前工作区存在非本轮产生的 `dashboard-client.tsx`、`jobs-list-client.tsx`、`types.ts`、`project.test.ts` 改动，未纳入本次提交范围
+  - Docker Compose 联调仍受本机 Docker 环境阻塞，未在本轮复验
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -533,6 +569,7 @@
 | 010 | 2026-05-01 23:06 | 8423bab | refactor(project): support local postgres workflow | C-06, J-07, K-01 ~ K-04 | 按用户要求支持非 Docker 本机 PostgreSQL 运行路线 |
 | 011 | 2026-05-01 23:32 | b7eb6ac | chore(dev): verify local postgres runtime | C-06, J-09 | 安装并验证本机 PostgreSQL、后端和前端联通 |
 | 012 | 2026-05-01 23:53 | 2aa90b5 | style(frontend): polish jobs page layout | E-01, E-05 | 按浏览器备注优化 `/jobs` 列表页、全局导航和状态信息展示 |
+| 013 | 2026-05-02 00:25 | PENDING_COMMIT | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
 
 ---
 
@@ -548,8 +585,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证，`/jobs` 列表页视觉优化已完成
+- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证，`/jobs` 列表页视觉优化已完成，`/jobs/new` 新增岗位页分栏布局已完成
 - 已完成任务数：59
 - 未完成任务数：8
 - 当前风险：完整 CRUD / JD Analyzer / Dashboard 浏览器手工验收待执行；Docker Compose 联调仍不可用
-- 下一步：在 `http://localhost:3000` 执行新增、解析、编辑、删除和 Dashboard 浏览器验收
+- 下一步：继续按用户要求重构 Dashboard 与详情页/列表页剩余交互视觉，并在 `http://localhost:3000` 执行新增、解析、编辑、删除和 Dashboard 浏览器验收

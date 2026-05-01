@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --color-surface: #f7f8f4;
-  --color-panel: rgba(255, 255, 255, 0.9);
+  --color-surface: #f8fafc;
+  --color-panel: rgba(255, 255, 255, 0.92);
   --color-panel-strong: #ffffff;
   --color-ink: #111827;
   --color-muted: #64748b;
-  --color-line: rgba(100, 116, 139, 0.2);
+  --color-line: #e2e8f0;
   --color-accent: #b7410e;
-  --color-accent-soft: #fff1e7;
+  --color-accent-soft: #fff7ed;
   --color-success: #15803d;
 }
 
