@@ -1,124 +1,141 @@
 # Job Tracker + JD Analyzer
 
-个人求职管理系统 MVP 的初始化仓库，当前已按前后端分离结构完成基础重组，便于后续按任务卡继续推进。
+个人求职管理系统 MVP。当前本机运行路线已调整为 **PostgreSQL 本机服务 + FastAPI 本机进程 + Next.js 本机进程**，不再依赖 Docker Desktop。
+
+## 技术栈
+
+- 前端：Next.js + React + TypeScript + Tailwind CSS
+- 后端：FastAPI + Python 3.12
+- 数据库：PostgreSQL
+- 测试：Vitest、pytest
+- 代码规范：ESLint、Prettier、ruff、black
 
 ## 目录结构
 
 ```text
 job-tracker-ai/
-├─ AGENTS.md
-├─ README.md
-├─ docker-compose.yml
-├─ .env.example
-├─ docs/
-│  └─ job-tracker/
-│     ├─ PRD.md
-│     ├─ TASK_CARD.md
-│     ├─ OPERATION_LOG.md
-│     └─ ACCEPTANCE_RECEIPT.md
-├─ frontend/
-│  ├─ Dockerfile
-│  ├─ package.json
-│  └─ ...
-├─ backend/
-│  ├─ Dockerfile
-│  ├─ requirements.txt
-│  └─ ...
-└─ db/
-   └─ init.sql
+├─ backend/                 # FastAPI 后端
+├─ db/init.sql              # PostgreSQL schema
+├─ docs/job-tracker/        # PRD / 任务卡 / 操作日志 / 验收回执
+├─ frontend/                # Next.js 前端
+├─ scripts/                 # 本机运行脚本
+├─ .env.example             # 本机运行环境变量模板
+├─ .env.docker.example      # 历史 Docker Compose 环境变量模板
+└─ docker-compose.yml       # 保留但不再作为当前本机主运行入口
 ```
 
-## 技术栈
+## 本机运行
 
-- 前端：Next.js + React + TypeScript + Tailwind CSS
-- 后端：FastAPI + Python
-- 数据库：PostgreSQL
-- 容器化：Docker + Docker Compose
-- 测试：Vitest、pytest
-- 代码规范：ESLint、Prettier、ruff、black
+### 1. 安装 PostgreSQL
 
-## 当前初始化状态
+安装 PostgreSQL 16 或兼容版本，并确保以下命令在 PowerShell 中可用：
 
-- 已完成治理文档落地
-- 已将原有 Next.js 代码迁移至 `frontend/`
-- 已创建 FastAPI 基础骨架至 `backend/`
-- 已创建 PostgreSQL 初始化脚本 `db/init.sql`
-- 已补齐前后端 Dockerfile 与根级 `docker-compose.yml`
-- 已加入前后端基础测试与代码规范配置
-
-## 本地开发
-
-### 1. 环境变量
-
-复制环境变量模板并按需调整：
-
-```bash
-cp .env.example .env
+```powershell
+psql --version
+createdb --version
 ```
 
-### 2. 前端开发
+如果命令不可用，把 PostgreSQL 的 `bin` 目录加入 `PATH`，常见路径类似：
 
-```bash
-cd frontend
-npm install
-npm run dev
+```text
+C:\Program Files\PostgreSQL\16\bin
 ```
 
-默认地址：`http://localhost:3000`
+### 2. 创建环境变量
 
-### 3. 后端开发
+```powershell
+Copy-Item .env.example .env -Force
+```
 
-建议使用 Python 3.12 虚拟环境：
+默认本机数据库地址：
 
-```bash
+```env
+DATABASE_URL=postgresql+psycopg://jobtracker:jobtracker@localhost:5432/jobtracker
+```
+
+### 3. 初始化数据库
+
+以 PostgreSQL 管理员用户执行：
+
+```powershell
+.\scripts\init-local-postgres.ps1
+```
+
+如果你的 PostgreSQL 管理员用户名不是 `postgres`：
+
+```powershell
+.\scripts\init-local-postgres.ps1 -AdminUser your_admin_user
+```
+
+该脚本会：
+
+- 创建或更新 `jobtracker` 数据库用户
+- 创建 `jobtracker` 数据库
+- 执行 `db/init.sql`
+
+### 4. 启动后端
+
+```powershell
+.\scripts\start-backend.ps1
+```
+
+默认地址：
+
+- API 文档：`http://localhost:8000/docs`
+- 健康检查：`http://localhost:8000/api/health`
+
+### 5. 启动前端
+
+新开一个 PowerShell：
+
+```powershell
+.\scripts\start-frontend.ps1
+```
+
+默认地址：
+
+```text
+http://localhost:3000
+```
+
+### 6. 一键拉起前后端
+
+数据库已安装并初始化后，也可以执行：
+
+```powershell
+.\scripts\start-local.ps1
+```
+
+该脚本会打开两个 PowerShell 窗口，分别启动后端和前端。
+
+## 环境检查
+
+```powershell
+.\scripts\check-local-env.ps1
+```
+
+它会检查 Node.js、npm、Python、psql、PostgreSQL 服务，以及 `3000` / `8000` / `5432` 端口状态。
+
+## 质量检查
+
+后端：
+
+```powershell
 cd backend
-python -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+.\.venv\Scripts\ruff.exe check .
+.\.venv\Scripts\black.exe --check .
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
-默认地址：`http://localhost:8000/docs`
+前端：
 
-### 4. 数据库初始化
-
-本地 PostgreSQL 可执行：
-
-```bash
-psql "$DATABASE_URL" -f db/init.sql
+```powershell
+cd frontend
+npm run lint
+npm run test
+npm run build
 ```
 
-## Docker Compose 启动
+## Docker 状态
 
-推荐优先使用 Docker Compose：
-
-```bash
-docker compose --env-file .env up --build
-```
-
-服务默认端口：
-
-- 前端：`3000`
-- 后端：`8000`
-- PostgreSQL：`5432`
-
-初始化脚本会通过 `db/init.sql` 自动创建 `jobs` 表。
-
-## Linux 部署思路
-
-默认部署目标为 Linux 服务器，建议使用以下方式：
-
-1. 在服务器安装 Docker Engine 与 Docker Compose Plugin。
-2. 克隆仓库后创建 `.env`。
-3. 使用 `docker compose --env-file .env up -d --build` 启动服务。
-4. 通过 Nginx 或 Caddy 反向代理 `frontend:3000`。
-5. PostgreSQL 数据卷独立持久化，并定期备份。
-
-## 下一步
-
-后续应按 `docs/job-tracker/TASK_CARD.md` 顺序继续实现：
-
-1. 数据层联通验证
-2. Jobs CRUD API
-3. JD Analyzer 规则引擎
-4. Dashboard 页面与统计接口
+当前机器 Docker Desktop / WSL 环境不可用，Docker Compose 不再作为本机主运行入口。仓库仍保留 Dockerfile、`docker-compose.yml` 和 `.env.docker.example`，用于未来在可用 Docker 环境中恢复容器化验收。

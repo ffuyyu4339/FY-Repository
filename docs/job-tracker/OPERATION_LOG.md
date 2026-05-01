@@ -383,6 +383,50 @@
 
 ---
 
+### LOG-010
+- 时间：2026-05-01 23:06
+- 任务：TASK-J/K / 非 Docker 本机运行路线重构
+- 目标：按用户要求放弃当前机器上的 Docker 路线，改为本机 PostgreSQL + 本机 FastAPI + 本机 Next.js 的开发运行方式
+- 修改文件：
+  - `.env.example`
+  - `.env.docker.example`
+  - `README.md`
+  - `backend/app/cli.py`
+  - `scripts/check-local-env.ps1`
+  - `scripts/init-local-postgres.ps1`
+  - `scripts/start-backend.ps1`
+  - `scripts/start-frontend.ps1`
+  - `scripts/start-local.ps1`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `.\\.venv\\Scripts\\python.exe -m app.cli --help`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\scripts\\check-local-env.ps1`
+- 执行结果：
+  - 已将 `.env.example` 默认数据库地址切换为 `localhost:5432`
+  - 已新增 `.env.docker.example` 保留历史 Docker Compose 环境模板
+  - 已新增 `python -m app.cli init-db`，可在本机 PostgreSQL 上执行 `db/init.sql`
+  - 已新增本机环境检查、PostgreSQL 初始化、前端启动、后端启动和一键启动脚本
+  - README 已改为非 Docker 本机运行说明
+  - 后端 `ruff`、`black --check`、`pytest` 通过
+  - 前端 `lint`、`test`、`build` 通过
+  - 环境检查脚本按预期提示当前缺少 `psql` / PostgreSQL Windows 服务
+- 风险/备注：
+  - 按 PRD 原始约束，Docker Compose 仍是正式验收项；本次变更来自用户明确要求，当前本机主路线调整为非 Docker
+  - 项目仍使用 PostgreSQL，未替换为 SQLite / Supabase / Firebase
+  - 下一步需要安装本机 PostgreSQL 后才能执行数据库实连和浏览器手工验收
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -418,15 +462,15 @@
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
 | ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | `docker info` 无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
-| ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | open | 需安装 PostgreSQL 并创建 `jobtracker` 数据库/用户后，后端本地 `.env` 才能指向 `localhost:5432` |
+| ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | open | 已补充本机初始化脚本；需安装 PostgreSQL 并运行 `scripts/init-local-postgres.ps1` |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：本地代码质量检查通过，Docker 不可用；非 Docker 运行环境未就绪
+- 当前阶段：非 Docker 本机运行路线已完成代码与文档重构
 - 已完成任务数：59
 - 未完成任务数：8
-- 当前风险：Docker Compose 联调仍受 Docker Desktop 系统服务未注册影响；非 Docker 路线缺少 PostgreSQL
-- 下一步：若继续 Docker，需修复 Docker Desktop / WSL；若放弃 Docker，需安装本地 PostgreSQL 并补充本地运行配置
+- 当前风险：非 Docker 路线缺少本机 PostgreSQL，无法完成数据库实连与手工验收
+- 下一步：安装本地 PostgreSQL，执行 `scripts/init-local-postgres.ps1`，再运行 `scripts/start-local.ps1` 做浏览器验收

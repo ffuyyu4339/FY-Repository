@@ -142,6 +142,6 @@
 ---
 
 ## 当前状态
-- 当前阶段：本地代码质量检查通过，Docker 联调与手工验收待完成
-- 当前阻塞：Docker CLI / Compose 插件存在，但 Docker Desktop 服务未注册、WSL 无可用发行版，`docker compose up -d --build` 仍无法连接 `dockerDesktopLinuxEngine`；本机也未安装 PostgreSQL，放弃 Docker 后需另配本地 PostgreSQL 才能运行
-- 最新更新时间：2026-05-01 22:51
+- 当前阶段：已按用户要求重构为非 Docker 本机运行路线，前后端质量检查通过
+- 当前阻塞：本机尚未安装 PostgreSQL / `psql`，无法完成数据库实连、后端真实启动和页面手工验收
+- 最新更新时间：2026-05-01 23:06
