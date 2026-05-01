@@ -311,7 +311,7 @@
   - 当前首要阻塞为运行环境缺少可用 Docker daemon / PostgreSQL，而不是前后端 lint/test/build 失败
   - `rg --files` 在当前 Codex Windows 包路径下被拒绝访问，已改用 PowerShell 文件枚举
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `c12fc0f`
 
 ---
 
@@ -343,7 +343,7 @@
   - 当前阻塞为 Windows 管理员授权 / 系统级 Docker Desktop 安装未完成
   - 需要用户在 UAC 中确认管理员权限，或手动以管理员身份运行 `C:\Program Files\Docker\Docker\Docker Desktop Installer.exe install --quiet --accept-license`
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `c086cb0`
 
 ---
 
@@ -379,7 +379,7 @@
   - 若放弃 Docker，必须先安装并初始化本地 PostgreSQL，再调整后端本地 `.env` 使用 `localhost:5432`
   - 按 PRD，Docker Compose 仍是正式验收要求；非 Docker 只能作为本机临时开发路线
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `2f33c2a`
 
 ---
 
@@ -423,7 +423,7 @@
   - 项目仍使用 PostgreSQL，未替换为 SQLite / Supabase / Firebase
   - 下一步需要安装本机 PostgreSQL 后才能执行数据库实连和浏览器手工验收
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `8423bab`
 
 ---
 
@@ -462,7 +462,7 @@
   - 完整 CRUD / JD Analyzer / Dashboard 仍需浏览器手工验收
   - Docker Compose 联调仍不作为当前本机路线继续推进
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b7eb6ac`
 
 ---
 
@@ -496,7 +496,7 @@
   - 本次仅优化 `/jobs` 列表页与全局导航视觉，不改变 API、数据库或业务逻辑
   - 当前数据库存在 1 条空白岗位记录，因此浏览器复查时展示的是列表行而非空状态
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `2aa90b5`
 
 ---
 
@@ -527,6 +527,12 @@
 | 004 | 2026-04-16 00:36 | a1d5f1d | docs(project): sync governance records with git history | K-05, K-06 | 回填历史 commit 记录并同步治理文档 |
 | 005 | 2026-04-16 00:48 | b8cb514 | fix(frontend): repair codespaces jd analyzer request flow | J-06, E-05, G-01 ~ G-10 | 修复前端类型收窄与 Codespaces JD 解析请求链路 |
 | 006 | 2026-04-16 02:59 | b4e3a01 | fix(frontend): support codespaces backend forwarding | E-02, F-10 | 修复 Codespaces 8000 转发地址识别与后端 CORS 配置 |
+| 007 | 2026-04-30 18:25 | c12fc0f | docs(project): record local runtime blockers | J-07, J-08, J-09 | 记录 Docker daemon 不可用、服务未启动和本机 PostgreSQL 缺失状态 |
+| 008 | 2026-04-30 19:06 | c086cb0 | docs(project): record docker install blocker | J-07, J-08 | 记录 Docker Desktop 安装残留与系统服务未注册阻塞 |
+| 009 | 2026-05-01 22:51 | 2f33c2a | docs(project): record docker environment recheck | J-07, J-08 | 复查 Docker CLI / Compose 与 WSL 状态，确认 Docker 路线不可运行 |
+| 010 | 2026-05-01 23:06 | 8423bab | refactor(project): support local postgres workflow | C-06, J-07, K-01 ~ K-04 | 按用户要求支持非 Docker 本机 PostgreSQL 运行路线 |
+| 011 | 2026-05-01 23:32 | b7eb6ac | chore(dev): verify local postgres runtime | C-06, J-09 | 安装并验证本机 PostgreSQL、后端和前端联通 |
+| 012 | 2026-05-01 23:53 | 2aa90b5 | style(frontend): polish jobs page layout | E-01, E-05 | 按浏览器备注优化 `/jobs` 列表页、全局导航和状态信息展示 |
 
 ---
 
