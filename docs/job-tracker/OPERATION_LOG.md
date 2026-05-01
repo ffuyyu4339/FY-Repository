@@ -740,6 +740,28 @@
 
 ---
 
+### LOG-019
+- 时间：2026-05-02 02:55
+- 任务：TASK-L / 非 Docker 剩余项复核
+- 目标：按用户要求暂时搁置 Docker 问题，复核是否仍存在非 Docker 未完成任务，并同步当前交付状态
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `git status --short`
+  - `Select-String -Path docs/job-tracker/TASK_CARD.md -Pattern '^- \\[ \\]'`
+- 执行结果：
+  - 已确认任务卡未完成项仅剩 Docker 相关 3 项：基础服务启动、Docker Compose 联调、MVP+ Docker Compose 联调
+  - 已按用户最新指令将 Docker 验证标记为暂时搁置的系统级环境阻塞，不作为当前继续推进项
+  - 已确认非 Docker MVP+ 功能范围已完成并可试用
+- 风险/备注：
+  - Docker Compose 仍是原 PRD 的正式验收项；当前只是按用户要求延期，不代表该项已通过
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -779,6 +801,7 @@
 | 016 | 2026-05-02 00:44 | 925f71d | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
+| 019 | 2026-05-02 02:55 | PENDING_COMMIT | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
 
 ---
 
@@ -797,5 +820,5 @@
 - 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过质量检查、页面访问和 MVP+ 关键 API 闭环验证；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
 - 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与 MVP+ 合规辅助自动化任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
-- 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项
-- 下一步：修复本机 Docker Desktop / WSL 后，执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验
+- 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
+- 下一步：如恢复 Docker Desktop / WSL，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker

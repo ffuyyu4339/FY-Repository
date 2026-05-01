@@ -10,8 +10,8 @@
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
 - 验收范围：MVP + 合规辅助自动化增强
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：MVP+ 已自主验收，存在 Docker 阻塞项
-- 最终结论：本机 MVP+ 功能验收通过；严格按 PRD 的 Docker Compose 全量验收未通过
+- 当前状态：非 Docker MVP+ 已自主验收；Docker 验证按用户要求暂时搁置
+- 最终结论：本机 MVP+ 功能验收通过；Docker Compose 全量验收延期，未计入当前继续推进范围
 
 ---
 
@@ -43,7 +43,7 @@
 | B-02 | FastAPI 后端初始化完成 | PASS | 已创建 `backend/app` 基础骨架 |
 | B-03 | Dockerfile 已完成 | PASS | 前后端 Dockerfile 均已创建 |
 | B-04 | docker-compose.yml 已完成 | PASS | 已创建根级服务编排文件 |
-| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Docker CLI / Compose 插件存在，Compose 配置可解析且容器内部地址已修正为 `db:5432` / `backend:8000`，但 Docker Desktop Linux Engine 不可连接 |
+| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Docker CLI / Compose 插件存在，Compose 配置可解析且容器内部地址已修正为 `db:5432` / `backend:8000`，但 Docker Desktop Linux Engine 不可连接；按用户要求暂时搁置 |
 | B-06 | Linux 运行说明完整 | PASS | README 已补充 Linux 部署与运行说明 |
 
 ---
@@ -141,7 +141,7 @@
 | I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
 | I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，14 项测试覆盖 API、分析逻辑、偏好、来源、事件与 LLM 回退 |
 | I-04 | 前端 build 通过 | PASS | `npm run build` 已通过，类型错误与本机构建链路已修复 |
-| I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 已通过，实际 `docker compose up -d --build` 因 Docker daemon 不可连接失败，尚未完成容器内联调 |
+| I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 已通过，实际 `docker compose up -d --build` 因 Docker daemon 不可连接失败，尚未完成容器内联调；按用户要求暂时搁置 |
 | I-06 | README 完整 | PASS | 已改为本机 PostgreSQL + FastAPI + Next.js 运行说明，并保留 Docker 状态说明 |
 | I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、事件记录、技能搜索、删除、Dashboard、Sources、Settings、Guide 页面 |
 
@@ -195,8 +195,8 @@
 ---
 
 ## 最终验收结论
-- 是否达到 MVP 发布条件：否，严格按 PRD 仍缺 Docker Compose 实际启动与联调
+- 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
 - 验收时间：2026-05-02 01:48
-- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞，因此原 PRD 容器化验收项仍未关闭，不能判定为全量 MVP+ Docker 验收通过。
+- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
