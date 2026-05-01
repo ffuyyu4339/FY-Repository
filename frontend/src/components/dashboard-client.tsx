@@ -7,7 +7,6 @@ import { fetchDashboardSummary } from "@/lib/api";
 import {
   formatStatusLabel,
   formatTrackLabel,
-  statusOptions,
   type DashboardSummary,
   type StatusValue,
 } from "@/lib/types";
@@ -61,12 +60,7 @@ function IconShell({ children }: IconProps) {
 
 function BriefcaseIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="M9 6V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1m5 5v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8m16 0V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3m16 0H4m8 0v2"
         stroke="currentColor"
@@ -80,12 +74,7 @@ function BriefcaseIcon() {
 
 function MapPinIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="M12 21s7-5.2 7-12A7 7 0 1 0 5 9c0 6.8 7 12 7 12Zm0-9.5A2.5 2.5 0 1 0 12 6a2.5 2.5 0 0 0 0 5.5Z"
         stroke="currentColor"
@@ -99,12 +88,7 @@ function MapPinIcon() {
 
 function StarIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z"
         stroke="currentColor"
@@ -118,12 +102,7 @@ function StarIcon() {
 
 function TagIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="M20 13.5 13.5 20a2 2 0 0 1-2.8 0L4 13.3V4h9.3l6.7 6.7a2 2 0 0 1 0 2.8ZM8 8h.01"
         stroke="currentColor"
@@ -380,7 +359,8 @@ export function DashboardClient() {
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm text-slate-500">
-                      {job.company_name || "未填写公司"} · {job.city || "未知城市"}
+                      {job.company_name || "未填写公司"} ·{" "}
+                      {job.city || "未知城市"}
                     </p>
                     <p className="mt-1 truncate font-semibold text-slate-950">
                       {job.job_title || "未填写岗位"}

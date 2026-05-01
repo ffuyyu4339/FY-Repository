@@ -65,12 +65,7 @@ const matchBadgeClass: Record<MatchLevelValue, string> = {
 
 function SearchIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
+    <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
       <path
         d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"
         stroke="currentColor"
