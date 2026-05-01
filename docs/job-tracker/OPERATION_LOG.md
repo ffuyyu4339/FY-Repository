@@ -762,6 +762,66 @@
 
 ---
 
+### LOG-020
+- 时间：2026-05-02 03:05
+- 任务：TASK-L/K / 非 Docker MVP+ 最终验收
+- 目标：执行当前交付口径下的非 Docker MVP+ 验收，确认后端、前端、本机 API、页面访问和关键业务闭环可用
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `git status --short`
+  - `Get-NetTCPConnection -LocalPort 3000,8000,5432`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `.\\scripts\\check-local-env.ps1`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/preferences`
+  - `Invoke-RestMethod http://localhost:8000/api/source-links`
+  - 临时调用 `PUT /api/preferences`
+  - 临时调用 `POST/PUT/DELETE /api/source-links`
+  - 临时调用 `POST /api/analyze-jd`
+  - 临时调用 `POST/PUT/DELETE /api/jobs`
+  - 临时调用 `POST/GET /api/jobs/{id}/events`
+  - `Invoke-RestMethod http://localhost:8000/api/jobs?q=RAG`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new?platform=...&job_link=...`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/settings`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - `docker compose config`
+- 执行结果：
+  - 工作树验收前干净
+  - 3000 / 8000 / 5432 均在监听，本机环境检查通过
+  - 后端 `ruff`、`black --check`、`pytest -q` 均通过，pytest 14 项通过
+  - 前端 `lint`、`test`、`build` 均通过，Vitest 12 项通过，Next build 生成全部目标页面
+  - 健康检查返回 `ok`
+  - 偏好配置读取与同值更新成功，默认简历版本为 `v1`
+  - 默认来源入口返回 7 条
+  - 临时来源链接创建、更新为停用、删除成功
+  - 临时 JD 解析返回 `ai_app_dev`、`priority_apply`、`analysis_source=rules`
+  - 临时岗位创建成功，随后更新为 `applied`，投递事件记录成功，事件列表返回 3 条，最后岗位删除成功
+  - `GET /api/jobs?q=RAG` 可命中技能搜索
+  - Dashboard summary 可访问
+  - `/`、`/jobs`、`/jobs/new`、带来源参数的 `/jobs/new`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
+  - `docker compose config` 可解析，未执行 `docker compose up`，符合用户要求的 Docker 暂时搁置口径
+- 风险/备注：
+  - Docker Compose 实际启动与容器内联调仍未验收，原因是用户已要求暂时搁置 Docker 问题
+  - 本次验收后，非 Docker MVP+ 可试用状态成立
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -802,6 +862,7 @@
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 | 019 | 2026-05-02 02:55 | be704d7 | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
+| 020 | 2026-05-02 03:05 | PENDING_COMMIT | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
 
 ---
 
@@ -817,7 +878,7 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过质量检查、页面访问和 MVP+ 关键 API 闭环验证；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
 - 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与 MVP+ 合规辅助自动化任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
 - 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置

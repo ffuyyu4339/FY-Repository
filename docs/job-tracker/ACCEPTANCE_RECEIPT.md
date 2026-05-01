@@ -10,8 +10,8 @@
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
 - 验收范围：MVP + 合规辅助自动化增强
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：非 Docker MVP+ 已自主验收；Docker 验证按用户要求暂时搁置
-- 最终结论：本机 MVP+ 功能验收通过；Docker Compose 全量验收延期，未计入当前继续推进范围
+- 当前状态：非 Docker MVP+ 验收通过；Docker 验证按用户要求暂时搁置
+- 最终结论：本机非 Docker MVP+ 验收通过；Docker Compose 全量验收延期，未计入当前继续推进范围
 
 ---
 
@@ -151,11 +151,13 @@
 - Docker 配置证据：`docker compose config` 已确认后端容器 `DATABASE_URL` 指向 `db:5432`，前端容器 `BACKEND_INTERNAL_URL` 指向 `backend:8000`，本机 `.env` 不再污染容器内部地址
 - Docker LLM 配置证据：`docker compose config` 已确认后端容器包含 `LLM_ENABLED`、`LLM_PROVIDER`、`LLM_API_BASE_URL`、`LLM_API_KEY`、`LLM_MODEL`
 - Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞
+- 本轮 Docker 口径：2026-05-02 用户明确要求 Docker 问题暂时搁置，本次验收仅执行 `docker compose config`，不执行 `docker compose up`
 - 非 Docker 重构证据：已新增 `scripts/check-local-env.ps1`、`scripts/init-local-postgres.ps1`、`scripts/start-backend.ps1`、`scripts/start-frontend.ps1`、`scripts/start-local.ps1`
 - 非 Docker 配置证据：`.env.example` 已指向 `localhost:5432`，`.env.docker.example` 保留 Docker Compose 配置
 - PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
 - MVP+ 数据库验证：`python -m app.cli init-db` 已应用 `app_preferences`、`source_links`、`job_events`，默认来源链接已写入本机 PostgreSQL
 - 后端真实联通：`GET /api/health` 返回 `{"status":"ok"}`，`GET /api/dashboard/summary` 可返回当前统计数据
+- 本轮后端验收：`GET /api/health` 返回 `ok`；`GET /api/preferences`、`GET /api/source-links`、`GET /api/dashboard/summary` 均成功；临时来源链接 CRUD、临时岗位创建/状态更新/事件记录/删除均成功
 - 前端真实访问：`GET http://localhost:3000/jobs` 返回 HTTP 200
 - 新增页访问验证：`GET http://localhost:3000/jobs/new` 返回 HTTP 200
 - 平台入口页访问验证：`GET http://localhost:3000/sources` 返回 HTTP 200
@@ -165,6 +167,7 @@
 - 流程入口访问验证：`GET http://localhost:3000/` 返回 HTTP 200，页面包含“今天的求职工作从这里开始”
 - 列表查询入口验证：`GET http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score` 返回 HTTP 200
 - 关键功能链路验证：临时调用 `POST /api/analyze-jd` 得到 `ai_app_dev`、`priority_apply`、92 分，随后 `POST /api/jobs` 创建临时岗位、`PUT /api/jobs/{id}` 更新为 `applied`、`DELETE /api/jobs/{id}` 删除成功
+- 本轮关键功能链路验证：临时 `POST /api/analyze-jd` 得到 `ai_app_dev`、`priority_apply`、`analysis_source=rules`；临时岗位创建、状态更新为 `applied`、新增 `applied` 投递事件、事件列表读取、技能搜索 `q=RAG`、岗位删除均成功
 - MVP+ 关键功能链路验证：`GET /api/preferences` 返回默认偏好；`GET /api/source-links` 返回 BOSS直聘、拉勾、猎聘、智联招聘、前程无忧、牛客、脉脉；临时调用 `POST /api/jobs/{id}/events` 成功记录 `applied` 事件；`GET /api/jobs?q=RAG` 可匹配技能数组；临时岗位已删除
 - JD Analyzer 来源验证：临时 `POST /api/analyze-jd` 返回 `analysis_source=rules`；后端测试已覆盖 LLM 成功和失败回退场景
 - 流程补齐证据：首页已按“收集岗位 / 解析修正 / 投递跟进 / 复盘决策”组织；Dashboard 统计卡和流程状态可跳转到列表筛选；列表支持 URL query 初始化筛选并展示下一步提示；JD 解析后可自动从 `pending_analysis` 推进到 `ready_to_apply`
@@ -174,6 +177,7 @@
 - 后端 lint 输出：`ruff check .`、`black --check .` 通过
 - pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过，14 项测试通过
 - 前端页面交互测试：`npm run test` 通过，12 项测试通过，包含 JobEditor 点击“解析 JD”自动回填、默认简历版本预填、来源页、设置页验证
+- 本轮页面访问验收：`/`、`/jobs`、`/jobs/new`、带来源参数的 `/jobs/new`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
 - 前端 Codespaces 地址测试：已验证 `http://localhost:8000` 在 Codespaces 浏览器环境下会自动解析为当前工作区的 8000 转发地址
 - 前端 build 输出：`npm run build` 通过
 - 前端 build 路由证据：Next build 生成 `/sources`、`/settings`、`/guide`
@@ -198,5 +202,5 @@
 - 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 01:48
+- 验收时间：2026-05-02 03:05
 - 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
