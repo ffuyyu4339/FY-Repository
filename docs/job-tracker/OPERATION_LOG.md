@@ -578,7 +578,7 @@
   - 本次仍严格限定在 PRD MVP 内，没有引入爬虫、自动投递、多用户、外部通知或 AI 对话助手
   - Docker Compose 联调仍受本机 Docker Desktop / WSL 环境阻塞，未在本轮改动中解决
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `37591be`
 
 ---
 
@@ -616,7 +616,7 @@
 | 011 | 2026-05-01 23:32 | b7eb6ac | chore(dev): verify local postgres runtime | C-06, J-09 | 安装并验证本机 PostgreSQL、后端和前端联通 |
 | 012 | 2026-05-01 23:53 | 2aa90b5 | style(frontend): polish jobs page layout | E-01, E-05 | 按浏览器备注优化 `/jobs` 列表页、全局导航和状态信息展示 |
 | 013 | 2026-05-02 00:25 | b97a17d | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
-| 014 | 2026-05-02 00:34 | PENDING_COMMIT | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
+| 014 | 2026-05-02 00:34 | 37591be | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
 
 ---
 
