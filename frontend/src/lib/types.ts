@@ -113,6 +113,16 @@ export type JobListFilters = {
   sort_order: "asc" | "desc";
 };
 
+export const defaultJobListFilters: JobListFilters = {
+  q: "",
+  city: "",
+  track: "",
+  match_level: "",
+  status: "",
+  sort_by: "updated_at",
+  sort_order: "desc",
+};
+
 export const trackOptions: { value: TrackValue; label: string }[] = [
   { value: "data_analyst", label: "数据分析" },
   { value: "ai_app_dev", label: "AI 应用开发" },
@@ -142,11 +152,49 @@ export const statusOptions: { value: StatusValue; label: string }[] = [
   { value: "archived", label: "归档" },
 ];
 
-export const trackLabelMap = Object.fromEntries(trackOptions.map((item) => [item.value, item.label]));
+const sortByValues = new Set<JobListFilters["sort_by"]>([
+  "updated_at",
+  "match_score",
+]);
+const sortOrderValues = new Set<JobListFilters["sort_order"]>(["asc", "desc"]);
+
+function asStringParam(value: string | null): string {
+  return value?.trim() ?? "";
+}
+
+export function getJobListFiltersFromSearch(search: string): JobListFilters {
+  const params = new URLSearchParams(search);
+  const sortBy = params.get("sort_by");
+  const sortOrder = params.get("sort_order");
+
+  return {
+    ...defaultJobListFilters,
+    q: asStringParam(params.get("q")),
+    city: asStringParam(params.get("city")),
+    track: asStringParam(params.get("track")),
+    match_level: asStringParam(params.get("match_level")),
+    status: asStringParam(params.get("status")),
+    sort_by:
+      sortBy && sortByValues.has(sortBy as JobListFilters["sort_by"])
+        ? (sortBy as JobListFilters["sort_by"])
+        : defaultJobListFilters.sort_by,
+    sort_order:
+      sortOrder &&
+      sortOrderValues.has(sortOrder as JobListFilters["sort_order"])
+        ? (sortOrder as JobListFilters["sort_order"])
+        : defaultJobListFilters.sort_order,
+  };
+}
+
+export const trackLabelMap = Object.fromEntries(
+  trackOptions.map((item) => [item.value, item.label]),
+);
 export const matchLevelLabelMap = Object.fromEntries(
   matchLevelOptions.map((item) => [item.value, item.label]),
 );
-export const statusLabelMap = Object.fromEntries(statusOptions.map((item) => [item.value, item.label]));
+export const statusLabelMap = Object.fromEntries(
+  statusOptions.map((item) => [item.value, item.label]),
+);
 
 export function listToText(values: string[]): string {
   return values.join(", ");

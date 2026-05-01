@@ -536,6 +536,52 @@
 
 ---
 
+### LOG-014
+- 时间：2026-05-02 00:34
+- 任务：TASK-E/J / 求职操作流程补齐与关键功能验证
+- 目标：审查现有求职链路，将入口页、列表页、Dashboard 与新增/详情页串成“收集 JD -> 解析修正 -> 投递跟进 -> 统计复盘”的完整 MVP 内流程，并完成关键功能验证
+- 修改文件：
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/lib/types.ts`
+  - `frontend/src/lib/project.test.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/app/page.tsx src/components/dashboard-client.tsx src/components/jobs-list-client.tsx src/components/job-editor.tsx src/components/job-editor.test.tsx src/lib/project.test.ts src/lib/types.ts`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - 临时调用 `POST /api/analyze-jd`、`POST /api/jobs`、`PUT /api/jobs/{id}`、`DELETE /api/jobs/{id}`
+- 执行结果：
+  - 首页已从说明型入口改为按收集、解析、投递、复盘组织的工作入口
+  - Dashboard 已改为可行动的投递复盘页，统计卡和流程状态可直接跳转到对应岗位队列
+  - 岗位列表已支持从 URL query 初始化筛选，并新增待解析、优先投递、待投递、面试跟进快捷队列
+  - 列表行已补充下一步提示，帮助从当前状态进入下一动作
+  - JD 解析后如岗位仍为 `pending_analysis` 且匹配等级不是 `ignore`，会自动推进到 `ready_to_apply`
+  - 已补充 query 筛选解析测试，前端 `lint`、`test`、`build` 均通过
+  - 后端 `ruff`、`black --check`、`pytest` 均通过；pytest 仍存在既有 `datetime.utcnow()` 弃用警告
+  - 本机 3000 / 8000 / 5432 均已监听，`/api/health` 返回 ok，Dashboard summary 可访问
+  - 临时 JD 解析、创建岗位、更新状态、删除岗位链路验证通过
+- 风险/备注：
+  - 本次仍严格限定在 PRD MVP 内，没有引入爬虫、自动投递、多用户、外部通知或 AI 对话助手
+  - Docker Compose 联调仍受本机 Docker Desktop / WSL 环境阻塞，未在本轮改动中解决
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -570,6 +616,7 @@
 | 011 | 2026-05-01 23:32 | b7eb6ac | chore(dev): verify local postgres runtime | C-06, J-09 | 安装并验证本机 PostgreSQL、后端和前端联通 |
 | 012 | 2026-05-01 23:53 | 2aa90b5 | style(frontend): polish jobs page layout | E-01, E-05 | 按浏览器备注优化 `/jobs` 列表页、全局导航和状态信息展示 |
 | 013 | 2026-05-02 00:25 | b97a17d | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
+| 014 | 2026-05-02 00:34 | PENDING_COMMIT | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
 
 ---
 
@@ -585,8 +632,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证，`/jobs` 列表页视觉优化已完成，`/jobs/new` 新增岗位页分栏布局已完成
-- 已完成任务数：59
-- 未完成任务数：8
-- 当前风险：完整 CRUD / JD Analyzer / Dashboard 浏览器手工验收待执行；Docker Compose 联调仍不可用
-- 下一步：继续按用户要求重构 Dashboard 与详情页/列表页剩余交互视觉，并在 `http://localhost:3000` 执行新增、解析、编辑、删除和 Dashboard 浏览器验收
+- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证，`/jobs`、`/jobs/new`、`/dashboard` 与首页已补齐 MVP 内求职操作链路
+- 已完成任务数：60
+- 未完成任务数：7
+- 当前风险：Docker Compose 联调仍不可用，阻塞原 PRD 的容器化验收项
+- 下一步：如需正式关闭 Docker 验收项，需要先修复本机 Docker Desktop / WSL，再执行 `docker compose up -d --build` 联调

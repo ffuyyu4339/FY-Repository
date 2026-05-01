@@ -126,7 +126,7 @@
 - [x] ~~确保后端 lint 通过~~
 - [x] ~~确保前端 build 通过~~
 - [ ] 确保 Docker Compose 联调通过
-- [ ] 确保关键功能可手工验证
+- [x] ~~确保关键功能可手工验证~~
 
 ---
 
@@ -142,6 +142,6 @@
 ---
 
 ## 当前状态
-- 当前阶段：非 Docker 本机运行路线已打通，PostgreSQL / FastAPI / Next.js 均已启动验证，`/jobs` 列表页视觉优化已在 Codex 内置浏览器复查，`/jobs/new` 新增岗位页已重构为左右分栏工作流布局
-- 当前阻塞：Docker Compose 联调仍不可用；完整 CRUD / JD Analyzer / Dashboard 浏览器手工验收待执行
-- 最新更新时间：2026-05-02 00:25
+- 当前阶段：非 Docker 本机运行路线已打通，PostgreSQL / FastAPI / Next.js 均已启动验证；入口页、岗位列表、Dashboard 与新增/详情页已按“收集 JD -> 解析修正 -> 投递跟进 -> 统计复盘”补齐操作链路；关键 API 流程已完成临时数据创建、更新与删除验证
+- 当前阻塞：Docker Compose 联调仍不可用；如需正式满足原 PRD Docker Compose 验收项，仍需先修复本机 Docker Desktop / WSL 环境
+- 最新更新时间：2026-05-02 00:34

@@ -277,9 +277,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
             ? "ready_to_apply"
             : current.status,
       }));
-      setSuccessMessage(
-        "JD 解析完成，结果已写入表单，你可以继续人工修正。",
-      );
+      setSuccessMessage("JD 解析完成，结果已写入表单，你可以继续人工修正。");
     } catch (analysisError) {
       setError(
         analysisError instanceof Error ? analysisError.message : "JD 解析失败",
