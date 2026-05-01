@@ -758,7 +758,7 @@
 - 风险/备注：
   - Docker Compose 仍是原 PRD 的正式验收项；当前只是按用户要求延期，不代表该项已通过
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `be704d7`
 
 ---
 
@@ -801,7 +801,7 @@
 | 016 | 2026-05-02 00:44 | 925f71d | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
-| 019 | 2026-05-02 02:55 | PENDING_COMMIT | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
+| 019 | 2026-05-02 02:55 | be704d7 | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
 
 ---
 
