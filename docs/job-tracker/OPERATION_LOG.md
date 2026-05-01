@@ -627,7 +627,7 @@
   - 严格按 PRD，Docker Compose 启动仍是阻塞项，不能宣称最终 MVP 全量验收通过
   - 本机非 Docker 路线已达到可运行、可验证、可回滚状态
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b4dae41`
 
 ---
 
@@ -778,7 +778,7 @@
 | 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
 | 016 | 2026-05-02 00:44 | PENDING_COMMIT | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
-| 018 | 2026-05-02 02:45 | PENDING_COMMIT | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
+| 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 
 ---
 
