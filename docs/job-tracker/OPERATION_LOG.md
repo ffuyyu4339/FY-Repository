@@ -627,7 +627,7 @@
   - 严格按 PRD，Docker Compose 启动仍是阻塞项，不能宣称最终 MVP 全量验收通过
   - 本机非 Docker 路线已达到可运行、可验证、可回滚状态
 - 对应提交：
-  - `b4dae41`
+  - `925f71d`
 
 ---
 
@@ -736,7 +736,7 @@
   - Docker Compose 联调仍阻塞在宿主机 Docker Desktop / WSL 系统级安装状态，需要用户完成管理员授权或手动安装 Docker Desktop 与 WSL 发行版
   - 本轮仅补齐前端偏好接入，不改变后端 API 或数据库结构
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b4dae41`
 
 ---
 
@@ -776,7 +776,7 @@
 | 013 | 2026-05-02 00:25 | b97a17d | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
 | 014 | 2026-05-02 00:34 | 37591be | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
 | 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
-| 016 | 2026-05-02 00:44 | PENDING_COMMIT | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
+| 016 | 2026-05-02 00:44 | 925f71d | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
 | 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 
