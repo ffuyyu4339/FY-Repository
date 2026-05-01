@@ -853,7 +853,7 @@
   - 首次 Playwright 截图接口超时，已改用 Browser CUA 截图并成功捕获 Dashboard 画面
   - Docker Compose 实际启动与容器联调仍按用户要求暂时搁置
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `108ab0c`
 
 ---
 
@@ -885,7 +885,7 @@
   - 该中文菜单只在 development 环境渲染，生产构建不显示
   - `Webpack` 为打包器专有名词，保留英文名称
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `108ab0c`
 
 ---
 
@@ -930,8 +930,8 @@
 | 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
 | 019 | 2026-05-02 02:55 | be704d7 | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
 | 020 | 2026-05-02 03:05 | 02c9ed8 | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
-| 021 | 2026-05-02 03:08 | PENDING_COMMIT | docs(project): record browser acceptance | J-08, K-05 ~ K-07 | 使用 Codex 内置浏览器验收首页、列表、新增解析、Dashboard、平台入口与指南 |
-| 022 | 2026-05-02 03:17 | PENDING_COMMIT | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
+| 021 | 2026-05-02 03:08 | 108ab0c | docs(project): record browser acceptance | J-08, K-05 ~ K-07 | 使用 Codex 内置浏览器验收首页、列表、新增解析、Dashboard、平台入口与指南 |
+| 022 | 2026-05-02 03:17 | 108ab0c | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
 
 ---
 
