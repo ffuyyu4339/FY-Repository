@@ -24,7 +24,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-[var(--color-line)] bg-[rgba(248,250,252,0.86)] backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-[1040px] items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:px-6">
+      <div className="mx-auto flex w-full max-w-[1040px] flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-8 lg:flex-nowrap lg:px-6">
         <Link href="/" className="group flex min-w-0 items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-ink)] text-sm font-semibold text-white transition group-hover:bg-[var(--color-accent)]">
             JT
@@ -41,7 +41,7 @@ export function SiteHeader() {
 
         <nav
           aria-label="主导航"
-          className="flex shrink-0 items-center rounded-full border border-[var(--color-line)] bg-white/70 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.05)]"
+          className="flex max-w-full shrink-0 items-center overflow-x-auto rounded-full border border-[var(--color-line)] bg-white/70 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.05)]"
         >
           {navigationItems.map((item) => (
             <Link

@@ -6,13 +6,16 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import {
   analyzeJD,
+  createJobEvent,
   createJob,
   deleteJob,
+  fetchJobEvents,
   fetchJob,
   updateJob,
 } from "@/lib/api";
 import {
   formatMatchLevelLabel,
+  formatJobEventLabel,
   formatStatusLabel,
   formatTrackLabel,
   listToText,
@@ -21,7 +24,11 @@ import {
   textToList,
   trackOptions,
   type JobPayload,
+  type JobEvent,
+  type JobEventType,
+  type JobEventPayload,
   type MatchLevelValue,
+  type JDAnalysisResult,
   type StatusValue,
   type TrackValue,
 } from "@/lib/types";
@@ -111,6 +118,29 @@ const statusHintMap: Record<StatusValue, string> = {
   offer: "已进入 Offer",
   rejected: "已拒绝，待复盘",
   archived: "已归档",
+};
+
+const manualEventOptions: { value: JobEventType; label: string }[] = [
+  { value: "opened_source", label: "打开来源" },
+  { value: "copied_jd", label: "复制 JD" },
+  { value: "applied", label: "已投递" },
+  { value: "online_test", label: "在线测试" },
+  { value: "interview_1", label: "一面" },
+  { value: "interview_2", label: "二面" },
+  { value: "hr_interview", label: "HR 面" },
+  { value: "offer", label: "Offer" },
+  { value: "rejected", label: "已拒绝" },
+  { value: "archived", label: "归档" },
+  { value: "note", label: "备注" },
+];
+
+const analysisSourceLabelMap: Record<
+  NonNullable<JDAnalysisResult["analysis_source"]>,
+  string
+> = {
+  rules: "规则引擎",
+  llm: "LLM 解析",
+  fallback: "LLM 回退规则",
 };
 
 function toFormState(payload: JobPayload): JobFormState {
@@ -204,6 +234,32 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [jobEvents, setJobEvents] = useState<JobEvent[]>([]);
+  const [eventType, setEventType] = useState<JobEventType>("applied");
+  const [eventNotes, setEventNotes] = useState("");
+  const [addingEvent, setAddingEvent] = useState(false);
+  const [analysisSource, setAnalysisSource] = useState<
+    JDAnalysisResult["analysis_source"] | null
+  >(null);
+
+  useEffect(() => {
+    if (mode !== "create" || typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const platform = params.get("platform");
+    const jobLink = params.get("job_link");
+    if (!platform && !jobLink) {
+      return;
+    }
+
+    setFormState((current) => ({
+      ...current,
+      platform: platform || current.platform,
+      job_link: jobLink || current.job_link,
+    }));
+  }, [mode]);
 
   useEffect(() => {
     if (mode !== "edit" || !jobId) {
@@ -219,6 +275,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
         const job = await fetchJob(currentJobId);
         if (!cancelled) {
           setFormState(toFormState(job));
+          setJobEvents(await fetchJobEvents(currentJobId));
         }
       } catch (loadError) {
         if (!cancelled) {
@@ -250,6 +307,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
       setAnalyzing(true);
       setError(null);
       const analysis = await analyzeJD(formState.jd_raw_text);
+      setAnalysisSource(analysis.analysis_source || "rules");
       setFormState((current) => ({
         ...current,
         company_name: analysis.company_name || current.company_name,
@@ -277,7 +335,11 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
             ? "ready_to_apply"
             : current.status,
       }));
-      setSuccessMessage("JD 解析完成，结果已写入表单，你可以继续人工修正。");
+      const sourceLabel =
+        analysisSourceLabelMap[analysis.analysis_source || "rules"];
+      setSuccessMessage(
+        `JD 解析完成（${sourceLabel}），结果已写入表单，你可以继续人工修正。`,
+      );
     } catch (analysisError) {
       setError(
         analysisError instanceof Error ? analysisError.message : "JD 解析失败",
@@ -348,6 +410,36 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
     }
   }
 
+  async function reloadJobEvents(currentJobId: string) {
+    setJobEvents(await fetchJobEvents(currentJobId));
+  }
+
+  async function handleAddEvent() {
+    if (!jobId) {
+      setError("请先保存岗位，再记录投递事件。");
+      return;
+    }
+
+    try {
+      setAddingEvent(true);
+      setError(null);
+      const payload: JobEventPayload = {
+        event_type: eventType,
+        notes: eventNotes || null,
+      };
+      await createJobEvent(jobId, payload);
+      setEventNotes("");
+      await reloadJobEvents(jobId);
+      setSuccessMessage("投递事件已记录。");
+    } catch (eventError) {
+      setError(
+        eventError instanceof Error ? eventError.message : "事件记录失败",
+      );
+    } finally {
+      setAddingEvent(false);
+    }
+  }
+
   function updateField<Key extends keyof JobFormState>(
     key: Key,
     value: JobFormState[Key],
@@ -398,6 +490,9 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
           {metricBadge("方向", formatTrackLabel(formState.track))}
           {metricBadge("等级", formatMatchLevelLabel(formState.match_level))}
           {metricBadge("分数", `${formState.match_score || 0}`)}
+          {analysisSource
+            ? metricBadge("解析", analysisSourceLabelMap[analysisSource])
+            : null}
         </div>
       </div>
 
@@ -749,6 +844,73 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                 </Field>
               </div>
             </SectionBlock>
+
+            {mode === "edit" ? (
+              <SectionBlock
+                title="投递时间线"
+                description="记录外部平台上的手动动作和后续反馈，不接管平台账号。"
+              >
+                <div className="grid gap-3">
+                  <div className="grid gap-2 sm:grid-cols-[140px_1fr]">
+                    <select
+                      value={eventType}
+                      onChange={(event) =>
+                        setEventType(event.target.value as JobEventType)
+                      }
+                      className={selectClass}
+                    >
+                      {manualEventOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      value={eventNotes}
+                      onChange={(event) => setEventNotes(event.target.value)}
+                      placeholder="事件备注，例如：已在 BOSS 手动投递"
+                      className={fieldClass}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddEvent}
+                    disabled={addingEvent}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-200 hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {addingEvent ? "记录中..." : "记录事件"}
+                  </button>
+
+                  <div className="space-y-2">
+                    {jobEvents.length === 0 ? (
+                      <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+                        暂无投递事件。
+                      </p>
+                    ) : null}
+                    {jobEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-sm font-semibold text-slate-900">
+                            {formatJobEventLabel(event.event_type)}
+                          </span>
+                          <time className="text-xs text-slate-400">
+                            {new Date(event.event_at).toLocaleString("zh-CN")}
+                          </time>
+                        </div>
+                        {event.notes ? (
+                          <p className="mt-1 text-xs leading-5 text-slate-500">
+                            {event.notes}
+                          </p>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </SectionBlock>
+            ) : null}
           </div>
 
           <div className="sticky bottom-0 z-10 border-t border-slate-100 bg-white/95 p-4 backdrop-blur">

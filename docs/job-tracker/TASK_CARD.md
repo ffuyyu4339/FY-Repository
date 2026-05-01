@@ -141,7 +141,32 @@
 
 ---
 
+## L. MVP+ 合规自动化与大模型增强
+- [x] ~~更新 PRD，明确 MVP+ 合规辅助自动化边界~~
+- [x] ~~新增招聘平台入口与搜索链接数据表~~
+- [x] ~~新增求职偏好配置数据表~~
+- [x] ~~新增投递事件时间线数据表~~
+- [x] ~~实现 Preferences API~~
+- [x] ~~实现 Source Links API~~
+- [x] ~~实现 Job Events API~~
+- [x] ~~扩展 JD Analyzer，支持 OpenAI-compatible LLM 解析与规则回退~~
+- [x] ~~修复岗位关键词搜索覆盖技能数组和关键词数组~~
+- [x] ~~修复面试中快捷筛选覆盖一面、二面、HR 面~~
+- [x] ~~修复 Dashboard 高分岗位排除已拒绝、归档、忽略岗位~~
+- [x] ~~新增 `/sources` 平台入口页~~
+- [x] ~~新增 `/settings` 偏好设置页~~
+- [x] ~~新增 `/guide` 新人使用指南页~~
+- [x] ~~在岗位详情页展示并新增投递事件~~
+- [x] ~~补充 MVP+ 后端测试~~
+- [x] ~~补充 MVP+ 前端测试~~
+- [x] ~~执行 MVP+ 后端 ruff / black / pytest 验证~~
+- [x] ~~执行 MVP+ 前端 lint / test / build 验证~~
+- [x] ~~执行 MVP+ 本机 API 与页面访问验证~~
+- [ ] 执行 MVP+ Docker Compose 联调验证
+
+---
+
 ## 当前状态
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 运行路线已打通并完成复验；入口页、岗位列表、Dashboard 与新增/详情页已串成“收集 JD -> 解析修正 -> 投递跟进 -> 统计复盘”的 MVP 流程；关键 API 流程已完成临时数据创建、更新与删除验证
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 运行路线已打通；MVP+ 合规辅助自动化已完成代码实现，包含平台入口、偏好设置、投递事件时间线、LLM 解析开关和规则回退；后端 ruff/black/pytest、前端 lint/test/build、本机 API 与页面访问已通过
 - 当前阻塞：Docker Compose 配置已修正为容器内部 `db:5432` / `backend:8000` 地址，但实际 `docker compose up -d --build` 仍因本机 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞
-- 最新更新时间：2026-05-02 00:44
+- 最新更新时间：2026-05-02 01:40

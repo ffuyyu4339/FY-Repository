@@ -8,15 +8,19 @@ import { JobEditor } from "./job-editor";
 
 const {
   analyzeJDMock,
+  createJobEventMock,
   createJobMock,
   deleteJobMock,
+  fetchJobEventsMock,
   fetchJobMock,
   updateJobMock,
   pushMock,
 } = vi.hoisted(() => ({
   analyzeJDMock: vi.fn(),
+  createJobEventMock: vi.fn(),
   createJobMock: vi.fn(),
   deleteJobMock: vi.fn(),
+  fetchJobEventsMock: vi.fn(),
   fetchJobMock: vi.fn(),
   updateJobMock: vi.fn(),
   pushMock: vi.fn(),
@@ -30,8 +34,10 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/api", () => ({
   analyzeJD: analyzeJDMock,
+  createJobEvent: createJobEventMock,
   createJob: createJobMock,
   deleteJob: deleteJobMock,
+  fetchJobEvents: fetchJobEventsMock,
   fetchJob: fetchJobMock,
   updateJob: updateJobMock,
 }));
@@ -39,8 +45,10 @@ vi.mock("@/lib/api", () => ({
 describe("JobEditor", () => {
   beforeEach(() => {
     analyzeJDMock.mockReset();
+    createJobEventMock.mockReset();
     createJobMock.mockReset();
     deleteJobMock.mockReset();
+    fetchJobEventsMock.mockReset();
     fetchJobMock.mockReset();
     updateJobMock.mockReset();
     pushMock.mockReset();
@@ -62,6 +70,7 @@ describe("JobEditor", () => {
       track: "ai_app_dev",
       match_score: 88,
       match_level: "priority_apply",
+      analysis_source: "rules",
     });
 
     render(<JobEditor mode="create" />);
@@ -92,7 +101,9 @@ describe("JobEditor", () => {
 
     expect(analyzeJDMock).toHaveBeenCalledTimes(1);
     expect(
-      screen.getByText("JD 解析完成，结果已写入表单，你可以继续人工修正。"),
+      screen.getByText(
+        "JD 解析完成（规则引擎），结果已写入表单，你可以继续人工修正。",
+      ),
     ).toBeInTheDocument();
   });
 });

@@ -40,7 +40,7 @@ const quickFilters: {
     label: "待投递",
     filter: { status: "ready_to_apply", sort_by: "match_score" },
   },
-  { label: "面试中", filter: { status: "interview_1" } },
+  { label: "面试中", filter: { status_group: "interviewing" } },
 ];
 
 const statusBadgeClass: Record<StatusValue, string> = {
@@ -138,6 +138,7 @@ export function JobsListClient() {
     filters.track,
     filters.match_level,
     filters.status,
+    filters.status_group,
   ].filter(Boolean).length;
   const priorityJobs = jobs.filter(
     (job) => job.match_level === "priority_apply",
@@ -270,7 +271,11 @@ export function JobsListClient() {
           <select
             value={filters.status}
             onChange={(event) =>
-              setFilters({ ...filters, status: event.target.value })
+              setFilters({
+                ...filters,
+                status: event.target.value,
+                status_group: "",
+              })
             }
             className={selectClass}
           >

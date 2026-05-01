@@ -2,8 +2,14 @@ import type {
   DashboardSummary,
   JDAnalysisResult,
   Job,
+  JobEvent,
+  JobEventPayload,
   JobListFilters,
   JobPayload,
+  Preference,
+  PreferencePayload,
+  SourceLink,
+  SourceLinkPayload,
 } from "@/lib/types";
 
 const LOCALHOST_HOSTNAMES = new Set(["localhost", "127.0.0.1"]);
@@ -22,7 +28,10 @@ export function deriveCodespacesApiBaseUrl(browserOrigin: string): string {
       return "";
     }
 
-    url.hostname = url.hostname.replace(CODESPACES_PORT_SUFFIX_PATTERN, "-8000");
+    url.hostname = url.hostname.replace(
+      CODESPACES_PORT_SUFFIX_PATTERN,
+      "-8000",
+    );
     return url.origin;
   } catch {
     return "";
@@ -45,7 +54,9 @@ export function resolveApiBaseUrl(
 
   try {
     const browserUrl = new URL(browserOrigin);
-    const isCodespacesLikeBrowser = !LOCALHOST_HOSTNAMES.has(browserUrl.hostname);
+    const isCodespacesLikeBrowser = !LOCALHOST_HOSTNAMES.has(
+      browserUrl.hostname,
+    );
 
     if (isCodespacesLikeBrowser && LOCALHOST_API_PATTERN.test(trimmedBaseUrl)) {
       return deriveCodespacesApiBaseUrl(browserOrigin) || "";
@@ -68,7 +79,10 @@ type RequestOptions = RequestInit & {
   parseJson?: boolean;
 };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { parseJson = true, headers, ...init } = options;
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     ...init,
@@ -102,6 +116,8 @@ export function buildJobsQuery(filters: JobListFilters): string {
   if (filters.track) searchParams.set("track", filters.track);
   if (filters.match_level) searchParams.set("match_level", filters.match_level);
   if (filters.status) searchParams.set("status", filters.status);
+  if (filters.status_group)
+    searchParams.set("status_group", filters.status_group);
   searchParams.set("sort_by", filters.sort_by);
   searchParams.set("sort_order", filters.sort_order);
   const queryString = searchParams.toString();
@@ -123,7 +139,10 @@ export async function createJob(payload: JobPayload): Promise<Job> {
   });
 }
 
-export async function updateJob(jobId: string, payload: JobPayload): Promise<Job> {
+export async function updateJob(
+  jobId: string,
+  payload: JobPayload,
+): Promise<Job> {
   return request<Job>(`/api/jobs/${jobId}`, {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -146,4 +165,64 @@ export async function analyzeJD(jdRawText: string): Promise<JDAnalysisResult> {
 
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   return request<DashboardSummary>("/api/dashboard/summary");
+}
+
+export async function fetchPreferences(): Promise<Preference> {
+  return request<Preference>("/api/preferences");
+}
+
+export async function updatePreferences(
+  payload: PreferencePayload,
+): Promise<Preference> {
+  return request<Preference>("/api/preferences", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchSourceLinks(
+  includeDisabled = false,
+): Promise<SourceLink[]> {
+  const query = includeDisabled ? "?include_disabled=true" : "";
+  return request<SourceLink[]>(`/api/source-links${query}`);
+}
+
+export async function createSourceLink(
+  payload: SourceLinkPayload,
+): Promise<SourceLink> {
+  return request<SourceLink>("/api/source-links", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateSourceLink(
+  sourceLinkId: number,
+  payload: SourceLinkPayload,
+): Promise<SourceLink> {
+  return request<SourceLink>(`/api/source-links/${sourceLinkId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteSourceLink(sourceLinkId: number): Promise<void> {
+  return request<void>(`/api/source-links/${sourceLinkId}`, {
+    method: "DELETE",
+    parseJson: false,
+  });
+}
+
+export async function fetchJobEvents(jobId: string): Promise<JobEvent[]> {
+  return request<JobEvent[]>(`/api/jobs/${jobId}/events`);
+}
+
+export async function createJobEvent(
+  jobId: string,
+  payload: JobEventPayload,
+): Promise<JobEvent> {
+  return request<JobEvent>(`/api/jobs/${jobId}/events`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }

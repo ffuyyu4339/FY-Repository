@@ -1,7 +1,10 @@
 import re
 from collections import OrderedDict
+from typing import Any
 
+from app.core.config import settings
 from app.schemas.analyzer import JDAnalyzeResponse
+from app.services.llm_analyzer import analyze_jd_with_llm
 
 KEYWORDS_BY_TRACK = {
     "data_analyst": {
@@ -183,7 +186,50 @@ def normalize_experience_score(experience_required: str | None) -> int:
     return 5
 
 
-def normalize_city_score(city: str | None, remote_allowed: bool) -> int:
+def get_preference_list(preferences: Any, key: str) -> list[str]:
+    if preferences is None:
+        return []
+    if isinstance(preferences, dict):
+        value = preferences.get(key)
+    else:
+        value = getattr(preferences, key, None)
+    return [str(item).strip() for item in value or [] if str(item).strip()]
+
+
+def get_preference_int(preferences: Any, key: str) -> int | None:
+    if preferences is None:
+        return None
+    if isinstance(preferences, dict):
+        value = preferences.get(key)
+    else:
+        value = getattr(preferences, key, None)
+    return int(value) if value is not None else None
+
+
+def get_preference_bool(preferences: Any, key: str, default: bool = False) -> bool:
+    if preferences is None:
+        return default
+    if isinstance(preferences, dict):
+        value = preferences.get(key, default)
+    else:
+        value = getattr(preferences, key, default)
+    return bool(value)
+
+
+def normalize_city_score(
+    city: str | None, remote_allowed: bool, preferences: Any = None
+) -> int:
+    target_cities = get_preference_list(preferences, "target_cities")
+    if target_cities:
+        if city and any(target_city in city for target_city in target_cities):
+            return 10
+        remote_is_target = any(target_city == "远程" for target_city in target_cities)
+        if remote_allowed and remote_is_target:
+            return 9
+        if city:
+            return 4
+        return 5
+
     if city == "上海":
         return 10
     if remote_allowed:
@@ -195,7 +241,17 @@ def normalize_city_score(city: str | None, remote_allowed: bool) -> int:
     return 5
 
 
-def normalize_salary_score(salary_max: int | None) -> int:
+def normalize_salary_score(salary_max: int | None, preferences: Any = None) -> int:
+    min_salary = get_preference_int(preferences, "min_salary")
+    if min_salary is not None:
+        if salary_max is None:
+            return 5
+        if salary_max >= min_salary:
+            return 10
+        if salary_max >= max(int(min_salary * 0.8), 1):
+            return 7
+        return 4
+
     if salary_max is None:
         return 5
     if salary_max >= 35:
@@ -234,8 +290,10 @@ def calculate_match_score(
     remote_allowed: bool,
     salary_max: int | None,
     jd_raw_text: str,
+    preferences: Any = None,
 ) -> int:
-    track_score = {
+    target_tracks = get_preference_list(preferences, "target_tracks")
+    base_track_score = {
         "data_analyst": 30,
         "ai_app_dev": 30,
         "android_client": 24,
@@ -243,10 +301,25 @@ def calculate_match_score(
         "general_software": 18,
         "other": 8,
     }.get(track, 8)
-    tech_score = min(len(skills), 5) * 5
+    if target_tracks:
+        track_score = 30 if track in target_tracks else min(base_track_score, 18)
+    else:
+        track_score = base_track_score
+
+    priority_skills = {
+        skill.lower() for skill in get_preference_list(preferences, "priority_skills")
+    }
+    if priority_skills:
+        matched_priority_skills = sum(
+            1 for skill in skills if skill.lower() in priority_skills
+        )
+        tech_score = min(matched_priority_skills * 6 + len(skills) * 3, 25)
+    else:
+        tech_score = min(len(skills), 5) * 5
+
     experience_score = normalize_experience_score(experience_required)
-    city_score = normalize_city_score(city, remote_allowed)
-    salary_score = normalize_salary_score(salary_max)
+    city_score = normalize_city_score(city, remote_allowed, preferences)
+    salary_score = normalize_salary_score(salary_max, preferences)
     clarity_score = normalize_clarity_score(jd_raw_text)
     total_score = (
         track_score
@@ -259,8 +332,34 @@ def calculate_match_score(
     return min(total_score, 100)
 
 
-def analyze_jd_text(text: str) -> JDAnalyzeResponse:
+def normalize_analysis_score(
+    result: JDAnalyzeResponse, jd_raw_text: str, preferences: Any = None
+) -> JDAnalyzeResponse:
+    match_score = calculate_match_score(
+        track=result.track,
+        skills=result.skills_extracted,
+        experience_required=result.experience_required,
+        city=result.city,
+        remote_allowed=result.remote_allowed,
+        salary_max=result.salary_max,
+        jd_raw_text=jd_raw_text,
+        preferences=preferences,
+    )
+    result.match_score = match_score
+    result.match_level = map_match_level(match_score)
+    result.keywords = result.keywords or result.skills_extracted
+    return result
+
+
+def analyze_jd_text(text: str, preferences: Any = None) -> JDAnalyzeResponse:
     normalized_text = text.strip()
+    llm_enabled = get_preference_bool(preferences, "llm_enabled", default=True)
+    llm_attempted = settings.llm_enabled and llm_enabled
+    llm_result = analyze_jd_with_llm(normalized_text, enabled=llm_enabled)
+    if llm_result is not None:
+        llm_result.analysis_source = "llm"
+        return normalize_analysis_score(llm_result, normalized_text, preferences)
+
     skills = extract_ordered_keywords(normalized_text)
     city, remote_allowed = extract_city(normalized_text)
     experience_required = extract_experience(normalized_text)
@@ -275,9 +374,10 @@ def analyze_jd_text(text: str) -> JDAnalyzeResponse:
         remote_allowed=remote_allowed,
         salary_max=salary_max,
         jd_raw_text=normalized_text,
+        preferences=preferences,
     )
 
-    return JDAnalyzeResponse(
+    result = JDAnalyzeResponse(
         company_name=extract_company_name(normalized_text),
         job_title=extract_job_title(normalized_text),
         city=city,
@@ -292,4 +392,6 @@ def analyze_jd_text(text: str) -> JDAnalyzeResponse:
         track=track,
         match_score=match_score,
         match_level=map_match_level(match_score),
+        analysis_source="fallback" if llm_attempted else "rules",
     )
+    return result

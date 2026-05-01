@@ -5,6 +5,8 @@
 - 本机开发：PostgreSQL 本机服务 + FastAPI 本机进程 + Next.js 本机进程。
 - 容器联调：保留 Dockerfile 与 `docker-compose.yml`，用于 Docker daemon 可用的 Linux / Docker Desktop 环境。
 
+当前 MVP+ 已加入合规辅助自动化能力：平台入口与搜索链接管理、浏览器本地登录态打开外部平台、投递事件时间线、偏好配置和 OpenAI-compatible 国内大模型 JD 解析。系统不保存招聘平台账号、密码、Cookie、验证码或登录令牌，也不自动爬取或自动投递。
+
 ## 技术栈
 
 - 前端：Next.js + React + TypeScript + Tailwind CSS
@@ -58,6 +60,18 @@ Copy-Item .env.example .env -Force
 DATABASE_URL=postgresql+psycopg://jobtracker:jobtracker@localhost:5432/jobtracker
 ```
 
+如需启用国内大模型 JD 解析，配置 OpenAI-compatible API：
+
+```env
+LLM_ENABLED=true
+LLM_PROVIDER=openai_compatible
+LLM_API_BASE_URL=https://api.deepseek.com
+LLM_API_KEY=your_api_key
+LLM_MODEL=deepseek-v4-flash
+```
+
+未配置或接口失败时，后端会自动回退到规则引擎。
+
 ### 3. 初始化数据库
 
 以 PostgreSQL 管理员用户执行：
@@ -108,6 +122,15 @@ DATABASE_URL=postgresql+psycopg://jobtracker:jobtracker@localhost:5432/jobtracke
 ```text
 http://localhost:3000
 ```
+
+主要页面：
+
+- `/jobs`：岗位列表、筛选、排序
+- `/jobs/new`：粘贴 JD、解析、保存岗位
+- `/sources`：招聘平台入口与搜索链接
+- `/settings`：求职偏好与 LLM 开关
+- `/guide`：新人使用指南
+- `/dashboard`：求职统计复盘
 
 ### 6. 一键拉起前后端
 

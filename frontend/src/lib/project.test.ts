@@ -35,6 +35,7 @@ describe("frontend helpers", () => {
         track: "",
         match_level: "",
         status: "ready_to_apply",
+        status_group: "",
         sort_by: "match_score",
         sort_order: "desc",
       }),
@@ -46,11 +47,12 @@ describe("frontend helpers", () => {
   it("reads job filters from query string for workflow links", () => {
     expect(
       getJobListFiltersFromSearch(
-        "?status=pending_analysis&match_level=priority_apply&sort_by=match_score&sort_order=asc",
+        "?status=pending_analysis&match_level=priority_apply&sort_by=match_score&sort_order=asc&status_group=interviewing",
       ),
     ).toMatchObject({
       status: "pending_analysis",
       match_level: "priority_apply",
+      status_group: "interviewing",
       sort_by: "match_score",
       sort_order: "asc",
     });

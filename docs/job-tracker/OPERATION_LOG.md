@@ -631,6 +631,75 @@
 
 ---
 
+### LOG-016
+- 时间：2026-05-02 01:48
+- 任务：TASK-L / MVP+ 合规自动化与国内大模型增强
+- 目标：实现平台入口、偏好设置、投递事件时间线、OpenAI-compatible LLM JD 解析与规则回退，并同步治理文档
+- 修改文件：
+  - `db/init.sql`
+  - `.env.example`
+  - `.env.docker.example`
+  - `docker-compose.yml`
+  - `README.md`
+  - `backend/app/models/job.py`
+  - `backend/app/repositories/jobs.py`
+  - `backend/app/api/routes/*`
+  - `backend/app/schemas/*`
+  - `backend/app/services/*`
+  - `backend/tests/*`
+  - `frontend/src/app/*`
+  - `frontend/src/components/*`
+  - `frontend/src/lib/*`
+  - `docs/job-tracker/PRD.md`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `npx prettier --write src`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\.venv\\Scripts\\python.exe -m app.cli init-db`
+  - `Invoke-RestMethod http://localhost:8000/api/preferences`
+  - `Invoke-RestMethod http://localhost:8000/api/source-links`
+  - `Invoke-RestMethod POST http://localhost:8000/api/analyze-jd`
+  - 临时调用 `POST /api/jobs`、`POST /api/jobs/{id}/events`、`GET /api/jobs/{id}/events`、`GET /api/jobs?q=RAG`、`DELETE /api/jobs/{id}`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/settings`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new?platform=...`
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+- 执行结果：
+  - 已新增 `app_preferences`、`source_links`、`job_events` 三张表，并通过 `python -m app.cli init-db` 应用到本机 PostgreSQL
+  - 已预置 BOSS直聘、拉勾、猎聘、智联招聘、前程无忧、牛客、脉脉平台入口
+  - 已实现 `GET/PUT /api/preferences`
+  - 已实现 `GET/POST/PUT/DELETE /api/source-links`
+  - 已实现 `GET/POST /api/jobs/{id}/events`
+  - 已扩展 `POST /api/analyze-jd`，返回 `analysis_source`，支持 OpenAI-compatible LLM 解析并在失败或未配置时回退规则引擎
+  - 已修复 `GET /api/jobs?q=...` 搜索覆盖 `skills_extracted` 与 `keywords`
+  - 已新增 `status_group=interviewing` 覆盖一面、二面、HR 面
+  - 已修复 Dashboard 高分岗位排除 `ignore`、`rejected`、`archived`
+  - 已新增 `/sources`、`/settings`、`/guide` 页面，并在岗位详情页新增投递事件时间线
+  - 后端 `ruff`、`black --check`、`pytest -q` 均通过，pytest 为 14 项通过
+  - 前端 `lint`、`test`、`build` 均通过，Vitest 为 11 项通过，Next build 生成 `/sources`、`/settings`、`/guide`
+  - 本机 API 验证通过：偏好、来源、JD 解析、临时岗位创建、投递事件记录、技能搜索、临时岗位删除均成功
+  - 本机页面访问通过：`/sources`、`/settings`、`/guide`、`/jobs/new?...`、`/dashboard` 均返回 HTTP 200
+  - `docker compose config` 通过，并确认 LLM 环境变量已透传到后端容器
+  - `docker compose up -d --build` 仍失败，错误为无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+- 风险/备注：
+  - MVP+ 仍不保存招聘平台账号、密码、Cookie、验证码或登录令牌，不执行爬虫或自动投递
+  - LLM 仅解析用户主动粘贴的 JD，未配置 API 或 API 失败时自动回退规则引擎
+  - Docker Compose 实际联调仍受本机 Docker Desktop / WSL daemon 不可用阻塞
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -668,6 +737,7 @@
 | 014 | 2026-05-02 00:34 | 37591be | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
 | 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
 | 016 | 2026-05-02 00:44 | PENDING_COMMIT | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
+| 017 | 2026-05-02 01:48 | PENDING_COMMIT | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
 
 ---
 
@@ -683,8 +753,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过质量检查、页面访问和关键 API 闭环验证；Compose 配置已完成本机 `.env` 与容器内部地址隔离
-- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与最终治理记录均已完成
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过质量检查、页面访问和 MVP+ 关键 API 闭环验证；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
+- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与 MVP+ 合规辅助自动化任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
 - 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项
-- 下一步：修复本机 Docker Desktop / WSL 后，执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard 联调复验
+- 下一步：修复本机 Docker Desktop / WSL 后，执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验

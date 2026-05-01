@@ -8,10 +8,10 @@
 ## 项目信息
 - 项目名称：Job Tracker + JD Analyzer
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
-- 验收范围：MVP
+- 验收范围：MVP + 合规辅助自动化增强
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：已自主验收，存在阻塞项
-- 最终结论：本机功能验收通过；严格按 PRD 的 Docker Compose 全量验收未通过
+- 当前状态：MVP+ 已自主验收，存在 Docker 阻塞项
+- 最终结论：本机 MVP+ 功能验收通过；严格按 PRD 的 Docker Compose 全量验收未通过
 
 ---
 
@@ -56,6 +56,7 @@
 | C-02 | 数据库初始化脚本已完成 | PASS | `db/init.sql` 已创建 |
 | C-03 | FastAPI 数据库连接正常 | PASS | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，`/api/jobs` 已通过真实数据库返回空列表 |
 | C-04 | jobs 数据访问层可用 | PASS | 已创建基础仓储与 schema 骨架 |
+| C-05 | MVP+ 新增数据表可用 | PASS | 已新增 `app_preferences`、`source_links`、`job_events`，并通过 `python -m app.cli init-db` 应用到本机 PostgreSQL |
 
 ---
 
@@ -67,6 +68,10 @@
 | D-02 | Analyzer API 可用 | PASS | 已实现 JD 解析、字段抽取、匹配分与匹配等级返回 |
 | D-03 | Dashboard API 可用 | PASS | 已实现总数、状态分布、方向分布、上海岗位数、Top N、高频技能词汇总 |
 | D-04 | API 错误处理基础可用 | PASS | 已补充 404、422、500 级别基础错误响应 |
+| D-05 | Preferences API 可用 | PASS | `GET/PUT /api/preferences` 已实现并通过本机 API 验证 |
+| D-06 | Source Links API 可用 | PASS | `GET/POST/PUT/DELETE /api/source-links` 已实现，默认平台入口可返回 |
+| D-07 | Job Events API 可用 | PASS | `GET/POST /api/jobs/{id}/events` 已实现，临时岗位事件记录验证通过 |
+| D-08 | MVP+ 列表逻辑修复可用 | PASS | 搜索已覆盖技能数组和关键词数组，`status_group=interviewing` 已覆盖一面、二面、HR 面 |
 
 ---
 
@@ -79,6 +84,9 @@
 | E-03 | `/jobs/[id]` 页面可用 | PASS | 已接入详情编辑、状态维护与删除操作 |
 | E-04 | `/dashboard` 页面可用 | PASS | 已接入统计汇总、高分岗位与技能词展示 |
 | E-05 | 页面基础导航可用 | PASS | 已提供首页入口、全局导航与页面布局 |
+| E-06 | `/sources` 页面可用 | PASS | 已新增平台入口页，支持展示默认来源、打开外部链接、创建/编辑/删除来源、跳转新增岗位并预填平台与链接 |
+| E-07 | `/settings` 页面可用 | PASS | 已新增偏好设置页，支持目标城市、方向、技能、薪资、默认简历版本与 LLM 开关 |
+| E-08 | `/guide` 页面可用 | PASS | 已新增新人使用指南页，说明平台入口、复制 JD、解析确认、手动投递与记录结果流程 |
 
 ---
 
@@ -96,6 +104,7 @@
 | F-08 | 匹配分计算可用 | PASS | 已接入后端分析结果回填匹配分 |
 | F-09 | 匹配等级映射可用 | PASS | 已接入后端分析结果回填匹配等级 |
 | F-10 | 支持人工修正分析结果 | PASS | 解析结果回填后可在表单中直接修正并保存；Codespaces 下前端会自动命中 8000 转发后端，FastAPI 也已允许对应来源跨域访问 |
+| F-11 | LLM 解析与规则回退可用 | PASS | `analysis_source` 已返回 `rules` / `llm` / `fallback`；未配置或调用失败时自动回退规则引擎 |
 
 ---
 
@@ -106,6 +115,7 @@
 | G-01 | 状态流转可用 | PASS | 详情页已支持更新岗位状态 |
 | G-02 | 简历版本字段可用 | PASS | 详情页已支持维护简历版本字段 |
 | G-03 | 备注字段可用 | PASS | 详情页已支持备注字段维护 |
+| G-04 | 投递事件时间线可用 | PASS | 详情页已支持新增和查看打开来源、复制 JD、已投递、笔试、面试、Offer、拒绝等事件 |
 
 ---
 
@@ -117,7 +127,7 @@
 | H-02 | 各状态统计可用 | PASS | 已展示状态分布列表 |
 | H-03 | 各方向统计可用 | PASS | 已展示方向分布列表 |
 | H-04 | 上海岗位统计可用 | PASS | 已展示上海岗位统计指标 |
-| H-05 | 高分岗位 Top N 可用 | PASS | 已展示高分岗位跳转列表 |
+| H-05 | 高分岗位 Top N 可用 | PASS | 已展示高分岗位跳转列表，并排除 `ignore`、`rejected`、`archived` 岗位 |
 | H-06 | 高频技能词展示可用 | PASS | 已展示高频技能词标签 |
 
 ---
@@ -128,35 +138,44 @@
 |---|---|---|---|
 | I-01 | 前端 lint 通过 | PASS | `npm run lint` 已通过 |
 | I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
-| I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，覆盖 API 与分析逻辑 |
+| I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，14 项测试覆盖 API、分析逻辑、偏好、来源、事件与 LLM 回退 |
 | I-04 | 前端 build 通过 | PASS | `npm run build` 已通过，类型错误与本机构建链路已修复 |
 | I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 已通过，实际 `docker compose up -d --build` 因 Docker daemon 不可连接失败，尚未完成容器内联调 |
 | I-06 | README 完整 | PASS | 已改为本机 PostgreSQL + FastAPI + Next.js 运行说明，并保留 Docker 状态说明 |
-| I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、状态更新、删除、Dashboard summary 与页面入口 |
+| I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、事件记录、技能搜索、删除、Dashboard、Sources、Settings、Guide 页面 |
 
 ---
 
 ## 验收证据
 - Docker 配置证据：`docker compose config` 已确认后端容器 `DATABASE_URL` 指向 `db:5432`，前端容器 `BACKEND_INTERNAL_URL` 指向 `backend:8000`，本机 `.env` 不再污染容器内部地址
+- Docker LLM 配置证据：`docker compose config` 已确认后端容器包含 `LLM_ENABLED`、`LLM_PROVIDER`、`LLM_API_BASE_URL`、`LLM_API_KEY`、`LLM_MODEL`
 - Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞
 - 非 Docker 重构证据：已新增 `scripts/check-local-env.ps1`、`scripts/init-local-postgres.ps1`、`scripts/start-backend.ps1`、`scripts/start-frontend.ps1`、`scripts/start-local.ps1`
 - 非 Docker 配置证据：`.env.example` 已指向 `localhost:5432`，`.env.docker.example` 保留 Docker Compose 配置
 - PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
+- MVP+ 数据库验证：`python -m app.cli init-db` 已应用 `app_preferences`、`source_links`、`job_events`，默认来源链接已写入本机 PostgreSQL
 - 后端真实联通：`GET /api/health` 返回 `{"status":"ok"}`，`GET /api/dashboard/summary` 可返回当前统计数据
 - 前端真实访问：`GET http://localhost:3000/jobs` 返回 HTTP 200
 - 新增页访问验证：`GET http://localhost:3000/jobs/new` 返回 HTTP 200
+- 平台入口页访问验证：`GET http://localhost:3000/sources` 返回 HTTP 200
+- 偏好设置页访问验证：`GET http://localhost:3000/settings` 返回 HTTP 200
+- 新人指南页访问验证：`GET http://localhost:3000/guide` 返回 HTTP 200
+- 来源预填新增页访问验证：`GET http://localhost:3000/jobs/new?platform=...&job_link=...` 返回 HTTP 200
 - 流程入口访问验证：`GET http://localhost:3000/` 返回 HTTP 200，页面包含“今天的求职工作从这里开始”
 - 列表查询入口验证：`GET http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score` 返回 HTTP 200
 - 关键功能链路验证：临时调用 `POST /api/analyze-jd` 得到 `ai_app_dev`、`priority_apply`、92 分，随后 `POST /api/jobs` 创建临时岗位、`PUT /api/jobs/{id}` 更新为 `applied`、`DELETE /api/jobs/{id}` 删除成功
+- MVP+ 关键功能链路验证：`GET /api/preferences` 返回默认偏好；`GET /api/source-links` 返回 BOSS直聘、拉勾、猎聘、智联招聘、前程无忧、牛客、脉脉；临时调用 `POST /api/jobs/{id}/events` 成功记录 `applied` 事件；`GET /api/jobs?q=RAG` 可匹配技能数组；临时岗位已删除
+- JD Analyzer 来源验证：临时 `POST /api/analyze-jd` 返回 `analysis_source=rules`；后端测试已覆盖 LLM 成功和失败回退场景
 - 流程补齐证据：首页已按“收集岗位 / 解析修正 / 投递跟进 / 复盘决策”组织；Dashboard 统计卡和流程状态可跳转到列表筛选；列表支持 URL query 初始化筛选并展示下一步提示；JD 解析后可自动从 `pending_analysis` 推进到 `ready_to_apply`
 - 前端视觉复查：Codex 内置浏览器已刷新 `http://localhost:3000/jobs`，确认新导航、新标题区、状态条、紧凑筛选区和列表行生效
 - 新增页布局重构证据：`frontend/src/components/job-editor.tsx` 已改为左右分栏工作流，JD 原文输入区 `min-h-[500px]`，右侧表单合并基础信息、分析结果与投递流程，并提供底部 sticky 保存操作栏
 - 前端 lint 输出：`npm run lint` 通过
 - 后端 lint 输出：`ruff check .`、`black --check .` 通过
-- pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过
-- 前端页面交互测试：`npm run test` 通过，包含 JobEditor 点击“解析 JD”自动回填验证
+- pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过，14 项测试通过
+- 前端页面交互测试：`npm run test` 通过，11 项测试通过，包含 JobEditor 点击“解析 JD”自动回填、来源页、设置页验证
 - 前端 Codespaces 地址测试：已验证 `http://localhost:8000` 在 Codespaces 浏览器环境下会自动解析为当前工作区的 8000 转发地址
 - 前端 build 输出：`npm run build` 通过
+- 前端 build 路由证据：Next build 生成 `/sources`、`/settings`、`/guide`
 - Codespaces 请求修复：前端会自动推导 8000 转发后端地址，FastAPI 已放行 `*.app.github.dev` / `*.githubpreview.dev` 来源，Compose 与环境模板已同步补齐对应变量
 - 页面截图：Codex 内置浏览器已完成 `/jobs` 当前视图截图复查
 - Linux 部署说明：已写入 `README.md`
@@ -178,5 +197,5 @@
 - 是否达到 MVP 发布条件：否，严格按 PRD 仍缺 Docker Compose 实际启动与联调
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 00:44
-- 最终说明：当前已完成前后端功能主链、前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证；`/jobs`、`/jobs/new`、`/dashboard` 与首页已补齐 MVP 内求职操作链路；Compose 文件已完成本机 `.env` 与容器内部地址隔离，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞，因此原 PRD 容器化验收项仍未关闭，不能判定为全量 MVP 验收通过。
+- 验收时间：2026-05-02 01:48
+- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问与关键 API 闭环验证均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞，因此原 PRD 容器化验收项仍未关闭，不能判定为全量 MVP+ Docker 验收通过。
