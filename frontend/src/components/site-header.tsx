@@ -1,26 +1,57 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { navigationItems } from "@/lib/project";
 
 export function SiteHeader() {
+  const pathname = usePathname();
+
+  function isActiveRoute(href: string) {
+    if (href === "/jobs/new") {
+      return pathname.startsWith("/jobs/new");
+    }
+
+    if (href === "/jobs") {
+      return (
+        pathname === "/jobs" ||
+        (pathname.startsWith("/jobs/") && !pathname.startsWith("/jobs/new"))
+      );
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+
   return (
-    <header className="sticky top-0 z-20 border-b border-[var(--color-line)] bg-white/75 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-accent)] text-sm font-semibold text-white">
+    <header className="sticky top-0 z-20 border-b border-[var(--color-line)] bg-[rgba(248,250,252,0.86)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-[1040px] items-center justify-between gap-4 px-5 py-3 sm:px-8 lg:px-6">
+        <Link href="/" className="group flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-ink)] text-sm font-semibold text-white transition group-hover:bg-[var(--color-accent)]">
             JT
           </div>
-          <div>
-            <p className="text-sm font-semibold">Job Tracker</p>
-            <p className="text-xs text-[var(--color-muted)]">MVP 初始化骨架</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-tight">
+              Job Tracker
+            </p>
+            <p className="truncate text-xs text-[var(--color-muted)]">
+              JD Analyzer
+            </p>
           </div>
         </Link>
 
-        <nav className="flex items-center gap-2">
+        <nav
+          aria-label="主导航"
+          className="flex shrink-0 items-center rounded-full border border-[var(--color-line)] bg-white/70 p-1 shadow-[0_12px_30px_rgba(15,23,42,0.05)]"
+        >
           {navigationItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full px-4 py-2 text-sm text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+              className={`rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
+                isActiveRoute(item.href)
+                  ? "bg-[var(--color-ink)] text-white shadow-sm"
+                  : "text-[var(--color-muted)] hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+              }`}
             >
               {item.label}
             </Link>

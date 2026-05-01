@@ -142,6 +142,6 @@
 ---
 
 ## 当前状态
-- 当前阶段：非 Docker 本机运行路线已打通，PostgreSQL / FastAPI / Next.js 均已启动验证
+- 当前阶段：非 Docker 本机运行路线已打通，PostgreSQL / FastAPI / Next.js 均已启动验证，`/jobs` 列表页视觉优化已在 Codex 内置浏览器复查
 - 当前阻塞：Docker Compose 联调仍不可用；完整 CRUD / JD Analyzer / Dashboard 浏览器手工验收待执行
-- 最新更新时间：2026-05-01 23:32
+- 最新更新时间：2026-05-01 23:53

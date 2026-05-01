@@ -466,6 +466,40 @@
 
 ---
 
+### LOG-012
+- 时间：2026-05-01 23:53
+- 任务：TASK-E / `/jobs` 列表页视觉优化
+- 目标：按浏览器备注优化列表页整体审美，收窄导航与内容视觉宽度，弱化粗色块，补充更现代的状态与工作区信息
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/site-header.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/app/globals.css src/app/layout.tsx src/components/site-header.tsx src/components/jobs-list-client.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - Codex 内置浏览器刷新 `http://localhost:3000/jobs`
+- 执行结果：
+  - 已将顶部导航改为更紧凑的胶囊式导航，并移除 `MVP 初始化骨架` 占位文案
+  - 已将列表页头部改为更轻的工作台标题区，主 CTA 与统计入口更清晰
+  - 已将筛选区改为紧凑表单面板，并增加当前结果、优先投递、待分析状态条
+  - 已将空状态改为有下一步行动的工作区，引导新增岗位、解析 JD 与按匹配分投递
+  - 已修复全局 `a { color: inherit }` 覆盖 Tailwind 链接文字颜色，导致深色链接按钮文字不可见的问题
+  - 前端 `lint`、`test`、`build` 均通过
+  - Codex 内置浏览器已刷新 `/jobs` 并确认新布局生效
+- 风险/备注：
+  - 本次仅优化 `/jobs` 列表页与全局导航视觉，不改变 API、数据库或业务逻辑
+  - 当前数据库存在 1 条空白岗位记录，因此浏览器复查时展示的是列表行而非空状态
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -508,7 +542,7 @@
 ---
 
 ## 阶段总结
-- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证
+- 当前阶段：非 Docker 本机运行路线已打通并完成基础联通验证，`/jobs` 列表页视觉优化已完成
 - 已完成任务数：59
 - 未完成任务数：8
 - 当前风险：完整 CRUD / JD Analyzer / Dashboard 浏览器手工验收待执行；Docker Compose 联调仍不可用

@@ -30,9 +30,9 @@ export default function RootLayout({
       className={`${manrope.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[var(--color-surface)] text-[var(--color-ink)]">
-        <div className="min-h-screen bg-[radial-gradient(circle_at_top,#fff7ed_0%,#fef3c7_24%,#f8fafc_60%)]">
+        <div className="min-h-screen bg-[linear-gradient(180deg,#f7f8f4_0%,#f8fafc_48%,#eef4f7_100%)]">
           <SiteHeader />
-          <main className="mx-auto flex w-full max-w-6xl flex-col px-4 pb-12 pt-8 sm:px-6 lg:px-8">
+          <main className="mx-auto flex w-full max-w-[1040px] flex-col px-5 pb-14 pt-6 sm:px-8 lg:px-6">
             {children}
           </main>
         </div>

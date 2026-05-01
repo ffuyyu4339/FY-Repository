@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --color-surface: #f8fafc;
-  --color-panel: rgba(255, 255, 255, 0.88);
-  --color-panel-strong: #fffaf2;
-  --color-ink: #1f2937;
-  --color-muted: #475569;
-  --color-line: rgba(148, 163, 184, 0.28);
-  --color-accent: #c2410c;
-  --color-accent-soft: #ffedd5;
+  --color-surface: #f7f8f4;
+  --color-panel: rgba(255, 255, 255, 0.9);
+  --color-panel-strong: #ffffff;
+  --color-ink: #111827;
+  --color-muted: #64748b;
+  --color-line: rgba(100, 116, 139, 0.2);
+  --color-accent: #b7410e;
+  --color-accent-soft: #fff1e7;
   --color-success: #15803d;
 }
 
@@ -31,8 +31,14 @@ body {
   font-family: var(--font-manrope), sans-serif;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 a {
-  color: inherit;
   text-decoration: none;
 }
 
