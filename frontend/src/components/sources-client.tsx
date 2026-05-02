@@ -18,6 +18,14 @@ import {
   type SourceLinkPayload,
   type TrackValue,
 } from "@/lib/types";
+import {
+  PageHero,
+  accentButtonClass,
+  cn,
+  controlClass,
+  secondaryButtonClass,
+  selectControlClass,
+} from "@/components/ui";
 
 type SourceFormState = {
   platform_name: string;
@@ -41,13 +49,7 @@ const emptyFormState: SourceFormState = {
   sort_order: "100",
 };
 
-const inputClass =
-  "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
-
-const selectClass =
-  "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
-
-const intakeSteps = ["打开网页", "复制 JD", "录入岗位", "解析跟进"];
+const intakeSteps = ["打开网页", "复制 JD", "录入岗位", "解析确认"];
 
 function toFormState(sourceLink: SourceLink): SourceFormState {
   return {
@@ -73,6 +75,14 @@ function toPayload(formState: SourceFormState): SourceLinkPayload {
     enabled: formState.enabled,
     sort_order: Number(formState.sort_order || 100),
   };
+}
+
+function FieldLabel({ children }: { children: string }) {
+  return (
+    <span className="text-xs font-medium text-[var(--color-text-secondary)]">
+      {children}
+    </span>
+  );
 }
 
 export function SourcesClient() {
@@ -159,83 +169,93 @@ export function SourcesClient() {
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
-        <div>
-          <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
-            workspace / sources
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-            招聘网页入口
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            保存常用招聘平台、搜索链接和筛选条件。外部网页只负责查看岗位，JD
-            原文回到系统内解析和跟进。
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-          <p className="text-xs font-semibold text-slate-500">采集流程</p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {intakeSteps.map((step, index) => (
-              <span
-                key={step}
-                className="rounded-lg bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700"
-              >
-                <span className="mr-1 font-mono text-[var(--color-accent)]">
-                  {index + 1}
-                </span>
-                {step}
-              </span>
-            ))}
+      <PageHero
+        breadcrumb="workspace / sources"
+        title="招聘入口库"
+        description="集中保存招聘平台和搜索链接，打开后用浏览器本地登录态查看岗位，再手动复制 JD 回系统解析。"
+        actions={
+          <>
+            <Link href="/jobs/new" className={accentButtonClass}>
+              录入岗位
+            </Link>
+            <Link href="/guide" className={secondaryButtonClass}>
+              查看流程
+            </Link>
+          </>
+        }
+      />
+
+      <div className="grid gap-2 rounded-lg border border-[var(--color-border)] bg-white p-3 sm:grid-cols-4">
+        {intakeSteps.map((step, index) => (
+          <div
+            key={step}
+            className="flex items-center gap-2 rounded-lg bg-[var(--color-surface-muted)] px-3 py-2 text-sm text-slate-700"
+          >
+            <span className="font-mono text-xs font-semibold text-[var(--color-accent)]">
+              0{index + 1}
+            </span>
+            <span className="font-medium">{step}</span>
           </div>
-        </div>
+        ))}
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       ) : null}
 
       {successMessage ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 shadow-sm">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
           {successMessage}
         </div>
       ) : null}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_390px]">
-        <div className="space-y-3">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">
+                来源列表
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">
+                平台入口
+              </h2>
+            </div>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              {loading ? "正在同步..." : `${sourceLinks.length} 个入口`}
+            </p>
+          </div>
+
           {loading ? (
-            <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500 shadow-sm">
+            <div className="rounded-lg border border-[var(--color-border)] bg-white px-4 py-6 text-sm text-[var(--color-text-secondary)]">
               正在加载平台入口...
             </div>
           ) : null}
 
           {!loading && sourceLinks.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500 shadow-sm">
+            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-5 text-sm text-[var(--color-text-secondary)]">
               还没有平台入口，右侧添加第一个搜索链接。
             </div>
           ) : null}
 
-          {sourceLinks.map((sourceLink) => (
-            <div
-              key={sourceLink.id}
-              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-orange-200 hover:shadow-md"
-            >
-              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
-                <p className="ml-2 min-w-0 flex-1 truncate rounded-full bg-white px-3 py-1.5 font-mono text-[11px] text-slate-500 ring-1 ring-slate-200">
-                  {sourceLink.url}
-                </p>
-              </div>
-              <div className="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+          <div className="grid gap-2">
+            {sourceLinks.map((sourceLink) => (
+              <article
+                key={sourceLink.id}
+                className={cn(
+                  "grid gap-4 rounded-lg border bg-white p-4 transition hover:border-orange-200 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center",
+                  sourceLink.enabled
+                    ? "border-[var(--color-border)]"
+                    : "border-slate-200 opacity-70",
+                )}
+              >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-semibold text-slate-950">
+                    <h3 className="truncate text-base font-semibold text-[var(--color-text-primary)]">
                       {sourceLink.title}
-                    </h2>
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
+                    </h3>
+                    <span className="rounded-full bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs text-slate-600">
                       {sourceLink.platform_name}
                     </span>
                     {!sourceLink.enabled ? (
@@ -244,36 +264,36 @@ export function SourcesClient() {
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                    打开外部网页后复制
-                    JD，把平台、链接和岗位描述带回新增岗位页。
+                  <p className="mt-2 truncate font-mono text-xs text-[var(--color-text-secondary)]">
+                    {sourceLink.url}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {sourceLink.city ? (
-                      <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                      <span className="rounded-md bg-[var(--color-surface-muted)] px-2 py-1 text-xs text-slate-600">
                         {sourceLink.city}
                       </span>
                     ) : null}
                     {sourceLink.track ? (
-                      <span className="rounded-md bg-orange-50 px-2 py-1 text-xs text-[var(--color-accent)]">
+                      <span className="rounded-md bg-[var(--color-accent-soft)] px-2 py-1 text-xs text-[var(--color-accent)]">
                         {formatTrackLabel(sourceLink.track)}
                       </span>
                     ) : null}
                     {sourceLink.keywords.map((keyword) => (
                       <span
                         key={keyword}
-                        className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600"
+                        className="rounded-md bg-[var(--color-surface-muted)] px-2 py-1 text-xs text-slate-600"
                       >
                         {keyword}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 md:w-36 md:flex-col">
+
+                <div className="flex flex-wrap gap-2 lg:w-36 lg:flex-col">
                   <button
                     type="button"
                     onClick={() => openSource(sourceLink)}
-                    className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)]"
+                    className={accentButtonClass}
                   >
                     打开平台
                   </button>
@@ -281,7 +301,7 @@ export function SourcesClient() {
                     href={`/jobs/new?platform=${encodeURIComponent(
                       sourceLink.platform_name,
                     )}&job_link=${encodeURIComponent(sourceLink.url)}`}
-                    className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+                    className={secondaryButtonClass}
                   >
                     录入岗位
                   </Link>
@@ -291,101 +311,127 @@ export function SourcesClient() {
                       setEditingId(sourceLink.id);
                       setFormState(toFormState(sourceLink));
                     }}
-                    className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+                    className={secondaryButtonClass}
                   >
                     编辑
                   </button>
                 </div>
-              </div>
-            </div>
-          ))}
+              </article>
+            ))}
+          </div>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24"
+          className="rounded-lg border border-[var(--color-border)] bg-white p-4 lg:sticky lg:top-24"
         >
-          <div className="border-b border-slate-100 pb-4">
+          <div className="border-b border-[var(--color-border)] pb-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-slate-950">
-                  {editingId ? "编辑来源" : "新增来源"}
+                <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
+                  {editingId ? "配置来源" : "新增来源"}
                 </h2>
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  只保存外部链接和筛选条件，不保存平台账号或登录令牌。
+                <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
+                  只保存平台名、搜索链接和筛选条件；不保存平台账号、密码、Cookie
+                  或登录令牌。
                 </p>
               </div>
-              <Link
-                href="/settings"
-                className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+              <button
+                type="button"
+                onClick={resetForm}
+                className="shrink-0 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition hover:border-slate-300 hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
               >
-                偏好
-              </Link>
+                清空
+              </button>
             </div>
           </div>
+
           <div className="mt-4 grid gap-3">
-            <input
-              value={formState.platform_name}
-              onChange={(event) =>
-                updateField("platform_name", event.target.value)
-              }
-              placeholder="平台名称"
-              className={inputClass}
-              required
-            />
-            <input
-              value={formState.title}
-              onChange={(event) => updateField("title", event.target.value)}
-              placeholder="入口标题"
-              className={inputClass}
-              required
-            />
-            <input
-              value={formState.url}
-              onChange={(event) => updateField("url", event.target.value)}
-              placeholder="外部链接"
-              className={inputClass}
-              required
-            />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <label className="grid gap-1.5">
+              <FieldLabel>平台名称</FieldLabel>
               <input
-                value={formState.city}
-                onChange={(event) => updateField("city", event.target.value)}
-                placeholder="城市"
-                className={inputClass}
-              />
-              <select
-                value={formState.track}
+                value={formState.platform_name}
                 onChange={(event) =>
-                  updateField("track", event.target.value as TrackValue | "")
+                  updateField("platform_name", event.target.value)
                 }
-                className={selectClass}
-              >
-                <option value="">不限方向</option>
-                {trackOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                placeholder="平台名称"
+                className={controlClass}
+                required
+              />
+            </label>
+            <label className="grid gap-1.5">
+              <FieldLabel>入口标题</FieldLabel>
+              <input
+                value={formState.title}
+                onChange={(event) => updateField("title", event.target.value)}
+                placeholder="入口标题"
+                className={controlClass}
+                required
+              />
+            </label>
+            <label className="grid gap-1.5">
+              <FieldLabel>外部链接</FieldLabel>
+              <input
+                value={formState.url}
+                onChange={(event) => updateField("url", event.target.value)}
+                placeholder="外部链接"
+                className={controlClass}
+                required
+              />
+            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <FieldLabel>城市</FieldLabel>
+                <input
+                  value={formState.city}
+                  onChange={(event) => updateField("city", event.target.value)}
+                  placeholder="城市"
+                  className={controlClass}
+                />
+              </label>
+              <label className="grid gap-1.5">
+                <FieldLabel>方向</FieldLabel>
+                <select
+                  value={formState.track}
+                  onChange={(event) =>
+                    updateField("track", event.target.value as TrackValue | "")
+                  }
+                  className={selectControlClass}
+                >
+                  <option value="">不限方向</option>
+                  {trackOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
-            <input
-              value={formState.keywords}
-              onChange={(event) => updateField("keywords", event.target.value)}
-              placeholder="关键词，逗号分隔"
-              className={inputClass}
-            />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <label className="grid gap-1.5">
+              <FieldLabel>关键词</FieldLabel>
               <input
-                value={formState.sort_order}
+                value={formState.keywords}
                 onChange={(event) =>
-                  updateField("sort_order", event.target.value)
+                  updateField("keywords", event.target.value)
                 }
-                type="number"
-                placeholder="排序"
-                className={inputClass}
+                placeholder="关键词，逗号分隔"
+                className={controlClass}
               />
-              <label className="flex h-10 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm">
+            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <FieldLabel>排序</FieldLabel>
+                <input
+                  value={formState.sort_order}
+                  onChange={(event) =>
+                    updateField("sort_order", event.target.value)
+                  }
+                  type="number"
+                  placeholder="排序"
+                  className={controlClass}
+                />
+              </label>
+              <label className="mt-5 flex h-11 items-center justify-between rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm text-slate-700">
                 启用
                 <input
                   type="checkbox"
@@ -398,28 +444,20 @@ export function SourcesClient() {
               </label>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap justify-between gap-2">
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={saving}
-                className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] disabled:translate-y-0 disabled:opacity-60"
-              >
-                {saving ? "保存中..." : editingId ? "保存修改" : "创建入口"}
-              </button>
-              <button
-                type="button"
-                onClick={resetForm}
-                className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:text-slate-950"
-              >
-                重置
-              </button>
-            </div>
+
+          <div className="mt-4 flex flex-wrap justify-between gap-2 border-t border-[var(--color-border)] pt-4">
+            <button
+              type="submit"
+              disabled={saving}
+              className={accentButtonClass}
+            >
+              {saving ? "保存中..." : editingId ? "保存修改" : "创建入口"}
+            </button>
             {editingId ? (
               <button
                 type="button"
                 onClick={() => handleDelete(editingId)}
-                className="h-10 rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
               >
                 删除
               </button>

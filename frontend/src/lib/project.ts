@@ -1,9 +1,34 @@
 export const navigationItems = [
-  { href: "/jobs", label: "岗位列表" },
-  { href: "/jobs/new", label: "新增岗位" },
-  { href: "/sources", label: "平台入口" },
-  { href: "/dashboard", label: "统计面板" },
-  { href: "/guide", label: "指南" },
+  {
+    href: "/jobs",
+    label: "决策队列",
+    eyebrow: "Jobs",
+    description: "筛选、排序、判断下一步",
+  },
+  {
+    href: "/jobs/new",
+    label: "JD Intake Studio",
+    eyebrow: "Intake",
+    description: "粘贴 JD 并确认解析结果",
+  },
+  {
+    href: "/sources",
+    label: "招聘入口库",
+    eyebrow: "Sources",
+    description: "管理平台与搜索链接",
+  },
+  {
+    href: "/dashboard",
+    label: "求职雷达",
+    eyebrow: "Radar",
+    description: "复盘状态、方向和技能词",
+  },
+  {
+    href: "/guide",
+    label: "流程蓝图",
+    eyebrow: "Guide",
+    description: "查看合规使用流程",
+  },
 ];
 
 export const quickLinks = [

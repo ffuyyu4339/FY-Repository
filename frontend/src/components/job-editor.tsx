@@ -33,6 +33,19 @@ import {
   type StatusValue,
   type TrackValue,
 } from "@/lib/types";
+import {
+  MatchBadge,
+  PageHero,
+  ScoreRing,
+  StatusBadge,
+  accentButtonClass,
+  cn,
+  controlClass,
+  primaryButtonClass,
+  secondaryButtonClass,
+  selectControlClass,
+  textareaControlClass,
+} from "@/components/ui";
 
 type JobEditorProps = {
   mode: "create" | "edit";
@@ -97,16 +110,11 @@ const defaultFormState: JobFormState = {
   notes: "",
 };
 
-const fieldClass =
-  "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
+const fieldClass = controlClass;
+const selectClass = selectControlClass;
+const textareaClass = cn(textareaControlClass, "resize-y");
 
-const selectClass =
-  "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
-
-const textareaClass =
-  "w-full resize-y rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
-
-const paneClass = "rounded-2xl border border-slate-200 bg-white shadow-sm";
+const paneClass = "rounded-lg border border-[var(--color-border)] bg-white";
 
 const statusHintMap: Record<StatusValue, string> = {
   pending_analysis: "待补 JD 或待解析",
@@ -135,7 +143,7 @@ const manualEventOptions: { value: JobEventType; label: string }[] = [
   { value: "note", label: "备注" },
 ];
 
-const editorFlowSteps = ["来源网页", "JD 原文", "结构化字段", "投递状态"];
+const editorFlowSteps = ["来源", "JD 原文", "解析", "确认"];
 
 const analysisSourceLabelMap: Record<
   NonNullable<JDAnalysisResult["analysis_source"]>,
@@ -221,10 +229,89 @@ function SectionBlock({ children, description, title }: SectionBlockProps) {
 
 function metricBadge(label: string, value: string) {
   return (
-    <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600">
+    <span className="rounded-full border border-[var(--color-border)] bg-white px-2.5 py-1 text-xs text-[var(--color-text-secondary)]">
       {label}
-      <span className="ml-1 font-semibold text-slate-950">{value}</span>
+      <span className="ml-1 font-semibold text-[var(--color-text-primary)]">
+        {value}
+      </span>
     </span>
+  );
+}
+
+function StickyActionBar({
+  deleting,
+  formState,
+  mode,
+  onDelete,
+  onReset,
+  saving,
+  submitLabel,
+}: {
+  deleting: boolean;
+  formState: JobFormState;
+  mode: "create" | "edit";
+  onDelete: () => void;
+  onReset: () => void;
+  saving: boolean;
+  submitLabel: string;
+}) {
+  return (
+    <div className="sticky bottom-0 z-20 border-t border-[var(--color-border)] bg-[rgba(246,242,234,0.92)] py-3 backdrop-blur lg:col-span-2">
+      <div className="flex flex-col gap-3 rounded-lg border border-[var(--color-border)] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3 text-xs leading-5 text-[var(--color-text-secondary)]">
+          <ScoreRing score={Number(formState.match_score || 0)} size="sm" />
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-[var(--color-text-primary)]">
+              {formState.job_title || "未填写岗位名称"}
+            </p>
+            <p className="truncate">
+              {formatTrackLabel(formState.track)} ·{" "}
+              {formatMatchLevelLabel(formState.match_level)} ·{" "}
+              {formatStatusLabel(formState.status)}
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {mode === "create" ? (
+            <button
+              type="button"
+              onClick={onReset}
+              className={secondaryButtonClass}
+            >
+              重置
+            </button>
+          ) : null}
+          {mode === "edit" ? (
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={deleting}
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 bg-white px-4 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {deleting ? "删除中..." : "删除岗位"}
+            </button>
+          ) : null}
+          <button
+            type="submit"
+            name="intent"
+            value="return"
+            disabled={saving}
+            className={secondaryButtonClass}
+          >
+            保存并返回
+          </button>
+          <button
+            type="submit"
+            name="intent"
+            value="stay"
+            disabled={saving}
+            className={primaryButtonClass}
+          >
+            {submitLabel}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -376,6 +463,10 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+    const intent = submitter?.value === "return" ? "return" : "stay";
+
     if (mode === "edit" && !jobId) {
       setError("缺少岗位 ID，无法保存修改。");
       return;
@@ -401,6 +492,11 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
 
       setFormState(toFormState(job));
       setSuccessMessage(mode === "create" ? "岗位已创建。" : "岗位已更新。");
+
+      if (intent === "return") {
+        router.push("/jobs");
+        return;
+      }
 
       if (mode === "create") {
         router.push(`/jobs/${job.id}`);
@@ -472,9 +568,16 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
     setFormState((current) => ({ ...current, [key]: value }));
   }
 
+  function handleResetForm() {
+    setFormState(defaultFormState);
+    setAnalysisSource(null);
+    setError(null);
+    setSuccessMessage(null);
+  }
+
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500 shadow-sm">
+      <div className="rounded-lg border border-[var(--color-border)] bg-white px-4 py-6 text-sm text-[var(--color-text-secondary)]">
         正在加载岗位详情...
       </div>
     );
@@ -484,7 +587,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
     mode === "create"
       ? "workspace / jobs / new"
       : `workspace / jobs / ${jobId}`;
-  const title = mode === "create" ? "新增岗位" : "岗位详情与编辑";
+  const title = mode === "create" ? "JD Intake Studio" : "岗位详情与编辑";
   const submitLabel = saving
     ? "保存中..."
     : mode === "create"
@@ -495,39 +598,30 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
 
   return (
     <section className="space-y-5 pb-4">
-      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[1fr_auto] lg:items-end">
-        <div>
-          <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
-            {pageLabel}
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-            {title}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            左侧承接招聘网页和 JD 原文，右侧检查结构化字段、匹配结果和投递流程。
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/jobs"
-            className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-950"
-          >
-            返回列表
-          </Link>
-          {metricBadge("方向", formatTrackLabel(formState.track))}
-          {metricBadge("等级", formatMatchLevelLabel(formState.match_level))}
-          {metricBadge("分数", `${formState.match_score || 0}`)}
-          {analysisSource
-            ? metricBadge("解析", analysisSourceLabelMap[analysisSource])
-            : null}
-        </div>
-      </div>
+      <PageHero
+        breadcrumb={pageLabel}
+        title={title}
+        description="左侧完成来源链接、平台信息和 JD 原文录入，右侧检查解析字段、匹配结果和投递流程。"
+        actions={
+          <>
+            <Link href="/jobs" className={secondaryButtonClass}>
+              返回列表
+            </Link>
+            {metricBadge("方向", formatTrackLabel(formState.track))}
+            {metricBadge("等级", formatMatchLevelLabel(formState.match_level))}
+            {metricBadge("分数", `${formState.match_score || 0}`)}
+            {analysisSource
+              ? metricBadge("解析", analysisSourceLabelMap[analysisSource])
+              : null}
+          </>
+        }
+      />
 
-      <div className="grid gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-4">
+      <div className="grid gap-2 rounded-lg border border-[var(--color-border)] bg-white p-3 sm:grid-cols-4">
         {editorFlowSteps.map((step, index) => (
           <div
             key={step}
-            className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-700"
+            className="flex items-center gap-2 rounded-lg bg-[var(--color-surface-muted)] px-3 py-2 text-sm text-slate-700"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white font-mono text-xs font-semibold text-[var(--color-accent)] ring-1 ring-slate-200">
               {index + 1}
@@ -538,13 +632,13 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       ) : null}
 
       {successMessage ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 shadow-sm">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
           {successMessage}
         </div>
       ) : null}
@@ -556,24 +650,25 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
         <section className={`${paneClass} lg:sticky lg:top-24`}>
           <div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-base font-semibold text-slate-950">
-                来源网页与 JD 原文
+              <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
+                JD Studio
               </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-500">
-                保留来源链接、平台信息和原始描述，解析结果会自动写入右侧表单。
+              <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
+                保留来源链接、平台信息和原始 JD，解析结果会自动写入右侧
+                Inspector。
               </p>
             </div>
             <button
               type="button"
               onClick={handleAnalyze}
               disabled={analyzing}
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#9f350c] disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+              className={cn(accentButtonClass, "shrink-0")}
             >
               {analyzing ? "解析中..." : "一键解析 JD"}
             </button>
           </div>
           <div className="p-4">
-            <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+            <div className="mb-4 overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)]">
               <div className="flex items-center gap-2 border-b border-slate-200 px-3 py-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
@@ -609,7 +704,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                 updateField("jd_raw_text", event.target.value)
               }
               placeholder="粘贴岗位 JD 原文"
-              className={`${textareaClass} min-h-[500px] lg:min-h-[calc(100vh-18rem)]`}
+              className={cn(textareaClass, "min-h-[320px] max-h-[420px]")}
             />
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
               <span>{formState.jd_raw_text.trim().length} 字</span>
@@ -618,40 +713,34 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
           </div>
         </section>
 
-        <aside
-          className={`${paneClass} lg:max-h-[calc(100vh-6.75rem)] lg:overflow-y-auto`}
-        >
-          <div className="border-b border-slate-100 bg-white/95 px-4 py-4 backdrop-blur lg:sticky lg:top-0 lg:z-10">
+        <aside className={paneClass}>
+          <div className="border-b border-slate-100 bg-white px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold text-slate-950">
-                  岗位表单
+                <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
+                  Analysis Inspector
                 </h2>
-                <p className="mt-1 text-xs leading-5 text-slate-500">
+                <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
                   基础信息、分析结果和投递流程合并维护。
                 </p>
               </div>
-              <span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-[var(--color-accent)]">
-                {formatStatusLabel(formState.status)}
-              </span>
+              <StatusBadge status={formState.status} />
             </div>
           </div>
 
           <div className="space-y-5 px-4 py-4">
             <div className="grid gap-2 sm:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2">
                 <p className="text-[11px] text-slate-400">方向</p>
                 <p className="mt-0.5 truncate text-sm font-semibold text-slate-950">
                   {formatTrackLabel(formState.track)}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-                <p className="text-[11px] text-slate-400">匹配等级</p>
-                <p className="mt-0.5 truncate text-sm font-semibold text-slate-950">
-                  {formatMatchLevelLabel(formState.match_level)}
-                </p>
+              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2">
+                <p className="mb-1 text-[11px] text-slate-400">匹配等级</p>
+                <MatchBadge level={formState.match_level} />
               </div>
-              <div className="rounded-xl border border-orange-100 bg-orange-50 px-3 py-2">
+              <div className="rounded-lg border border-orange-100 bg-[var(--color-accent-soft)] px-3 py-2">
                 <p className="text-[11px] text-orange-700">匹配分</p>
                 <p className="mt-0.5 text-sm font-semibold text-slate-950">
                   {formState.match_score || 0}
@@ -835,7 +924,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                     ))}
                   </select>
                 </Field>
-                <label className="flex h-10 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 text-sm shadow-sm sm:col-span-2">
+                <label className="flex h-11 items-center justify-between rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm sm:col-span-2">
                   <span>
                     <span className="font-medium text-slate-700">支持远程</span>
                     <span className="ml-2 text-xs text-slate-400">
@@ -878,7 +967,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
 
             <SectionBlock
               title="投递流程"
-              description="记录简历版本和人工备注，便于详情页继续维护。"
+              description="选择当前生命周期状态，后续可在详情页继续追加事件。"
             >
               <div className="grid gap-3">
                 <div>
@@ -913,6 +1002,14 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                     })}
                   </div>
                 </div>
+              </div>
+            </SectionBlock>
+
+            <SectionBlock
+              title="备注与简历版本"
+              description="保留本次投递使用的简历版本、人工判断和后续提醒。"
+            >
+              <div className="grid gap-3">
                 <Field label="简历版本">
                   <input
                     value={formState.resume_version}
@@ -968,7 +1065,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                     type="button"
                     onClick={handleAddEvent}
                     disabled={addingEvent}
-                    className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-200 hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-10 rounded-lg border border-[var(--color-border)] bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-orange-200 hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {addingEvent ? "记录中..." : "记录事件"}
                   </button>
@@ -1004,41 +1101,17 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
               </SectionBlock>
             ) : null}
           </div>
-
-          <div className="sticky bottom-0 z-10 border-t border-slate-100 bg-white/95 p-4 backdrop-blur">
-            <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-xs leading-5 text-slate-500">
-                <p className="font-semibold text-slate-900">
-                  {formState.job_title || "未填写岗位名称"}
-                </p>
-                <p>
-                  {formatTrackLabel(formState.track)} ·{" "}
-                  {formatMatchLevelLabel(formState.match_level)} ·{" "}
-                  {formState.match_score || 0} 分
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {mode === "edit" ? (
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="h-10 rounded-lg border border-red-200 bg-white px-4 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {deleting ? "删除中..." : "删除岗位"}
-                  </button>
-                ) : null}
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {submitLabel}
-                </button>
-              </div>
-            </div>
-          </div>
         </aside>
+
+        <StickyActionBar
+          deleting={deleting}
+          formState={formState}
+          mode={mode}
+          onDelete={handleDelete}
+          onReset={handleResetForm}
+          saving={saving}
+          submitLabel={submitLabel}
+        />
       </form>
     </section>
   );

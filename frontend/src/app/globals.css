@@ -1,15 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --color-surface: #f8fafc;
-  --color-panel: rgba(255, 255, 255, 0.92);
-  --color-panel-strong: #ffffff;
-  --color-ink: #111827;
-  --color-muted: #64748b;
-  --color-line: #e2e8f0;
-  --color-accent: #b7410e;
-  --color-accent-soft: #fff7ed;
-  --color-success: #15803d;
+  --color-ink: #090e1f;
+  --color-paper: #f6f2ea;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f5f8;
+  --color-border: #dde3ea;
+  --color-accent: #c84a16;
+  --color-accent-soft: #fff1e8;
+  --color-blue: #4f6bff;
+  --color-green: #22a881;
+  --color-amber: #f59e0b;
+  --color-danger: #e5484d;
+  --color-text-primary: #07111f;
+  --color-text-secondary: #64748b;
+  --shadow-soft: 0 14px 36px rgba(9, 14, 31, 0.08);
 }
 
 @theme inline {
@@ -27,9 +32,16 @@ html {
 
 body {
   margin: 0;
-  color: var(--color-ink);
+  color: var(--color-text-primary);
   font-family: var(--font-manrope), sans-serif;
   overflow-x: hidden;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 241, 232, 0.58),
+      rgba(246, 242, 234, 0) 360px
+    ),
+    var(--color-paper);
 }
 
 button,
@@ -39,6 +51,14 @@ textarea {
   font: inherit;
 }
 
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
 a {
   text-decoration: none;
 }
@@ -46,4 +66,15 @@ a {
 ::selection {
   background: #fdba74;
   color: #431407;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
