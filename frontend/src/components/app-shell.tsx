@@ -7,7 +7,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { navigationItems } from "@/lib/project";
 
 function NavGlyph({ index }: { index: number }) {
-  const glyphs = ["◇", "＋", "↗", "◌", "▤"];
+  const glyphs = ["队", "录", "入", "雷", "图"];
   return <span aria-hidden="true">{glyphs[index] ?? "•"}</span>;
 }
 
@@ -57,23 +57,73 @@ function getPageName(pathname: string) {
   return current?.label ?? "求职作战台";
 }
 
-function NavigationList({ onNavigate }: { onNavigate?: () => void }) {
+function getShortNavLabel(href: string) {
+  const labels: Record<string, string> = {
+    "/jobs": "队列",
+    "/jobs/new": "录入",
+    "/sources": "入口",
+    "/dashboard": "雷达",
+    "/guide": "蓝图",
+  };
+
+  return labels[href] ?? "导航";
+}
+
+function NavigationList({
+  compact = false,
+  onNavigate,
+}: {
+  compact?: boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="主导航" className="grid gap-1.5">
+    <nav
+      aria-label="主导航"
+      className={compact ? "grid gap-2" : "grid gap-1.5"}
+    >
       {navigationItems.map((item, index) => {
         const active = isActiveRoute(pathname, item.href);
+
+        if (compact) {
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              title={`${item.label}：${item.description}`}
+              className={`group grid h-[4.25rem] place-items-center rounded-lg border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
+                active
+                  ? "border-white/80 bg-white text-[var(--color-ink)]"
+                  : "border-white/10 bg-white/[0.03] text-white/60 hover:border-white/25 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <span
+                className={`grid h-8 w-8 place-items-center rounded-md text-xs font-bold ${
+                  active
+                    ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
+                    : "bg-white/5 text-white/70"
+                }`}
+              >
+                <NavGlyph index={index} />
+              </span>
+              <span className="mt-1 block max-w-full truncate text-[11px] font-semibold leading-none">
+                {getShortNavLabel(item.href)}
+              </span>
+            </Link>
+          );
+        }
 
         return (
           <Link
             key={item.href}
             href={item.href}
             onClick={onNavigate}
-            className={`group grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-lg px-3 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
+            className={`group grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-lg border px-3 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
               active
-                ? "bg-white text-[var(--color-ink)]"
-                : "text-white/70 hover:bg-white/10 hover:text-white"
+                ? "border-orange-200 bg-[var(--color-accent-soft)] text-[var(--color-ink)]"
+                : "border-transparent text-white/70 hover:border-white/10 hover:bg-white/10 hover:text-white"
             }`}
           >
             <span
@@ -124,49 +174,45 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col bg-[var(--color-ink)] p-4 text-white lg:flex">
+    <div className="min-h-screen bg-[var(--color-paper)] lg:grid lg:grid-cols-[92px_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-black/10 bg-[var(--color-ink)] px-3 py-4 text-white lg:flex">
         <Link
           href="/jobs"
-          className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-3 rounded-xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+          title="求职作战台"
+          className="grid place-items-center rounded-lg border border-white/10 bg-white/[0.04] p-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
         >
-          <span className="grid h-11 w-11 place-items-center rounded-lg bg-[var(--color-accent)] text-sm font-bold text-white">
+          <span className="grid h-11 w-11 place-items-center rounded-md bg-[var(--color-accent)] text-sm font-bold text-white">
             JT
           </span>
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold">
-              求职作战台
-            </span>
-            <span className="mt-1 block truncate text-xs text-white/50">
-              Job Mission Control
-            </span>
-          </span>
+          <span className="sr-only">求职作战台</span>
         </Link>
 
-        <div className="mt-6">
-          <p className="mb-2 px-3 font-mono text-[11px] uppercase tracking-[0.16em] text-white/40">
-            Mission Routes
+        <div className="mt-5">
+          <p className="mb-2 text-center text-[10px] font-semibold tracking-[0.14em] text-white/35">
+            导航
           </p>
-          <NavigationList />
+          <NavigationList compact />
         </div>
 
-        <div className="mt-auto space-y-3 rounded-xl border border-white/10 bg-white/5 p-3 text-xs leading-5 text-white/60">
-          <p className="font-semibold text-white/80">MVP 边界</p>
-          <p>
-            只记录来源、JD、分析结果和手动投递进度，不保存平台令牌，不做自动投递。
-          </p>
+        <div className="mt-auto grid gap-2">
           <Link
             href="/settings"
-            className="inline-flex text-white/80 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+            title="偏好设置"
+            className="grid h-12 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-xs font-semibold text-white/60 transition hover:border-white/25 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/40"
           >
-            偏好设置
+            设置
           </Link>
+          <p className="px-1 text-center text-[10px] leading-4 text-white/35">
+            手动投递
+            <br />
+            不存令牌
+          </p>
         </div>
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 border-b border-[var(--color-border)] bg-[rgba(246,242,234,0.9)] backdrop-blur-xl">
-          <div className="mx-auto flex min-h-16 w-full max-w-[1440px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6 xl:px-8">
+        <header className="sticky top-0 z-30 border-b border-[var(--color-border)] bg-[rgba(246,242,234,0.88)] backdrop-blur-xl">
+          <div className="mx-auto flex min-h-14 w-full max-w-[1500px] flex-wrap items-center gap-2 px-3 py-2 sm:px-5 xl:px-7">
             <button
               type="button"
               aria-label="打开导航"
@@ -177,9 +223,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="text-lg leading-none">☰</span>
             </button>
 
-            <div className="min-w-0 shrink-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-text-secondary)]">
-                Command Bar
+            <div className="min-w-0 shrink-0 pr-2">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-[var(--color-text-secondary)]">
+                指挥栏
               </p>
               <p className="truncate text-sm font-semibold text-[var(--color-text-primary)]">
                 {getPageName(pathname)}
@@ -198,7 +244,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="搜索岗位、公司、技能"
-                className="h-10 min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-3.5 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20"
+                className="h-10 min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white/90 px-3.5 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20"
               />
               <button
                 type="submit"
@@ -223,8 +269,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           ) : null}
         </header>
 
-        <main className="w-full px-4 py-6 sm:px-6 xl:px-8">
-          <div className="mx-auto w-full max-w-[1440px]">{children}</div>
+        <main className="w-full px-3 py-5 sm:px-5 xl:px-7">
+          <div className="mx-auto w-full max-w-[1500px]">{children}</div>
         </main>
       </div>
     </div>

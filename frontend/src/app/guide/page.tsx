@@ -17,7 +17,7 @@ const flowSteps = [
   },
   {
     title: "录入岗位",
-    body: "回到 JD Intake Studio，填入来源平台、岗位链接和 JD 原文。",
+    body: "回到 JD 录入工作台，填入来源平台、岗位链接和 JD 原文。",
   },
   {
     title: "解析确认",
@@ -44,7 +44,7 @@ export default function GuidePage() {
   return (
     <section className="space-y-5">
       <PageHero
-        breadcrumb="workspace / guide"
+        breadcrumb="作战台 / 蓝图"
         title="流程蓝图"
         description="把外部招聘网页、JD 解析、手动投递和结果跟进串成一条可回溯流程。"
         actions={
@@ -63,7 +63,7 @@ export default function GuidePage() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
-              Operating Line
+              操作线
             </p>
             <h2 className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">
               求职操作线

@@ -130,7 +130,7 @@ export function SettingsClient() {
       <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
-            workspace / settings
+            作战台 / 设置
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
             偏好设置

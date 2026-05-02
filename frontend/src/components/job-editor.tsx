@@ -114,7 +114,8 @@ const fieldClass = controlClass;
 const selectClass = selectControlClass;
 const textareaClass = cn(textareaControlClass, "resize-y");
 
-const paneClass = "rounded-lg border border-[var(--color-border)] bg-white";
+const paneClass =
+  "rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.76)] backdrop-blur";
 
 const statusHintMap: Record<StatusValue, string> = {
   pending_analysis: "待补 JD 或待解析",
@@ -584,10 +585,8 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
   }
 
   const pageLabel =
-    mode === "create"
-      ? "workspace / jobs / new"
-      : `workspace / jobs / ${jobId}`;
-  const title = mode === "create" ? "JD Intake Studio" : "岗位详情与编辑";
+    mode === "create" ? "作战台 / 岗位 / 新增" : `作战台 / 岗位 / ${jobId}`;
+  const title = mode === "create" ? "JD 录入工作台" : "岗位详情与编辑";
   const submitLabel = saving
     ? "保存中..."
     : mode === "create"
@@ -651,11 +650,10 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
           <div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
-                JD Studio
+                JD 录入台
               </h2>
               <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
-                保留来源链接、平台信息和原始 JD，解析结果会自动写入右侧
-                Inspector。
+                保留来源链接、平台信息和原始 JD，解析结果会自动写入右侧 检查台。
               </p>
             </div>
             <button
@@ -718,7 +716,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
-                  Analysis Inspector
+                  解析检查台
                 </h2>
                 <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
                   基础信息、分析结果和投递流程合并维护。

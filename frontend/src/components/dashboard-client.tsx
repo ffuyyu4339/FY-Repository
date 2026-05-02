@@ -214,7 +214,7 @@ export function DashboardClient() {
   return (
     <section className="space-y-5">
       <PageHero
-        breadcrumb="workspace / dashboard"
+        breadcrumb="作战台 / 雷达"
         title="求职雷达"
         description="用真实岗位数据观察投递状态、方向分布、高分机会和技能词信号。"
         actions={

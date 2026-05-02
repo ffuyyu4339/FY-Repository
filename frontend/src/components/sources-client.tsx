@@ -170,7 +170,7 @@ export function SourcesClient() {
   return (
     <section className="space-y-5">
       <PageHero
-        breadcrumb="workspace / sources"
+        breadcrumb="作战台 / 入口"
         title="招聘入口库"
         description="集中保存招聘平台和搜索链接，打开后用浏览器本地登录态查看岗位，再手动复制 JD 回系统解析。"
         actions={

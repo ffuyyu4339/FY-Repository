@@ -7,7 +7,7 @@ export const navigationItems = [
   },
   {
     href: "/jobs/new",
-    label: "JD Intake Studio",
+    label: "JD 录入工作台",
     eyebrow: "Intake",
     description: "粘贴 JD 并确认解析结果",
   },

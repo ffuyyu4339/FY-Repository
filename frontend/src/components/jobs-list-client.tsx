@@ -16,7 +16,6 @@ import {
   type StatusValue,
 } from "@/lib/types";
 import {
-  InsightCard,
   MatchBadge,
   PageHero,
   ScoreRing,
@@ -69,7 +68,7 @@ function buildSourceLabel(job: Job) {
 function buildJdPreview(job: Job) {
   const normalized = job.jd_raw_text?.replace(/\s+/g, " ").trim();
   if (!normalized) {
-    return "暂无 JD 原文，建议进入详情补充后再解析。";
+    return "暂无 JD 原文";
   }
 
   return normalized.length > 108
@@ -96,6 +95,21 @@ function getNextAction(job: Job) {
   }
 
   return actionMap[job.status];
+}
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "时间未知";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function isInterviewing(job: Job) {
@@ -136,22 +150,22 @@ function FilterDock({
   }
 
   return (
-    <aside className="rounded-lg border border-[var(--color-border)] bg-white p-4 lg:sticky lg:top-24">
+    <aside className="rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.72)] p-3 backdrop-blur lg:sticky lg:top-20">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
-            Filter Dock
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--color-accent)]">
+            筛选轨道
           </p>
-          <h2 className="mt-1 text-base font-semibold text-[var(--color-text-primary)]">
+          <h2 className="mt-1 text-sm font-semibold text-[var(--color-text-primary)]">
             决策筛选
           </h2>
         </div>
-        <span className="rounded-full bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)]">
+        <span className="rounded-full border border-[var(--color-border)] bg-white px-2.5 py-1 text-xs text-[var(--color-text-secondary)]">
           {activeFilterCount} 个
         </span>
       </div>
 
-      <div className="mt-4 grid gap-3">
+      <div className="mt-4 grid gap-2.5">
         <label className="grid gap-1.5">
           <span className="text-xs font-medium text-[var(--color-text-secondary)]">
             搜索
@@ -279,13 +293,13 @@ function FilterDock({
         </label>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         {quickFilters.map((item) => (
           <button
             key={item.label}
             type="button"
             onClick={() => applyQuickFilter(item.filter)}
-            className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition hover:border-orange-200 hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+            className="h-9 rounded-md border border-[var(--color-border)] bg-white px-2 text-xs font-medium text-[var(--color-text-secondary)] transition hover:border-orange-200 hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
           >
             {item.label}
           </button>
@@ -295,7 +309,7 @@ function FilterDock({
       <button
         type="button"
         onClick={() => setFilters(defaultJobListFilters)}
-        className="mt-4 h-10 w-full rounded-lg border border-[var(--color-border)] bg-white text-sm font-medium text-[var(--color-text-secondary)] transition hover:border-slate-300 hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+        className="mt-3 h-10 w-full rounded-lg border border-[var(--color-border)] bg-transparent text-sm font-medium text-[var(--color-text-secondary)] transition hover:border-slate-300 hover:bg-white hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
       >
         重置筛选
       </button>
@@ -303,70 +317,205 @@ function FilterDock({
   );
 }
 
-function JobCard({ job }: { job: Job }) {
+function MissionStrip({
+  interviewingJobs,
+  jobsLength,
+  loading,
+  pendingJobs,
+  priorityJobs,
+}: {
+  interviewingJobs: number;
+  jobsLength: number;
+  loading: boolean;
+  pendingJobs: number;
+  priorityJobs: number;
+}) {
+  const metrics = [
+    { label: "当前结果", value: jobsLength, tone: "text-[var(--color-ink)]" },
+    {
+      label: "优先投递",
+      value: priorityJobs,
+      tone: "text-[var(--color-accent)]",
+    },
+    { label: "待分析", value: pendingJobs, tone: "text-[var(--color-amber)]" },
+    {
+      label: "面试中",
+      value: interviewingJobs,
+      tone: "text-[var(--color-blue)]",
+    },
+  ];
+
+  return (
+    <section className="rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.74)] px-3 py-2.5 backdrop-blur">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((metric) => (
+          <div
+            key={metric.label}
+            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--color-border)] py-2 last:border-b-0 sm:border-b-0 sm:border-r sm:px-3 sm:last:border-r-0"
+          >
+            <span className="truncate text-xs font-medium text-[var(--color-text-secondary)]">
+              {metric.label}
+            </span>
+            <span
+              className={cn(
+                "text-2xl font-bold tabular-nums tracking-tight",
+                metric.tone,
+              )}
+            >
+              {loading ? "..." : metric.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DecisionBrief({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
+  const topPriority = jobs
+    .filter((job) => job.match_level === "priority_apply")
+    .sort((left, right) => right.match_score - left.match_score)
+    .slice(0, 3);
+  const pending = jobs.filter((job) => job.status === "pending_analysis");
+  const nextFocus = topPriority[0] ?? pending[0] ?? jobs[0];
+
+  return (
+    <aside className="hidden rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.74)] p-4 backdrop-blur xl:sticky xl:top-20 xl:block">
+      <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--color-accent)]">
+        决策简报
+      </p>
+      <h2 className="mt-1 text-base font-semibold text-[var(--color-text-primary)]">
+        下一轮处理
+      </h2>
+
+      {loading ? (
+        <p className="mt-4 text-sm text-[var(--color-text-secondary)]">
+          正在整理队列...
+        </p>
+      ) : nextFocus ? (
+        <div className="mt-4 space-y-4">
+          <div className="rounded-md border border-orange-200 bg-[var(--color-accent-soft)] p-3">
+            <p className="text-xs font-semibold text-[var(--color-accent)]">
+              优先看这个
+            </p>
+            <p className="mt-2 line-clamp-2 text-sm font-semibold text-[var(--color-text-primary)]">
+              {nextFocus.job_title || "未填写岗位名称"}
+            </p>
+            <p className="mt-1 truncate text-xs text-[var(--color-text-secondary)]">
+              {nextFocus.company_name || "未填写公司"}
+            </p>
+          </div>
+          <div className="grid gap-2 text-sm">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[var(--color-text-secondary)]">待解析</span>
+              <span className="font-semibold text-[var(--color-amber)]">
+                {pending.length}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[var(--color-text-secondary)]">
+                高分候选
+              </span>
+              <span className="font-semibold text-[var(--color-accent)]">
+                {topPriority.length}
+              </span>
+            </div>
+          </div>
+          <Link
+            href={`/jobs/${nextFocus.id}`}
+            className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--color-ink)] px-3 text-sm font-semibold text-white transition hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30"
+          >
+            进入处理
+          </Link>
+        </div>
+      ) : (
+        <p className="mt-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+          队列为空。先粘贴 JD，解析后这里会给出下一步处理建议。
+        </p>
+      )}
+    </aside>
+  );
+}
+
+function JobRow({ job }: { job: Job }) {
+  const action = getNextAction(job);
+  const isPriority =
+    job.match_level === "priority_apply" || job.status === "ready_to_apply";
+
   return (
     <Link
       href={`/jobs/${job.id}`}
-      className="grid gap-4 rounded-lg border border-[var(--color-border)] bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 lg:grid-cols-[auto_minmax(0,1fr)_220px] lg:items-start"
+      className={cn(
+        "group grid gap-3 border-b border-[var(--color-border)] bg-white/80 px-3 py-3 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:px-4 lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px] lg:items-center",
+        isPriority && "border-l-2 border-l-[var(--color-accent)]",
+      )}
     >
-      <ScoreRing score={job.match_score} />
+      <div className="flex items-center gap-3 lg:block">
+        <ScoreRing score={job.match_score} size="sm" />
+        <span className="text-xs font-medium text-[var(--color-text-secondary)] lg:mt-2 lg:block lg:text-center">
+          匹配分
+        </span>
+      </div>
 
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
+          <h2 className="min-w-0 truncate text-base font-semibold text-[var(--color-text-primary)]">
+            {job.job_title || "未填写岗位名称"}
+          </h2>
           <MatchBadge level={job.match_level} />
-          <span className="rounded-full bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs font-medium text-[var(--color-text-secondary)]">
-            {formatTrackLabel(job.track)}
-          </span>
         </div>
-        <h2 className="mt-3 truncate text-lg font-semibold text-[var(--color-text-primary)]">
-          {job.job_title || "未填写岗位名称"}
-        </h2>
         <p className="mt-1 truncate text-sm text-[var(--color-text-secondary)]">
           {buildSubtitle(job)}
         </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {job.skills_extracted.slice(0, 5).map((skill) => (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          <span className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2 py-1 text-[11px] font-medium text-[var(--color-text-secondary)]">
+            {formatTrackLabel(job.track)}
+          </span>
+          {job.skills_extracted.slice(0, 4).map((skill) => (
             <span
               key={skill}
-              className="rounded-md bg-[var(--color-surface-muted)] px-2 py-1 text-xs text-slate-600"
+              className="rounded-md bg-[var(--color-surface-muted)] px-2 py-1 text-[11px] text-slate-600"
             >
               {skill}
             </span>
           ))}
           {job.skills_extracted.length === 0 ? (
-            <span className="rounded-md bg-amber-50 px-2 py-1 text-xs text-amber-700">
+            <span className="rounded-md bg-amber-50 px-2 py-1 text-[11px] text-amber-700">
               待解析技能词
             </span>
           ) : null}
         </div>
-        <p className="mt-3 line-clamp-2 text-xs leading-5 text-[var(--color-text-secondary)]">
+        <p className="mt-2 line-clamp-1 text-xs leading-5 text-[var(--color-text-secondary)]">
           {buildJdPreview(job)}
         </p>
       </div>
 
-      <div className="grid gap-3 rounded-lg bg-[var(--color-surface-muted)] p-3">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
-            当前状态
-          </span>
+      <div className="grid gap-2 text-sm lg:text-right">
+        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
           <StatusBadge status={job.status} />
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-[var(--color-text-secondary)]">
-            来源
-          </p>
-          <p className="mt-1 truncate text-sm font-medium text-[var(--color-text-primary)]">
+          <span className="rounded-full bg-[var(--color-surface-muted)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)]">
             {buildSourceLabel(job)}
-          </p>
-        </div>
-        <div className="flex items-center justify-between gap-2 border-t border-slate-200 pt-3">
-          <span className="text-xs text-[var(--color-text-secondary)]">
-            下一步动作
-          </span>
-          <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[var(--color-accent)]">
-            {getNextAction(job)}
           </span>
         </div>
+        <p className="text-xs text-[var(--color-text-secondary)]">
+          更新 {formatDateTime(job.updated_at)}
+        </p>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 lg:block">
+        <span className="text-xs text-[var(--color-text-secondary)]">
+          下一步
+        </span>
+        <span
+          className={cn(
+            "mt-0 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold transition lg:mt-2",
+            isPriority
+              ? "bg-[var(--color-accent)] text-white"
+              : "bg-white text-[var(--color-accent)] group-hover:bg-[var(--color-accent-soft)]",
+          )}
+        >
+          {action}
+        </span>
       </div>
     </Link>
   );
@@ -440,11 +589,11 @@ export function JobsListClient() {
       : cityOptions;
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-4">
       <PageHero
-        breadcrumb="workspace / jobs"
+        breadcrumb="作战台 / 岗位"
         title="岗位决策队列"
-        description="把所有岗位压成可排序、可筛选、可行动的队列，优先处理高匹配和待投递机会。"
+        description="用一屏队列完成判断：先看匹配分、状态和下一步动作，再进入详情处理。"
         actions={
           <>
             <Link href="/sources" className={secondaryButtonClass}>
@@ -457,35 +606,13 @@ export function JobsListClient() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <InsightCard
-          label="当前结果"
-          value={loading ? "..." : jobs.length}
-          description="受当前筛选条件影响"
-          href="/jobs"
-        />
-        <InsightCard
-          label="优先投递"
-          value={loading ? "..." : priorityJobs}
-          description="匹配等级为优先投递"
-          href="/jobs?match_level=priority_apply&sort_by=match_score"
-          tone="accent"
-        />
-        <InsightCard
-          label="待分析"
-          value={loading ? "..." : pendingJobs}
-          description="需要先补齐 JD 解析"
-          href="/jobs?status=pending_analysis"
-          tone="amber"
-        />
-        <InsightCard
-          label="面试中"
-          value={loading ? "..." : interviewingJobs}
-          description="一面、二面和 HR 面"
-          href="/jobs?status_group=interviewing"
-          tone="blue"
-        />
-      </div>
+      <MissionStrip
+        interviewingJobs={interviewingJobs}
+        jobsLength={jobs.length}
+        loading={loading}
+        pendingJobs={pendingJobs}
+        priorityJobs={priorityJobs}
+      />
 
       {error ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -493,7 +620,7 @@ export function JobsListClient() {
         </div>
       ) : null}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid items-start gap-4 lg:grid-cols-[248px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)_260px]">
         <FilterDock
           activeFilterCount={activeFilterCount}
           cityFilterOptions={cityFilterOptions}
@@ -502,13 +629,13 @@ export function JobsListClient() {
         />
 
         <div className="min-w-0 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.72)] px-4 py-3 backdrop-blur">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">
-                Job Stream
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">
+              <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--color-text-secondary)]">
                 岗位流
+              </p>
+              <h2 className="mt-1 text-base font-semibold text-[var(--color-text-primary)]">
+                按下一步动作处理
               </h2>
             </div>
             <p className="text-sm text-[var(--color-text-secondary)]">
@@ -517,15 +644,15 @@ export function JobsListClient() {
           </div>
 
           {loading ? (
-            <div className="rounded-lg border border-[var(--color-border)] bg-white px-4 py-6 text-sm text-[var(--color-text-secondary)]">
+            <div className="rounded-lg border border-[var(--color-border)] bg-white/80 px-4 py-6 text-sm text-[var(--color-text-secondary)]">
               正在加载岗位列表...
             </div>
           ) : null}
 
           {!loading && jobs.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
-                Empty Queue
+            <div className="rounded-lg border border-dashed border-slate-300 bg-[rgba(255,255,255,0.72)] p-6">
+              <p className="text-xs font-semibold tracking-[0.14em] text-[var(--color-accent)]">
+                空队列
               </p>
               <h2 className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
                 当前没有可决策的岗位
@@ -546,13 +673,15 @@ export function JobsListClient() {
           ) : null}
 
           {jobs.length > 0 ? (
-            <div className="grid gap-3">
+            <div className="overflow-hidden rounded-lg border border-[var(--color-border)] bg-white/70">
               {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <JobRow key={job.id} job={job} />
               ))}
             </div>
           ) : null}
         </div>
+
+        <DecisionBrief jobs={jobs} loading={loading} />
       </div>
     </section>
   );

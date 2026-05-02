@@ -36,12 +36,19 @@ body {
   font-family: var(--font-manrope), sans-serif;
   overflow-x: hidden;
   background:
+    linear-gradient(rgba(9, 14, 31, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(9, 14, 31, 0.03) 1px, transparent 1px),
     linear-gradient(
       180deg,
-      rgba(255, 241, 232, 0.58),
+      rgba(255, 241, 232, 0.42),
       rgba(246, 242, 234, 0) 360px
     ),
     var(--color-paper);
+  background-size:
+    44px 44px,
+    44px 44px,
+    auto,
+    auto;
 }
 
 button,

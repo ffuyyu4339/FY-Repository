@@ -125,12 +125,12 @@ export function PageHero({
   title: string;
 }) {
   return (
-    <section className="grid gap-4 border-b border-[var(--color-border)] pb-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+    <section className="grid gap-4 rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.58)] px-4 py-4 backdrop-blur lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
       <div className="min-w-0">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--color-accent)]">
+        <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent)]">
           {breadcrumb}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
           {title}
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
