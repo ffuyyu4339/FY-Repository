@@ -148,6 +148,7 @@
 | I-09 | 开发调试菜单中文化 | PASS | 已在内置浏览器验证左下角开发工具菜单显示“路由 / 静态 / 打包器 / 路由信息 / 偏好设置”，英文官方菜单不再出现 |
 | I-10 | 页面结构与网页/JD融合优化 | PASS | 已优化首页、平台入口、岗位列表、新增/详情页，使招聘网页来源、JD 原文、结构化解析与投递状态形成连续页面流程 |
 | I-11 | 前端 Job Mission Control UI/UX 重排 | PASS | 已通过 `npm run lint`、`npm run test`、`npm run build`，目标路由均返回 HTTP 200，并完成 Chrome headless 桌面/移动截图复查 |
+| I-12 | 前端 Job Mission Control 二次重排 | PASS | 已将 `/jobs` 从大卡片流二次调整为紧凑任务队列，AppShell 改为窄任务轨，PageHero 压缩为轻量面板，并通过 `npm run lint`、`npm run test`、`npm run build` 和目标路由访问验证 |
 
 ---
 
@@ -188,6 +189,10 @@
 - 本轮页面访问验收：`/`、`/jobs`、`/jobs/new`、带来源参数的 `/jobs/new`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
 - 本轮页面结构优化验收：`/` 已展示招聘网页来源与 JD 摘要融合入口；`/sources` 已展示浏览器窗口式来源列表和“打开网页 -> 复制 JD -> 录入岗位 -> 解析跟进”流程；`/jobs` 已展示来源网页与 JD 摘要；`/jobs/new` 已展示来源网页上下文、流程条和结构化检查摘要
 - 本轮 UI/UX 重排验收：`/jobs` 已展示岗位决策队列、FilterDock、Job Stream、匹配分和下一步动作；`/jobs/new` 已展示 JD Intake Studio、Analysis Inspector 和底部 StickyActionBar；`/sources` 已展示招聘入口库紧凑列表和右侧配置面板；`/dashboard` 已展示求职雷达 KPI、分布和洞察；`/guide` 已展示流程蓝图
+- 本轮 UI/UX 二次重排验收：`/jobs` 已由大卡片流调整为紧凑指标条、筛选轨道、表格式岗位队列和右侧决策简报；AppShell 已从宽侧栏改为窄任务轨，顶部指挥栏更薄，PageHero 首屏占用已压缩
+- 本轮插件/技能使用记录：已读取前端重排技能和 browser-use 技能；当前会话未暴露 browser-use 所需 Node REPL/browser callable 工具，已使用 Chrome headless 截图作为视觉复查 fallback
+- 本轮二次重排路由验证：`/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
+- 本轮二次重排视觉复查：Chrome headless 已截图复查 `/jobs` 桌面、`/jobs` 窄屏、`/jobs/new` 桌面；500px 窄屏截图中指标数值和主操作正常显示
 - 本轮运行验收：已执行 `.\\scripts\\start-local.ps1`，3000 / 8000 / 5432 均在监听；`GET /api/health` 返回 `ok`
 - 本轮视觉复查：Chrome headless 已截图复查 `/jobs` 桌面与移动端、`/jobs/new` 桌面、`/dashboard` 桌面；移动端 Command Bar 主操作已收口为整行按钮，新增页右侧 Inspector 不再使用内部长滚动容器
 - 前端 Codespaces 地址测试：已验证 `http://localhost:8000` 在 Codespaces 浏览器环境下会自动解析为当前工作区的 8000 转发地址
@@ -215,5 +220,5 @@
 - 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 14:40
-- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；本轮已完成 Job Mission Control 前端 UI/UX 重排，统一 AppShell、左侧垂直导航、顶部 Command Bar、页面 Hero、通用 Badge/Score/Insight 组件，并将 `/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 分别重排为岗位决策队列、JD Intake Studio、招聘入口库、求职雷达和流程蓝图。前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与浏览器/截图复查均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
+- 验收时间：2026-05-02 16:55
+- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；本轮已完成 Job Mission Control 前端 UI/UX 二次重排，统一 AppShell、左侧垂直导航、顶部 Command Bar、页面 Hero、通用 Badge/Score/Insight 组件，并将 `/jobs` 进一步压缩为岗位决策任务队列，减少大白卡和首屏空白。前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与浏览器/截图复查均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。

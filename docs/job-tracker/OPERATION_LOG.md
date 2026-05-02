@@ -987,6 +987,54 @@
 
 ---
 
+### LOG-025
+- 时间：2026-05-02 16:55
+- 任务：TASK-O / UI-UX 二次重排
+- 目标：按最新浏览器反馈继续降低后台模板感，将 `/jobs` 从大卡片工作台重排为更紧凑的任务队列
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/guide/page.tsx`
+  - `frontend/src/components/app-shell.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/settings-client.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `frontend/src/components/ui.tsx`
+  - `frontend/src/lib/project.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write ...`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - Chrome headless 截图：`/jobs` 桌面、`/jobs` 窄屏、`/jobs/new` 桌面
+- 执行结果：
+  - 已读取并按前端重排技能执行；browser-use 技能已读取，但当前会话未暴露其 Node REPL/browser callable 工具，因此使用 Chrome headless 作为视觉复查 fallback
+  - AppShell 已由宽深色侧栏改为窄任务轨，顶部 Command Bar 调整为更薄的全局搜索与关键动作区
+  - `/jobs` 已取消四个大统计卡和大岗位卡片流，改为紧凑指标条、左侧筛选轨道、中间表格式岗位队列、右侧决策简报
+  - 岗位行已突出匹配分、匹配等级、状态、来源、更新时间和下一步动作，减少重复白卡与首屏空白
+  - PageHero 已压缩为轻量工作区面板；残留的 `workspace`、`Command Bar`、`Job Stream`、`Analysis Inspector` 等结构标签已统一为中文文案
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run test` 通过，Vitest 12 项测试通过
+  - 前端 `npm run build` 通过
+  - `/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
+- 风险/备注：
+  - 本次只调整前端布局、视觉密度、组件结构和文案一致性；未新增爬虫、多用户、自动投递、AI 聊天助手或数据库 schema
+  - Chrome headless 窄屏截图在 390px 宽度下受桌面 headless 最小布局行为影响存在右侧裁切，500px 窄屏截图显示指标数值和主操作正常；实际移动端布局仍保留顶部导航入口与整行主操作
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `481ed25`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -1032,6 +1080,7 @@
 | 022 | 2026-05-02 03:17 | 108ab0c | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
 | 023 | 2026-05-02 11:25 | c13c588 | style(frontend): integrate source and jd workspace | M-01 ~ M-07 | 优化首页、平台入口、岗位列表和岗位编辑页结构，融合招聘网页来源与 JD 解析流程 |
 | 024 | 2026-05-02 14:40 | 3f561fb | style(frontend): refactor mission control workspace | N-01 ~ N-09 | 重排前端为 Job Mission Control，新增 AppShell、Command Bar、通用 UI 组件并改造五个目标页面 |
+| 025 | 2026-05-02 16:55 | 481ed25 | style(frontend): refine mission control layout | O-01 ~ O-06 | 二次重排 `/jobs` 为更紧凑的任务队列，收窄侧栏、压缩 Hero、改为表格式岗位流与决策简报 |
 
 ---
 
@@ -1047,7 +1096,7 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成 Job Mission Control 前端 UI/UX 重排，五个目标页面已统一到左侧导航、顶部 Command Bar、页面 Hero 与高密度工作区结构
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成 Job Mission Control 前端 UI/UX 二次重排，五个目标页面继续统一到左侧导航、顶部 Command Bar、页面 Hero 与高密度工作区结构，其中 `/jobs` 已调整为更紧凑的任务队列
 - 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务、页面结构优化任务和 UI/UX 作战台重排任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
 - 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
