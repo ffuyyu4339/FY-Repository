@@ -47,6 +47,8 @@ const inputClass =
 const selectClass =
   "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
 
+const intakeSteps = ["打开网页", "复制 JD", "录入岗位", "解析跟进"];
+
 function toFormState(sourceLink: SourceLink): SourceFormState {
   return {
     platform_name: sourceLink.platform_name,
@@ -157,25 +159,35 @@ export function SourcesClient() {
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[1fr_auto] lg:items-end">
+      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
         <div>
           <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
             workspace / sources
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-            平台入口
+            招聘网页入口
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            保存常用招聘平台和筛选链接，使用浏览器本地登录态打开，复制 JD
-            后回到系统解析。
+            保存常用招聘平台、搜索链接和筛选条件。外部网页只负责查看岗位，JD
+            原文回到系统内解析和跟进。
           </p>
         </div>
-        <Link
-          href="/settings"
-          className="w-fit rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
-        >
-          偏好设置
-        </Link>
+        <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">采集流程</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {intakeSteps.map((step, index) => (
+              <span
+                key={step}
+                className="rounded-lg bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700"
+              >
+                <span className="mr-1 font-mono text-[var(--color-accent)]">
+                  {index + 1}
+                </span>
+                {step}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
 
       {error ? (
@@ -190,7 +202,7 @@ export function SourcesClient() {
         </div>
       ) : null}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[1fr_360px]">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_390px]">
         <div className="space-y-3">
           {loading ? (
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500 shadow-sm">
@@ -207,72 +219,83 @@ export function SourcesClient() {
           {sourceLinks.map((sourceLink) => (
             <div
               key={sourceLink.id}
-              className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-orange-200 hover:shadow-md"
             >
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg font-semibold text-slate-950">
-                    {sourceLink.title}
-                  </h2>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
-                    {sourceLink.platform_name}
-                  </span>
-                  {!sourceLink.enabled ? (
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-400">
-                      已停用
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-1 truncate text-sm text-slate-500">
+              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+                <p className="ml-2 min-w-0 flex-1 truncate rounded-full bg-white px-3 py-1.5 font-mono text-[11px] text-slate-500 ring-1 ring-slate-200">
                   {sourceLink.url}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {sourceLink.city ? (
-                    <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">
-                      {sourceLink.city}
-                    </span>
-                  ) : null}
-                  {sourceLink.track ? (
-                    <span className="rounded-md bg-orange-50 px-2 py-1 text-xs text-[var(--color-accent)]">
-                      {formatTrackLabel(sourceLink.track)}
-                    </span>
-                  ) : null}
-                  {sourceLink.keywords.map((keyword) => (
-                    <span
-                      key={keyword}
-                      className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600"
-                    >
-                      {keyword}
-                    </span>
-                  ))}
-                </div>
               </div>
-              <div className="flex flex-wrap gap-2 md:justify-end">
-                <button
-                  type="button"
-                  onClick={() => openSource(sourceLink)}
-                  className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)]"
-                >
-                  打开平台
-                </button>
-                <Link
-                  href={`/jobs/new?platform=${encodeURIComponent(
-                    sourceLink.platform_name,
-                  )}&job_link=${encodeURIComponent(sourceLink.url)}`}
-                  className="inline-flex h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
-                >
-                  录入岗位
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingId(sourceLink.id);
-                    setFormState(toFormState(sourceLink));
-                  }}
-                  className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
-                >
-                  编辑
-                </button>
+              <div className="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-slate-950">
+                      {sourceLink.title}
+                    </h2>
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600">
+                      {sourceLink.platform_name}
+                    </span>
+                    {!sourceLink.enabled ? (
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-400">
+                        已停用
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                    打开外部网页后复制
+                    JD，把平台、链接和岗位描述带回新增岗位页。
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {sourceLink.city ? (
+                      <span className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                        {sourceLink.city}
+                      </span>
+                    ) : null}
+                    {sourceLink.track ? (
+                      <span className="rounded-md bg-orange-50 px-2 py-1 text-xs text-[var(--color-accent)]">
+                        {formatTrackLabel(sourceLink.track)}
+                      </span>
+                    ) : null}
+                    {sourceLink.keywords.map((keyword) => (
+                      <span
+                        key={keyword}
+                        className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 md:w-36 md:flex-col">
+                  <button
+                    type="button"
+                    onClick={() => openSource(sourceLink)}
+                    className="h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)]"
+                  >
+                    打开平台
+                  </button>
+                  <Link
+                    href={`/jobs/new?platform=${encodeURIComponent(
+                      sourceLink.platform_name,
+                    )}&job_link=${encodeURIComponent(sourceLink.url)}`}
+                    className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+                  >
+                    录入岗位
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingId(sourceLink.id);
+                      setFormState(toFormState(sourceLink));
+                    }}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+                  >
+                    编辑
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -283,12 +306,22 @@ export function SourcesClient() {
           className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24"
         >
           <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-semibold text-slate-950">
-              {editingId ? "编辑来源" : "新增来源"}
-            </h2>
-            <p className="mt-1 text-xs leading-5 text-slate-500">
-              只保存外部链接和筛选条件，不保存平台账号或登录令牌。
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-semibold text-slate-950">
+                  {editingId ? "编辑来源" : "新增来源"}
+                </h2>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  只保存外部链接和筛选条件，不保存平台账号或登录令牌。
+                </p>
+              </div>
+              <Link
+                href="/settings"
+                className="shrink-0 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
+              >
+                偏好
+              </Link>
+            </div>
           </div>
           <div className="mt-4 grid gap-3">
             <input

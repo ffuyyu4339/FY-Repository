@@ -146,6 +146,7 @@
 | I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、事件记录、技能搜索、删除、Dashboard、Sources、Settings、Guide 页面 |
 | I-08 | Codex 内置浏览器验收 | PASS | 已通过内置浏览器验证首页、岗位列表筛选、新增页 JD 解析回填、Dashboard、平台入口与指南页面 |
 | I-09 | 开发调试菜单中文化 | PASS | 已在内置浏览器验证左下角开发工具菜单显示“路由 / 静态 / 打包器 / 路由信息 / 偏好设置”，英文官方菜单不再出现 |
+| I-10 | 页面结构与网页/JD融合优化 | PASS | 已优化首页、平台入口、岗位列表、新增/详情页，使招聘网页来源、JD 原文、结构化解析与投递状态形成连续页面流程 |
 
 ---
 
@@ -184,8 +185,12 @@
 - pytest 输出：`.\\.venv\\Scripts\\python -m pytest -q` 通过，14 项测试通过
 - 前端页面交互测试：`npm run test` 通过，12 项测试通过，包含 JobEditor 点击“解析 JD”自动回填、默认简历版本预填、来源页、设置页验证
 - 本轮页面访问验收：`/`、`/jobs`、`/jobs/new`、带来源参数的 `/jobs/new`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
+- 本轮页面结构优化验收：`/` 已展示招聘网页来源与 JD 摘要融合入口；`/sources` 已展示浏览器窗口式来源列表和“打开网页 -> 复制 JD -> 录入岗位 -> 解析跟进”流程；`/jobs` 已展示来源网页与 JD 摘要；`/jobs/new` 已展示来源网页上下文、流程条和结构化检查摘要
+- 本轮运行验收：已执行 `.\\scripts\\start-local.ps1`，3000 / 8000 / 5432 均在监听；`GET /api/health` 返回 `ok`
+- 本轮视觉复查：Chrome headless 已截图复查首页桌面、首页移动端和新增岗位页桌面；移动端首页长 URL 已做截断收口，并增加全局横向溢出保护
 - 前端 Codespaces 地址测试：已验证 `http://localhost:8000` 在 Codespaces 浏览器环境下会自动解析为当前工作区的 8000 转发地址
 - 前端 build 输出：`npm run build` 通过
+- 本轮前端验证：`npm run lint`、`npm run test`、`npm run build` 均通过，Vitest 12 项测试通过
 - 前端 build 路由证据：Next build 生成 `/sources`、`/settings`、`/guide`
 - Codespaces 请求修复：前端会自动推导 8000 转发后端地址，FastAPI 已放行 `*.app.github.dev` / `*.githubpreview.dev` 来源，Compose 与环境模板已同步补齐对应变量
 - 页面截图：Codex 内置浏览器已完成 `/jobs` 当前视图截图复查，并完成 `/dashboard` 最终渲染截图
@@ -208,5 +213,5 @@
 - 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 03:17
-- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与 Codex 内置浏览器交互验收均已通过；开发模式调试菜单已在内置浏览器验证为中文显示。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
+- 验收时间：2026-05-02 11:25
+- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；本轮已进一步完成页面结构与网页/JD融合优化，首页、平台入口、岗位列表和岗位编辑页均能更清晰串联外部招聘网页、JD 原文、解析字段与投递状态。前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与浏览器/截图复查均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。

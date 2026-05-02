@@ -85,6 +85,27 @@ function buildSubtitle(job: Job) {
   ].join(" · ");
 }
 
+function buildSourceLabel(job: Job) {
+  if (job.platform) {
+    return job.platform;
+  }
+
+  if (job.job_link) {
+    return "外部链接";
+  }
+
+  return "手动录入";
+}
+
+function buildJdPreview(job: Job) {
+  const normalized = job.jd_raw_text?.replace(/\s+/g, " ").trim();
+  if (!normalized) {
+    return "暂无 JD 原文，建议进入详情补充后再解析。";
+  }
+
+  return normalized.length > 86 ? `${normalized.slice(0, 86)}...` : normalized;
+}
+
 export function JobsListClient() {
   const [filters, setFilters] = useState<JobListFilters>(defaultJobListFilters);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -162,7 +183,7 @@ export function JobsListClient() {
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[1fr_auto] lg:items-end">
+      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-end">
         <div>
           <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
             workspace / jobs
@@ -194,12 +215,25 @@ export function JobsListClient() {
             </span>
           </div>
         </div>
-        <Link
-          href="/dashboard"
-          className="w-fit rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
-        >
-          查看统计
-        </Link>
+        <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <p className="text-xs font-semibold text-slate-500">录入入口</p>
+          <div className="mt-3 grid gap-2">
+            <Link
+              href="/sources"
+              className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-orange-50 hover:text-[var(--color-accent)]"
+            >
+              招聘网页来源
+              <span className="text-xs text-slate-400">打开</span>
+            </Link>
+            <Link
+              href="/jobs/new"
+              className="flex items-center justify-between rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-[var(--color-accent)]"
+            >
+              粘贴 JD 解析
+              <span className="text-xs text-white/70">新增</span>
+            </Link>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -381,7 +415,7 @@ export function JobsListClient() {
             <Link
               key={job.id}
               href={`/jobs/${job.id}`}
-              className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md md:grid-cols-[minmax(0,1fr)_auto] md:items-start"
+              className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md lg:grid-cols-[minmax(0,1fr)_260px_96px] lg:items-start"
             >
               <div className="min-w-0">
                 <h2 className="truncate text-lg font-semibold text-slate-950">
@@ -409,7 +443,20 @@ export function JobsListClient() {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-3 md:min-w-32 md:flex-col md:items-end">
+              <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-slate-500">
+                    来源网页
+                  </span>
+                  <span className="truncate rounded-full bg-white px-2 py-0.5 text-[11px] text-slate-500 ring-1 ring-slate-200">
+                    {buildSourceLabel(job)}
+                  </span>
+                </div>
+                <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">
+                  {buildJdPreview(job)}
+                </p>
+              </div>
+              <div className="flex items-center justify-between gap-3 lg:min-w-24 lg:flex-col lg:items-end">
                 <span
                   className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusBadgeClass[job.status]}`}
                 >

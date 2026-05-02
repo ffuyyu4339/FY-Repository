@@ -34,7 +34,7 @@ export default function RootLayout({
         <NextDevtoolsI18n />
         <div className="min-h-screen bg-[var(--color-surface)]">
           <SiteHeader />
-          <main className="mx-auto flex w-full max-w-[1040px] flex-col px-5 pb-14 pt-6 sm:px-8 lg:px-6">
+          <main className="mx-auto flex w-full max-w-[1180px] flex-col px-5 pb-14 pt-6 sm:px-8 lg:px-6">
             {children}
           </main>
         </div>

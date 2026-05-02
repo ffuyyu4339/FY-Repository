@@ -135,6 +135,8 @@ const manualEventOptions: { value: JobEventType; label: string }[] = [
   { value: "note", label: "备注" },
 ];
 
+const editorFlowSteps = ["来源网页", "JD 原文", "结构化字段", "投递状态"];
+
 const analysisSourceLabelMap: Record<
   NonNullable<JDAnalysisResult["analysis_source"]>,
   string
@@ -267,7 +269,9 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
           setFormState((current) => ({
             ...current,
             resume_version:
-              current.resume_version || preferences.default_resume_version || "",
+              current.resume_version ||
+              preferences.default_resume_version ||
+              "",
           }));
         }
       } catch {
@@ -486,6 +490,8 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
     : mode === "create"
       ? "保存岗位"
       : "保存修改";
+  const sourceUrlLabel =
+    formState.job_link || "从平台入口进入时会自动带入岗位链接";
 
   return (
     <section className="space-y-5 pb-4">
@@ -498,7 +504,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
             {title}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            左侧粘贴和解析 JD，右侧集中修正结构化字段、匹配结果和投递流程。
+            左侧承接招聘网页和 JD 原文，右侧检查结构化字段、匹配结果和投递流程。
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -515,6 +521,20 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
             ? metricBadge("解析", analysisSourceLabelMap[analysisSource])
             : null}
         </div>
+      </div>
+
+      <div className="grid gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-4">
+        {editorFlowSteps.map((step, index) => (
+          <div
+            key={step}
+            className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-700"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white font-mono text-xs font-semibold text-[var(--color-accent)] ring-1 ring-slate-200">
+              {index + 1}
+            </span>
+            <span className="font-medium">{step}</span>
+          </div>
+        ))}
       </div>
 
       {error ? (
@@ -537,10 +557,10 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
           <div className="flex flex-col gap-3 border-b border-slate-100 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-base font-semibold text-slate-950">
-                JD 原文与解析
+                来源网页与 JD 原文
               </h2>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                保留原始描述，解析结果会自动写入右侧表单，仍可人工修正。
+                保留来源链接、平台信息和原始描述，解析结果会自动写入右侧表单。
               </p>
             </div>
             <button
@@ -553,6 +573,36 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
             </button>
           </div>
           <div className="p-4">
+            <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+              <div className="flex items-center gap-2 border-b border-slate-200 px-3 py-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+                <p className="ml-2 min-w-0 flex-1 truncate rounded-full bg-white px-3 py-1.5 font-mono text-[11px] text-slate-500 ring-1 ring-slate-200">
+                  {sourceUrlLabel}
+                </p>
+              </div>
+              <div className="grid gap-3 px-3 py-3 sm:grid-cols-3">
+                <div>
+                  <p className="text-[11px] text-slate-400">平台</p>
+                  <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">
+                    {formState.platform || "未填写"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-slate-400">岗位</p>
+                  <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">
+                    {formState.job_title || "等待解析"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[11px] text-slate-400">状态</p>
+                  <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">
+                    {formatStatusLabel(formState.status)}
+                  </p>
+                </div>
+              </div>
+            </div>
             <textarea
               value={formState.jd_raw_text}
               onChange={(event) =>
@@ -588,6 +638,27 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
           </div>
 
           <div className="space-y-5 px-4 py-4">
+            <div className="grid gap-2 sm:grid-cols-3">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                <p className="text-[11px] text-slate-400">方向</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-slate-950">
+                  {formatTrackLabel(formState.track)}
+                </p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                <p className="text-[11px] text-slate-400">匹配等级</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-slate-950">
+                  {formatMatchLevelLabel(formState.match_level)}
+                </p>
+              </div>
+              <div className="rounded-xl border border-orange-100 bg-orange-50 px-3 py-2">
+                <p className="text-[11px] text-orange-700">匹配分</p>
+                <p className="mt-0.5 text-sm font-semibold text-slate-950">
+                  {formState.match_score || 0}
+                </p>
+              </div>
+            </div>
+
             <SectionBlock
               title="岗位基础信息"
               description="解析后自动回填，也可以直接手动录入。"

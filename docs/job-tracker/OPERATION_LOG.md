@@ -889,6 +889,52 @@
 
 ---
 
+### LOG-023
+- 时间：2026-05-02 11:25
+- 任务：TASK-M / 页面结构与网页/JD融合优化
+- 目标：运行项目并自主优化页面结构，使招聘网页来源、JD 原文、解析字段和投递状态在页面上形成更清晰的连续流程
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\scripts\\start-local.ps1`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - Chrome headless 截图：`/` 桌面、`/jobs/new` 桌面、`/` 移动端
+- 执行结果：
+  - 已将全局内容宽度从 `1040px` 放宽到 `1180px`，适配列表与编辑工作台的双栏信息密度
+  - 首页已改为“招聘网页来源 + JD 摘要 + 解析入口”的组合工作台，首屏直接呈现网页来源和 JD 结构化结果的关系
+  - 平台入口页已改为浏览器窗口式来源列表，并补充“打开网页 -> 复制 JD -> 录入岗位 -> 解析跟进”流程提示
+  - 岗位列表页已新增来源网页与 JD 摘要区域，每条记录同时展示来源、JD 片段、匹配分与投递状态
+  - 新增/详情页已新增来源网页上下文、流程条和结构化摘要，使左侧 JD 原文与右侧表单的关系更明确
+  - 已增加横向溢出保护，并针对移动端首页长 URL 做截断收口
+  - 本机项目已启动，3000 / 8000 / 5432 均在监听；`/api/health` 返回 ok
+  - 前端 `lint`、`test`、`build` 均通过；Vitest 12 项测试通过
+  - 首页、岗位列表、新增岗位、平台入口、Dashboard 均返回 HTTP 200
+  - Chrome headless 桌面与移动截图已复查，首页和新增岗位页结构可读
+- 风险/备注：
+  - 本次只调整前端页面结构与视觉层级，不改后端 API、数据库 schema 或业务边界
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -932,6 +978,7 @@
 | 020 | 2026-05-02 03:05 | 02c9ed8 | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
 | 021 | 2026-05-02 03:08 | 108ab0c | docs(project): record browser acceptance | J-08, K-05 ~ K-07 | 使用 Codex 内置浏览器验收首页、列表、新增解析、Dashboard、平台入口与指南 |
 | 022 | 2026-05-02 03:17 | 108ab0c | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
+| 023 | 2026-05-02 11:25 | PENDING_COMMIT | style(frontend): integrate source and jd workspace | M-01 ~ M-07 | 优化首页、平台入口、岗位列表和岗位编辑页结构，融合招聘网页来源与 JD 解析流程 |
 
 ---
 
@@ -947,8 +994,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；Codex 内置浏览器页面与交互验收已通过；开发模式调试菜单已中文化；Compose 配置已完成本机 `.env` 与容器内部地址隔离，并新增 LLM 环境变量透传
-- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径与 MVP+ 合规辅助自动化任务均已完成
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成页面结构与网页/JD融合优化，首页、平台入口、岗位列表和岗位编辑页均能更清晰串联外部招聘网页、JD 原文、解析字段与投递状态
+- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务和页面结构优化任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
 - 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
 - 下一步：如恢复 Docker Desktop / WSL，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker
