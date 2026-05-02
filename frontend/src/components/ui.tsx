@@ -117,27 +117,69 @@ export function PageHero({
   actions,
   breadcrumb,
   description,
+  meta,
   title,
+  variant = "default",
 }: {
   actions?: ReactNode;
   breadcrumb: string;
   description: string;
+  meta?: ReactNode;
   title: string;
+  variant?: "default" | "mission";
 }) {
+  const mission = variant === "mission";
+
   return (
-    <section className="grid gap-4 rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.58)] px-4 py-4 backdrop-blur lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-      <div className="min-w-0">
-        <p className="text-[11px] font-semibold tracking-[0.18em] text-[var(--color-accent)]">
-          {breadcrumb}
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-          {title}
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">
-          {description}
-        </p>
+    <section
+      className={cn(
+        "relative overflow-hidden rounded-lg border px-4 py-4 backdrop-blur",
+        mission
+          ? "border-black/20 bg-[var(--color-ink)] text-white"
+          : "border-[var(--color-border)] bg-[rgba(255,255,255,0.58)]",
+      )}
+    >
+      {mission ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-30"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px)",
+            backgroundSize: "36px 36px",
+          }}
+        />
+      ) : null}
+      <div className="relative grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <div className="min-w-0">
+          <p
+            className={cn(
+              "text-[11px] font-semibold tracking-[0.18em]",
+              mission ? "text-orange-200" : "text-[var(--color-accent)]",
+            )}
+          >
+            {breadcrumb}
+          </p>
+          <h1
+            className={cn(
+              "mt-2 text-2xl font-semibold tracking-tight sm:text-3xl",
+              mission ? "text-white" : "text-[var(--color-text-primary)]",
+            )}
+          >
+            {title}
+          </h1>
+          <p
+            className={cn(
+              "mt-2 max-w-2xl text-sm leading-6",
+              mission ? "text-white/64" : "text-[var(--color-text-secondary)]",
+            )}
+          >
+            {description}
+          </p>
+        </div>
+        {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </div>
-      {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+      {meta ? <div className="relative mt-4">{meta}</div> : null}
     </section>
   );
 }

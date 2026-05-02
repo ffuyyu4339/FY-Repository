@@ -116,6 +116,19 @@ function isInterviewing(job: Job) {
   return ["interview_1", "interview_2", "hr_interview"].includes(job.status);
 }
 
+const rowAccentClass: Record<StatusValue, string> = {
+  pending_analysis: "border-l-[var(--color-amber)]",
+  ready_to_apply: "border-l-[var(--color-accent)]",
+  applied: "border-l-[var(--color-accent)]",
+  online_test: "border-l-[var(--color-blue)]",
+  interview_1: "border-l-[var(--color-blue)]",
+  interview_2: "border-l-[var(--color-blue)]",
+  hr_interview: "border-l-[var(--color-blue)]",
+  offer: "border-l-[var(--color-green)]",
+  rejected: "border-l-[var(--color-danger)]",
+  archived: "border-l-slate-400",
+};
+
 function SearchMark() {
   return (
     <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24">
@@ -331,29 +344,41 @@ function MissionStrip({
   priorityJobs: number;
 }) {
   const metrics = [
-    { label: "当前结果", value: jobsLength, tone: "text-[var(--color-ink)]" },
+    {
+      label: "当前结果",
+      value: jobsLength,
+      tone: "text-white",
+      line: "bg-white/70",
+    },
     {
       label: "优先投递",
       value: priorityJobs,
-      tone: "text-[var(--color-accent)]",
+      tone: "text-orange-200",
+      line: "bg-[var(--color-accent)]",
     },
-    { label: "待分析", value: pendingJobs, tone: "text-[var(--color-amber)]" },
+    {
+      label: "待分析",
+      value: pendingJobs,
+      tone: "text-amber-200",
+      line: "bg-[var(--color-amber)]",
+    },
     {
       label: "面试中",
       value: interviewingJobs,
-      tone: "text-[var(--color-blue)]",
+      tone: "text-blue-200",
+      line: "bg-[var(--color-blue)]",
     },
   ];
 
   return (
-    <section className="rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.74)] px-3 py-2.5 backdrop-blur">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((metric) => (
-          <div
-            key={metric.label}
-            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-[var(--color-border)] py-2 last:border-b-0 sm:border-b-0 sm:border-r sm:px-3 sm:last:border-r-0"
-          >
-            <span className="truncate text-xs font-medium text-[var(--color-text-secondary)]">
+    <div className="grid gap-2 rounded-md border border-white/10 bg-white/[0.06] p-2 sm:grid-cols-2 lg:grid-cols-4">
+      {metrics.map((metric) => (
+        <div
+          key={metric.label}
+          className="rounded-md border border-white/10 bg-black/10 px-3 py-2"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="truncate text-xs font-medium text-white/55">
               {metric.label}
             </span>
             <span
@@ -365,9 +390,39 @@ function MissionStrip({
               {loading ? "..." : metric.value}
             </span>
           </div>
-        ))}
+          <span
+            className={cn(
+              "mt-2 block h-1 rounded-full opacity-80",
+              metric.line,
+            )}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function QueueHeader({ count, loading }: { count: number; loading: boolean }) {
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[var(--color-ink)] px-4 py-3 text-white">
+        <div>
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-white/45">
+            岗位流
+          </p>
+          <h2 className="mt-1 text-base font-semibold">按下一步动作处理</h2>
+        </div>
+        <p className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/70">
+          {loading ? "正在同步..." : `${count} 条岗位`}
+        </p>
       </div>
-    </section>
+      <div className="hidden border-b border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--color-text-secondary)] lg:grid lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px]">
+        <span>匹配</span>
+        <span>岗位信息</span>
+        <span className="text-right">状态与来源</span>
+        <span className="text-right">下一步</span>
+      </div>
+    </>
   );
 }
 
@@ -380,56 +435,48 @@ function DecisionBrief({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
   const nextFocus = topPriority[0] ?? pending[0] ?? jobs[0];
 
   return (
-    <aside className="hidden rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.74)] p-4 backdrop-blur xl:sticky xl:top-20 xl:block">
-      <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--color-accent)]">
+    <aside className="hidden rounded-lg border border-black/20 bg-[var(--color-ink)] p-4 text-white xl:sticky xl:top-20 xl:block">
+      <p className="text-[11px] font-semibold tracking-[0.16em] text-orange-200">
         决策简报
       </p>
-      <h2 className="mt-1 text-base font-semibold text-[var(--color-text-primary)]">
-        下一轮处理
-      </h2>
+      <h2 className="mt-1 text-base font-semibold">下一轮处理</h2>
 
       {loading ? (
-        <p className="mt-4 text-sm text-[var(--color-text-secondary)]">
-          正在整理队列...
-        </p>
+        <p className="mt-4 text-sm text-white/55">正在整理队列...</p>
       ) : nextFocus ? (
         <div className="mt-4 space-y-4">
-          <div className="rounded-md border border-orange-200 bg-[var(--color-accent-soft)] p-3">
-            <p className="text-xs font-semibold text-[var(--color-accent)]">
-              优先看这个
-            </p>
-            <p className="mt-2 line-clamp-2 text-sm font-semibold text-[var(--color-text-primary)]">
+          <div className="rounded-md border border-orange-300/30 bg-white/[0.06] p-3">
+            <p className="text-xs font-semibold text-orange-200">优先看这个</p>
+            <p className="mt-2 line-clamp-2 text-sm font-semibold text-white">
               {nextFocus.job_title || "未填写岗位名称"}
             </p>
-            <p className="mt-1 truncate text-xs text-[var(--color-text-secondary)]">
+            <p className="mt-1 truncate text-xs text-white/50">
               {nextFocus.company_name || "未填写公司"}
             </p>
           </div>
           <div className="grid gap-2 text-sm">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[var(--color-text-secondary)]">待解析</span>
-              <span className="font-semibold text-[var(--color-amber)]">
+            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
+              <span className="text-white/55">待解析</span>
+              <span className="font-semibold text-amber-200">
                 {pending.length}
               </span>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[var(--color-text-secondary)]">
-                高分候选
-              </span>
-              <span className="font-semibold text-[var(--color-accent)]">
+              <span className="text-white/55">高分候选</span>
+              <span className="font-semibold text-orange-200">
                 {topPriority.length}
               </span>
             </div>
           </div>
           <Link
             href={`/jobs/${nextFocus.id}`}
-            className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--color-ink)] px-3 text-sm font-semibold text-white transition hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30"
+            className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-white px-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30"
           >
             进入处理
           </Link>
         </div>
       ) : (
-        <p className="mt-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+        <p className="mt-4 text-sm leading-6 text-white/55">
           队列为空。先粘贴 JD，解析后这里会给出下一步处理建议。
         </p>
       )}
@@ -446,8 +493,8 @@ function JobRow({ job }: { job: Job }) {
     <Link
       href={`/jobs/${job.id}`}
       className={cn(
-        "group grid gap-3 border-b border-[var(--color-border)] bg-white/80 px-3 py-3 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:px-4 lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px] lg:items-center",
-        isPriority && "border-l-2 border-l-[var(--color-accent)]",
+        "group grid gap-3 border-b border-l-[3px] border-b-[var(--color-border)] bg-white/[0.82] px-3 py-3 transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:px-4 lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px] lg:items-center",
+        rowAccentClass[job.status],
       )}
     >
       <div className="flex items-center gap-3 lg:block">
@@ -502,7 +549,7 @@ function JobRow({ job }: { job: Job }) {
         </p>
       </div>
 
-      <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 lg:block">
+      <div className="flex items-center justify-between gap-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-2 transition group-hover:border-orange-200 group-hover:bg-[var(--color-accent-soft)] lg:block">
         <span className="text-xs text-[var(--color-text-secondary)]">
           下一步
         </span>
@@ -594,6 +641,16 @@ export function JobsListClient() {
         breadcrumb="作战台 / 岗位"
         title="岗位决策队列"
         description="用一屏队列完成判断：先看匹配分、状态和下一步动作，再进入详情处理。"
+        variant="mission"
+        meta={
+          <MissionStrip
+            interviewingJobs={interviewingJobs}
+            jobsLength={jobs.length}
+            loading={loading}
+            pendingJobs={pendingJobs}
+            priorityJobs={priorityJobs}
+          />
+        }
         actions={
           <>
             <Link href="/sources" className={secondaryButtonClass}>
@@ -604,14 +661,6 @@ export function JobsListClient() {
             </Link>
           </>
         }
-      />
-
-      <MissionStrip
-        interviewingJobs={interviewingJobs}
-        jobsLength={jobs.length}
-        loading={loading}
-        pendingJobs={pendingJobs}
-        priorityJobs={priorityJobs}
       />
 
       {error ? (
@@ -629,20 +678,6 @@ export function JobsListClient() {
         />
 
         <div className="min-w-0 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.72)] px-4 py-3 backdrop-blur">
-            <div>
-              <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--color-text-secondary)]">
-                岗位流
-              </p>
-              <h2 className="mt-1 text-base font-semibold text-[var(--color-text-primary)]">
-                按下一步动作处理
-              </h2>
-            </div>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              {loading ? "正在同步..." : `${jobs.length} 条岗位`}
-            </p>
-          </div>
-
           {loading ? (
             <div className="rounded-lg border border-[var(--color-border)] bg-white/80 px-4 py-6 text-sm text-[var(--color-text-secondary)]">
               正在加载岗位列表...
@@ -674,6 +709,7 @@ export function JobsListClient() {
 
           {jobs.length > 0 ? (
             <div className="overflow-hidden rounded-lg border border-[var(--color-border)] bg-white/70">
+              <QueueHeader count={jobs.length} loading={loading} />
               {jobs.map((job) => (
                 <JobRow key={job.id} job={job} />
               ))}
