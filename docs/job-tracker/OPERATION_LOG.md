@@ -931,7 +931,59 @@
   - 本次只调整前端页面结构与视觉层级，不改后端 API、数据库 schema 或业务边界
   - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `c13c588`
+
+---
+
+### LOG-024
+- 时间：2026-05-02 14:40
+- 任务：TASK-N / UI-UX 作战台重排
+- 目标：在不改变核心业务范围的前提下，将前端从白卡片后台模板重排为 Job Mission Control
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/app/guide/page.tsx`
+  - `frontend/src/components/app-shell.tsx`
+  - `frontend/src/components/ui.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/site-header.tsx`
+  - `frontend/src/lib/project.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write ...`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - Chrome headless 截图：`/jobs` 桌面与移动、`/jobs/new` 桌面、`/dashboard` 桌面
+- 执行结果：
+  - 已新增统一 `AppShell`，使用左侧垂直导航、顶部 Command Bar 和主内容容器替代顶部居中胶囊导航
+  - 已在 `globals.css` 中整理 Job Mission Control 设计 token，使用暖纸色背景、深墨侧栏、赤橙关键动作和语义化状态色
+  - 已新增 `PageHero`、`StatusBadge`、`MatchBadge`、`ScoreRing`、`InsightCard` 与统一控件类
+  - `/jobs` 已重排为岗位决策队列：左侧 FilterDock、右侧 Job Stream、四项紧凑统计和明确空状态 CTA
+  - `/jobs/new` 已重排为 JD Intake Studio：来源、JD 原文、解析、确认四步流程，左侧 JD Studio，右侧 Analysis Inspector，底部 StickyActionBar；JD textarea 默认高度不超过 420px
+  - `/sources` 已重排为招聘入口库：紧凑入口列表、打开平台、录入岗位、右侧配置面板，并保留不保存账号和令牌说明
+  - `/dashboard` 已重排为求职雷达：总岗位数、优先投递、面试中、高分岗位 KPI，以及状态分布、方向分布、高分岗位 Top N、高频技能词
+  - `/guide` 已重排为流程蓝图，使用流程线展示打开平台、复制 JD、录入岗位、解析确认、手动投递、跟进结果
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run test` 通过，Vitest 12 项测试通过
+  - 前端 `npm run build` 通过
+  - `/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
+  - Chrome headless 桌面与移动截图已复查，移动端 Command Bar 操作已收口为整行按钮，未发现主要操作被内部滚动遮挡
+- 风险/备注：
+  - 本次只调整前端布局、视觉系统、组件结构和轻量交互；未新增爬虫、多用户、自动投递、AI 聊天助手或数据库 schema
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `3f561fb`
 
 ---
 
@@ -978,7 +1030,8 @@
 | 020 | 2026-05-02 03:05 | 02c9ed8 | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
 | 021 | 2026-05-02 03:08 | 108ab0c | docs(project): record browser acceptance | J-08, K-05 ~ K-07 | 使用 Codex 内置浏览器验收首页、列表、新增解析、Dashboard、平台入口与指南 |
 | 022 | 2026-05-02 03:17 | 108ab0c | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
-| 023 | 2026-05-02 11:25 | PENDING_COMMIT | style(frontend): integrate source and jd workspace | M-01 ~ M-07 | 优化首页、平台入口、岗位列表和岗位编辑页结构，融合招聘网页来源与 JD 解析流程 |
+| 023 | 2026-05-02 11:25 | c13c588 | style(frontend): integrate source and jd workspace | M-01 ~ M-07 | 优化首页、平台入口、岗位列表和岗位编辑页结构，融合招聘网页来源与 JD 解析流程 |
+| 024 | 2026-05-02 14:40 | 3f561fb | style(frontend): refactor mission control workspace | N-01 ~ N-09 | 重排前端为 Job Mission Control，新增 AppShell、Command Bar、通用 UI 组件并改造五个目标页面 |
 
 ---
 
@@ -994,8 +1047,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成页面结构与网页/JD融合优化，首页、平台入口、岗位列表和岗位编辑页均能更清晰串联外部招聘网页、JD 原文、解析字段与投递状态
-- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务和页面结构优化任务均已完成
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成 Job Mission Control 前端 UI/UX 重排，五个目标页面已统一到左侧导航、顶部 Command Bar、页面 Hero 与高密度工作区结构
+- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务、页面结构优化任务和 UI/UX 作战台重排任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
 - 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
 - 下一步：如恢复 Docker Desktop / WSL，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker

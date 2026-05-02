@@ -180,7 +180,20 @@
 
 ---
 
+## N. UI/UX 作战台重排
+- [x] ~~建立 Job Mission Control AppShell：左侧导航、顶部 Command Bar、主内容容器~~
+- [x] ~~整理暖纸色视觉 token、语义化状态色和统一控件状态~~
+- [x] ~~新增 PageHero、StatusBadge、MatchBadge、ScoreRing、InsightCard 等通用组件~~
+- [x] ~~/jobs 重排为岗位决策队列：FilterDock + Job Stream + 四项紧凑统计~~
+- [x] ~~/jobs/new 重排为 JD Intake Studio：JD Studio + Analysis Inspector + StickyActionBar~~
+- [x] ~~/sources 重排为招聘入口库：紧凑入口列表 + 右侧配置面板~~
+- [x] ~~/dashboard 重排为求职雷达：KPI、状态分布、方向分布、高分岗位、高频技能词~~
+- [x] ~~/guide 重排为流程蓝图：流程线 + 边界说明~~
+- [x] ~~执行前端 lint / test / build、目标路由访问和桌面/移动截图复查~~
+
+---
+
 ## 当前状态
-- 当前阶段：非 Docker MVP+ 已完成并通过本机验收；本机 PostgreSQL / FastAPI / Next.js 运行路线已打通；平台入口、偏好设置、投递事件时间线、LLM 解析开关和规则回退均已实现；本轮已进一步优化首页、平台入口、岗位列表和新增/详情页结构，使招聘网页来源、JD 原文、解析字段和投递状态在页面上形成连续流程
+- 当前阶段：非 Docker MVP+ 已完成并通过本机验收；本机 PostgreSQL / FastAPI / Next.js 运行路线已打通；平台入口、偏好设置、投递事件时间线、LLM 解析开关和规则回退均已实现；本轮已完成 Job Mission Control 前端 UI/UX 重排，统一 AppShell、Command Bar、页面 Hero、核心组件和五个目标页面的信息架构
 - 当前阻塞：Docker Compose 配置可解析且容器内部地址已修正，但实际 `docker compose up -d --build` 仍因本机 Docker Desktop / WSL 系统级安装未完成而阻塞；按用户要求，Docker 相关验证暂时搁置，不作为当前继续推进项
-- 最新更新时间：2026-05-02 11:25
+- 最新更新时间：2026-05-02 14:40
