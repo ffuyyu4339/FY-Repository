@@ -200,7 +200,7 @@
   - 当前阻塞已从前端类型错误转移为本机 Docker CLI 不可用，需先恢复 `docker` 命令再继续容器联调
   - 本次为恢复本机构建链路，执行了依赖补装
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b8cb514`
 
 ---
 
@@ -236,7 +236,841 @@
   - 当前本地 PowerShell 会话无法识别 `docker` 命令，无法在本地继续执行容器联调复验
   - `/jobs/new` 不再出现 `Failed to fetch`、点击“解析 JD”可自动回填字段的最终验证需在实际 Codespaces 浏览器页面完成
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `b8cb514`
+
+---
+
+### LOG-006
+- 时间：2026-04-16 02:59
+- 任务：TASK-E/G / Codespaces 8000 转发地址与后端 CORS 收口修复
+- 目标：确保 Codespaces 浏览器侧请求不再落到 `localhost:8000`，而是自动命中当前 8000 转发地址，并允许对应前端来源跨域访问 FastAPI
+- 修改文件：
+  - `frontend/src/lib/api.ts`
+  - `frontend/src/lib/project.test.ts`
+  - `backend/app/core/config.py`
+  - `backend/app/main.py`
+  - `docker-compose.yml`
+  - `.env.example`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm run lint`
+  - `npm run test`
+  - `.\\.venv\\Scripts\\ruff check .`
+  - `.\\.venv\\Scripts\\black --check .`
+  - `.\\.venv\\Scripts\\python -m pytest -q`
+  - `npm run build`
+  - `docker compose down`
+  - `docker compose up --build`
+- 执行结果：
+  - 已新增 Codespaces 地址推导逻辑，当浏览器运行在 `*.app.github.dev` / `*.githubpreview.dev` 且前端环境变量仍为 `http://localhost:8000` 时，会自动改写为当前工作区的 8000 转发地址
+  - 已补充前端单测，验证 `localhost:8000` 会被解析为 Codespaces 的 `-8000` 域名
+  - 已在 FastAPI 中补充 `allow_origin_regex`，允许当前 Codespaces 前端来源跨域访问
+  - 已将 `FRONTEND_ORIGINS` 与 `FRONTEND_ORIGIN_REGEX` 写入 Compose 与环境变量模板
+  - 前端 `npm run lint`、后端 `ruff check .`、`black --check .` 已通过
+  - 前端 `npm run test`、后端 `pytest -q`、前端 `npm run build` 已通过
+  - `docker compose down` 与 `docker compose up --build` 已按要求执行，但当前 PowerShell 会话无法识别 `docker` 命令，未能完成容器联调复验
+- 风险/备注：
+  - 当前环境缺少可用 `docker` CLI，导致无法在本机会话中直接完成 Compose 启停与浏览器手工验收
+  - `/jobs/new` 页面真实浏览器验证仍需在实际 Codespaces 访问环境中完成，但前端自动回填链路已由组件测试覆盖，后端 `POST /api/analyze-jd` 已由 API 测试覆盖
+- 对应提交：
+  - `b4e3a01`
+
+---
+
+### LOG-007
+- 时间：2026-04-30 18:25
+- 任务：TASK-J / 项目状态复查与运行阻塞定位
+- 目标：确认当前项目“完全用不了”的真实阻塞点，复核 lint / test / build / Docker Compose / 浏览器访问状态
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker --version`
+  - `docker info`
+  - `docker context ls`
+  - `docker compose config`
+  - `docker compose down; docker compose up -d --build`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - Browser 打开 `http://localhost:3000/jobs`
+- 执行结果：
+  - 前端 `lint`、`test`、`build` 均通过
+  - 后端 `ruff`、`black --check`、`pytest` 均通过
+  - `docker compose config` 可解析
+  - `docker compose up -d --build` 失败，原因是无法连接 Docker API：`npipe:////./pipe/dockerDesktopLinuxEngine` 不存在
+  - Browser 打开 `http://localhost:3000/jobs` 返回 `ERR_CONNECTION_REFUSED`，当前无前端服务监听
+  - 本机未发现 `psql` / `postgres` 命令，非 Docker 路径也没有现成 PostgreSQL 可用
+- 风险/备注：
+  - 当前首要阻塞为运行环境缺少可用 Docker daemon / PostgreSQL，而不是前后端 lint/test/build 失败
+  - `rg --files` 在当前 Codex Windows 包路径下被拒绝访问，已改用 PowerShell 文件枚举
+- 对应提交：
+  - `c12fc0f`
+
+---
+
+### LOG-008
+- 时间：2026-04-30 19:06
+- 任务：TASK-J / Docker Desktop 环境安装尝试
+- 目标：补齐 Docker Desktop / Docker daemon，使 Docker Compose 可用于 PostgreSQL、后端、前端联调
+- 修改文件：
+  - `.env`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `Copy-Item -Path .env.example -Destination .env -Force`
+  - `winget install --id Docker.DockerDesktop --source winget --accept-package-agreements --accept-source-agreements`
+  - `Docker Desktop Installer.exe install --quiet --accept-license`
+  - `Start-Process Docker Desktop Installer.exe -Verb RunAs`
+  - `docker info`
+  - `winget list --id Docker.DockerDesktop`
+  - `Get-Service *docker*`
+- 执行结果：
+  - 已从 `.env.example` 生成本地 `.env`，且 `.env` 被 Git 忽略
+  - `winget install` 下载并释放 Docker Desktop 安装文件，但安装流程长时间卡住
+  - 已确认 `Docker Desktop.exe` 已落盘到 `C:\Program Files\Docker\Docker`
+  - 静默安装命令返回，但 Docker 服务未注册，winget 仍未登记 Docker Desktop
+  - 管理员方式启动安装器触发 UAC，但授权未完成，未能继续注册系统服务
+  - `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+- 风险/备注：
+  - 当前阻塞为 Windows 管理员授权 / 系统级 Docker Desktop 安装未完成
+  - 需要用户在 UAC 中确认管理员权限，或手动以管理员身份运行 `C:\Program Files\Docker\Docker\Docker Desktop Installer.exe install --quiet --accept-license`
+- 对应提交：
+  - `c086cb0`
+
+---
+
+### LOG-009
+- 时间：2026-05-01 22:51
+- 任务：TASK-J / Docker 环境复查与非 Docker 路线评估
+- 目标：确认当前 Docker 环境是否可运行，并评估放弃 Docker 后的本地运行前提
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker --version`
+  - `docker compose version`
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+  - `Get-Service *docker*`
+  - `wsl -l -v`
+  - `Get-Command psql/postgres/pg_ctl`
+  - `Get-Service *postgres*`
+  - `Get-NetTCPConnection -LocalPort 3000,8000,5432`
+- 执行结果：
+  - Docker CLI 与 Compose 插件存在
+  - `docker compose config` 可正常解析项目编排文件
+  - `docker info` 与 `docker compose up -d --build` 均失败，无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+  - 未发现 Docker Desktop 系统服务
+  - WSL 当前无可用 Linux 发行版
+  - 未发现本机 PostgreSQL 命令、PostgreSQL 服务或 5432 端口监听
+  - 当前 3000 / 8000 / 5432 均无项目服务监听
+- 风险/备注：
+  - Docker 路线当前不可运行，问题在宿主机 Docker Desktop / WSL 安装状态，不在项目 Compose 文件
+  - 若放弃 Docker，必须先安装并初始化本地 PostgreSQL，再调整后端本地 `.env` 使用 `localhost:5432`
+  - 按 PRD，Docker Compose 仍是正式验收要求；非 Docker 只能作为本机临时开发路线
+- 对应提交：
+  - `2f33c2a`
+
+---
+
+### LOG-010
+- 时间：2026-05-01 23:06
+- 任务：TASK-J/K / 非 Docker 本机运行路线重构
+- 目标：按用户要求放弃当前机器上的 Docker 路线，改为本机 PostgreSQL + 本机 FastAPI + 本机 Next.js 的开发运行方式
+- 修改文件：
+  - `.env.example`
+  - `.env.docker.example`
+  - `README.md`
+  - `backend/app/cli.py`
+  - `scripts/check-local-env.ps1`
+  - `scripts/init-local-postgres.ps1`
+  - `scripts/start-backend.ps1`
+  - `scripts/start-frontend.ps1`
+  - `scripts/start-local.ps1`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `.\\.venv\\Scripts\\python.exe -m app.cli --help`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\scripts\\check-local-env.ps1`
+- 执行结果：
+  - 已将 `.env.example` 默认数据库地址切换为 `localhost:5432`
+  - 已新增 `.env.docker.example` 保留历史 Docker Compose 环境模板
+  - 已新增 `python -m app.cli init-db`，可在本机 PostgreSQL 上执行 `db/init.sql`
+  - 已新增本机环境检查、PostgreSQL 初始化、前端启动、后端启动和一键启动脚本
+  - README 已改为非 Docker 本机运行说明
+  - 后端 `ruff`、`black --check`、`pytest` 通过
+  - 前端 `lint`、`test`、`build` 通过
+  - 环境检查脚本按预期提示当前缺少 `psql` / PostgreSQL Windows 服务
+- 风险/备注：
+  - 按 PRD 原始约束，Docker Compose 仍是正式验收项；本次变更来自用户明确要求，当前本机主路线调整为非 Docker
+  - 项目仍使用 PostgreSQL，未替换为 SQLite / Supabase / Firebase
+  - 下一步需要安装本机 PostgreSQL 后才能执行数据库实连和浏览器手工验收
+- 对应提交：
+  - `8423bab`
+
+---
+
+### LOG-011
+- 时间：2026-05-01 23:32
+- 任务：TASK-C/J / 本机 PostgreSQL 安装与非 Docker 联通验证
+- 目标：安装 PostgreSQL，初始化项目数据库，并验证本机前后端可访问
+- 修改文件：
+  - `README.md`
+  - `scripts/check-local-env.ps1`
+  - `scripts/init-local-postgres.ps1`
+  - `scripts/start-frontend.ps1`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `winget install --id PostgreSQL.PostgreSQL.16 --source winget --accept-package-agreements --accept-source-agreements`
+  - `.\\scripts\\check-local-env.ps1`
+  - `.\\scripts\\init-local-postgres.ps1`
+  - `.\\scripts\\start-local.ps1`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+- 执行结果：
+  - PostgreSQL 16.13-3 已安装
+  - PostgreSQL Windows 服务 `postgresql-x64-16` 已启动并设置为自动启动
+  - 5432 端口已监听
+  - 已创建 / 更新 `jobtracker` 数据库用户
+  - 已创建 `jobtracker` 数据库并执行 `db/init.sql`
+  - 已验证 `jobs` 表存在
+  - 后端 8000 已启动，`/api/health` 返回 `{"status":"ok"}`，`/api/jobs` 返回空列表
+  - 前端 3000 已启动，`/jobs` 返回 HTTP 200
+  - 已将前端启动脚本改为 `next dev --webpack`，规避当前 Windows 环境下 Turbopack dev 首次页面请求长时间挂起
+- 风险/备注：
+  - PostgreSQL 管理员连接已验证；项目应用库使用 `jobtracker` / `jobtracker`
+  - 完整 CRUD / JD Analyzer / Dashboard 仍需浏览器手工验收
+  - Docker Compose 联调仍不作为当前本机路线继续推进
+- 对应提交：
+  - `b7eb6ac`
+
+---
+
+### LOG-012
+- 时间：2026-05-01 23:53
+- 任务：TASK-E / `/jobs` 列表页视觉优化
+- 目标：按浏览器备注优化列表页整体审美，收窄导航与内容视觉宽度，弱化粗色块，补充更现代的状态与工作区信息
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/site-header.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/app/globals.css src/app/layout.tsx src/components/site-header.tsx src/components/jobs-list-client.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - Codex 内置浏览器刷新 `http://localhost:3000/jobs`
+- 执行结果：
+  - 已将顶部导航改为更紧凑的胶囊式导航，并移除 `MVP 初始化骨架` 占位文案
+  - 已将列表页头部改为更轻的工作台标题区，主 CTA 与统计入口更清晰
+  - 已将筛选区改为紧凑表单面板，并增加当前结果、优先投递、待分析状态条
+  - 已将空状态改为有下一步行动的工作区，引导新增岗位、解析 JD 与按匹配分投递
+  - 已修复全局 `a { color: inherit }` 覆盖 Tailwind 链接文字颜色，导致深色链接按钮文字不可见的问题
+  - 前端 `lint`、`test`、`build` 均通过
+  - Codex 内置浏览器已刷新 `/jobs` 并确认新布局生效
+- 风险/备注：
+  - 本次仅优化 `/jobs` 列表页与全局导航视觉，不改变 API、数据库或业务逻辑
+  - 当前数据库存在 1 条空白岗位记录，因此浏览器复查时展示的是列表行而非空状态
+- 对应提交：
+  - `2aa90b5`
+
+---
+
+### LOG-013
+- 时间：2026-05-02 00:25
+- 任务：TASK-E / `/jobs/new` 新增岗位页分栏布局重构
+- 目标：按现代 SaaS 效率工具风格重构新增岗位页，将 JD 原文区与结构化表单拆为左右分栏工作流，并统一浅色工作台视觉规范
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/job-editor.test.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/components/job-editor.tsx src/components/job-editor.test.tsx src/app/globals.css src/app/layout.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+- 执行结果：
+  - 已将 `JobEditor` 改为左侧 JD 原文与解析、右侧岗位表单的 split-pane 布局
+  - JD 输入区已设置 `min-h-[500px]`，并将解析按钮调整为右上角主操作
+  - 右侧表单已合并岗位基础信息、分析结果与投递流程，短字段使用两列网格，长字段独占一行
+  - 已增加底部 sticky 保存操作栏，编辑模式保留删除岗位操作
+  - 已统一输入框、下拉框、文本域的细边框、浅阴影、`focus:ring-2 focus:ring-orange-500/20` 风格
+  - 已将全局背景从偏暖渐变收敛为 `#f8fafc` 浅灰工作台
+  - 前端 `lint`、`test`、`build` 均通过
+  - `GET http://localhost:3000/jobs/new` 返回 HTTP 200
+- 风险/备注：
+  - 本次仅改前端布局与样式，不改变 API、数据库或 JD Analyzer 业务逻辑
+  - 当前工作区存在非本轮产生的 `dashboard-client.tsx`、`jobs-list-client.tsx`、`types.ts`、`project.test.ts` 改动，未纳入本次提交范围
+  - Docker Compose 联调仍受本机 Docker 环境阻塞，未在本轮复验
+- 对应提交：
+  - `b97a17d`
+
+---
+
+### LOG-014
+- 时间：2026-05-02 00:34
+- 任务：TASK-E/J / 求职操作流程补齐与关键功能验证
+- 目标：审查现有求职链路，将入口页、列表页、Dashboard 与新增/详情页串成“收集 JD -> 解析修正 -> 投递跟进 -> 统计复盘”的完整 MVP 内流程，并完成关键功能验证
+- 修改文件：
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/lib/types.ts`
+  - `frontend/src/lib/project.test.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/app/page.tsx src/components/dashboard-client.tsx src/components/jobs-list-client.tsx src/components/job-editor.tsx src/components/job-editor.test.tsx src/lib/project.test.ts src/lib/types.ts`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - 临时调用 `POST /api/analyze-jd`、`POST /api/jobs`、`PUT /api/jobs/{id}`、`DELETE /api/jobs/{id}`
+- 执行结果：
+  - 首页已从说明型入口改为按收集、解析、投递、复盘组织的工作入口
+  - Dashboard 已改为可行动的投递复盘页，统计卡和流程状态可直接跳转到对应岗位队列
+  - 岗位列表已支持从 URL query 初始化筛选，并新增待解析、优先投递、待投递、面试跟进快捷队列
+  - 列表行已补充下一步提示，帮助从当前状态进入下一动作
+  - JD 解析后如岗位仍为 `pending_analysis` 且匹配等级不是 `ignore`，会自动推进到 `ready_to_apply`
+  - 已补充 query 筛选解析测试，前端 `lint`、`test`、`build` 均通过
+  - 后端 `ruff`、`black --check`、`pytest` 均通过；pytest 仍存在既有 `datetime.utcnow()` 弃用警告
+  - 本机 3000 / 8000 / 5432 均已监听，`/api/health` 返回 ok，Dashboard summary 可访问
+  - 临时 JD 解析、创建岗位、更新状态、删除岗位链路验证通过
+- 风险/备注：
+  - 本次仍严格限定在 PRD MVP 内，没有引入爬虫、自动投递、多用户、外部通知或 AI 对话助手
+  - Docker Compose 联调仍受本机 Docker Desktop / WSL 环境阻塞，未在本轮改动中解决
+- 对应提交：
+  - `37591be`
+  - `c2fd970`
+
+---
+
+### LOG-015
+- 时间：2026-05-02 00:44
+- 任务：TASK-J/K / 文件整合、流程复查与自主验收
+- 目标：整合本机运行与 Docker Compose 文件边界，复查质量命令、关键业务流程和最终验收状态
+- 修改文件：
+  - `docker-compose.yml`
+  - `.env.docker.example`
+  - `README.md`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\scripts\\check-local-env.ps1`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score`
+  - 临时调用 `POST /api/analyze-jd`、`POST /api/jobs`、`PUT /api/jobs/{id}`、`DELETE /api/jobs/{id}`
+- 执行结果：
+  - 已将 Compose 容器内部数据库地址改为 `DOCKER_DATABASE_URL`，默认指向 `db:5432`
+  - 已将 Next.js 容器内部后端代理地址改为 `DOCKER_BACKEND_INTERNAL_URL`，默认指向 `backend:8000`
+  - `docker compose config` 已确认本机 `.env` 不再污染容器内部 `DATABASE_URL` / `BACKEND_INTERNAL_URL`
+  - 后端 `ruff`、`black --check`、`pytest` 通过；pytest 仍存在既有 `datetime.utcnow()` 弃用警告
+  - 前端 `lint`、`test`、`build` 通过
+  - 本机环境检查通过，Node.js、npm、Python、psql、PostgreSQL 服务、3000 / 8000 / 5432 端口均满足当前本机路线
+  - `/api/health` 返回 ok，Dashboard summary 可访问
+  - 首页、岗位列表、新增岗位页、带 query 的岗位列表入口均返回 HTTP 200
+  - 临时 JD 解析得到 `ai_app_dev`、`priority_apply`、92 分；临时岗位创建、状态更新为 `applied`、删除均成功
+  - `docker compose up -d --build` 仍失败，错误为无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+- 风险/备注：
+  - 严格按 PRD，Docker Compose 启动仍是阻塞项，不能宣称最终 MVP 全量验收通过
+  - 本机非 Docker 路线已达到可运行、可验证、可回滚状态
+- 对应提交：
+  - `925f71d`
+
+---
+
+### LOG-016
+- 时间：2026-05-02 01:48
+- 任务：TASK-L / MVP+ 合规自动化与国内大模型增强
+- 目标：实现平台入口、偏好设置、投递事件时间线、OpenAI-compatible LLM JD 解析与规则回退，并同步治理文档
+- 修改文件：
+  - `db/init.sql`
+  - `.env.example`
+  - `.env.docker.example`
+  - `docker-compose.yml`
+  - `README.md`
+  - `backend/app/models/job.py`
+  - `backend/app/repositories/jobs.py`
+  - `backend/app/api/routes/*`
+  - `backend/app/schemas/*`
+  - `backend/app/services/*`
+  - `backend/tests/*`
+  - `frontend/src/app/*`
+  - `frontend/src/components/*`
+  - `frontend/src/lib/*`
+  - `docs/job-tracker/PRD.md`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `npx prettier --write src`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `.\\.venv\\Scripts\\python.exe -m app.cli init-db`
+  - `Invoke-RestMethod http://localhost:8000/api/preferences`
+  - `Invoke-RestMethod http://localhost:8000/api/source-links`
+  - `Invoke-RestMethod POST http://localhost:8000/api/analyze-jd`
+  - 临时调用 `POST /api/jobs`、`POST /api/jobs/{id}/events`、`GET /api/jobs/{id}/events`、`GET /api/jobs?q=RAG`、`DELETE /api/jobs/{id}`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/settings`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new?platform=...`
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+- 执行结果：
+  - 已新增 `app_preferences`、`source_links`、`job_events` 三张表，并通过 `python -m app.cli init-db` 应用到本机 PostgreSQL
+  - 已预置 BOSS直聘、拉勾、猎聘、智联招聘、前程无忧、牛客、脉脉平台入口
+  - 已实现 `GET/PUT /api/preferences`
+  - 已实现 `GET/POST/PUT/DELETE /api/source-links`
+  - 已实现 `GET/POST /api/jobs/{id}/events`
+  - 已扩展 `POST /api/analyze-jd`，返回 `analysis_source`，支持 OpenAI-compatible LLM 解析并在失败或未配置时回退规则引擎
+  - 已修复 `GET /api/jobs?q=...` 搜索覆盖 `skills_extracted` 与 `keywords`
+  - 已新增 `status_group=interviewing` 覆盖一面、二面、HR 面
+  - 已修复 Dashboard 高分岗位排除 `ignore`、`rejected`、`archived`
+  - 已新增 `/sources`、`/settings`、`/guide` 页面，并在岗位详情页新增投递事件时间线
+  - 后端 `ruff`、`black --check`、`pytest -q` 均通过，pytest 为 14 项通过
+  - 前端 `lint`、`test`、`build` 均通过，Vitest 为 11 项通过，Next build 生成 `/sources`、`/settings`、`/guide`
+  - 本机 API 验证通过：偏好、来源、JD 解析、临时岗位创建、投递事件记录、技能搜索、临时岗位删除均成功
+  - 本机页面访问通过：`/sources`、`/settings`、`/guide`、`/jobs/new?...`、`/dashboard` 均返回 HTTP 200
+  - `docker compose config` 通过，并确认 LLM 环境变量已透传到后端容器
+  - `docker compose up -d --build` 仍失败，错误为无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+- 风险/备注：
+  - MVP+ 仍不保存招聘平台账号、密码、Cookie、验证码或登录令牌，不执行爬虫或自动投递
+  - LLM 仅解析用户主动粘贴的 JD，未配置 API 或 API 失败时自动回退规则引擎
+  - Docker Compose 实际联调仍受本机 Docker Desktop / WSL daemon 不可用阻塞
+- 对应提交：
+  - `925f71d`
+
+---
+
+### LOG-018
+- 时间：2026-05-02 02:45
+- 任务：TASK-L / 默认简历版本接入与 Docker 阻塞复查
+- 目标：补齐偏好设置中的默认简历版本在新增岗位页的实际使用，并再次确认 Docker Compose 阻塞原因
+- 修改文件：
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/job-editor.test.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `docker context ls`
+  - `Get-Service *docker*`
+  - `Start-Process "C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe" -WindowStyle Hidden`
+  - `docker info`
+  - `wsl -l -v`
+  - `winget list --id Docker.DockerDesktop`
+  - `Get-Content "$env:LOCALAPPDATA\\Docker\\log\\host\\Docker Desktop.exe.log" -Tail 120`
+  - `npm run test`
+  - `npm run lint`
+  - `npm run build`
+- 执行结果：
+  - 已在新增岗位页读取 `GET /api/preferences`，当存在 `default_resume_version` 时自动填入简历版本字段
+  - 已补充前端测试覆盖默认简历版本预填，并修复测试文件缺少 cleanup 导致多渲染残留的问题
+  - 前端 `npm run test` 通过，12 项测试通过
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run build` 通过
+  - Docker Desktop 启动后 `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`
+  - Docker Desktop 日志显示缺少注册表键 `SOFTWARE\\Docker Inc.\\Docker Desktop`
+  - Docker 安装日志显示安装器曾尝试 UAC 提权，当前会话无法完成系统级安装注册
+  - `wsl -l -v` 显示无可用 Linux 发行版
+  - `winget list --id Docker.DockerDesktop` 未识别 Docker Desktop 为已安装程序包
+- 风险/备注：
+  - Docker Compose 联调仍阻塞在宿主机 Docker Desktop / WSL 系统级安装状态，需要用户完成管理员授权或手动安装 Docker Desktop 与 WSL 发行版
+  - 本轮仅补齐前端偏好接入，不改变后端 API 或数据库结构
+- 对应提交：
+  - `b4dae41`
+
+---
+
+### LOG-019
+- 时间：2026-05-02 02:55
+- 任务：TASK-L / 非 Docker 剩余项复核
+- 目标：按用户要求暂时搁置 Docker 问题，复核是否仍存在非 Docker 未完成任务，并同步当前交付状态
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `git status --short`
+  - `Select-String -Path docs/job-tracker/TASK_CARD.md -Pattern '^- \\[ \\]'`
+- 执行结果：
+  - 已确认任务卡未完成项仅剩 Docker 相关 3 项：基础服务启动、Docker Compose 联调、MVP+ Docker Compose 联调
+  - 已按用户最新指令将 Docker 验证标记为暂时搁置的系统级环境阻塞，不作为当前继续推进项
+  - 已确认非 Docker MVP+ 功能范围已完成并可试用
+- 风险/备注：
+  - Docker Compose 仍是原 PRD 的正式验收项；当前只是按用户要求延期，不代表该项已通过
+- 对应提交：
+  - `be704d7`
+
+---
+
+### LOG-020
+- 时间：2026-05-02 03:05
+- 任务：TASK-L/K / 非 Docker MVP+ 最终验收
+- 目标：执行当前交付口径下的非 Docker MVP+ 验收，确认后端、前端、本机 API、页面访问和关键业务闭环可用
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `git status --short`
+  - `Get-NetTCPConnection -LocalPort 3000,8000,5432`
+  - `.\\.venv\\Scripts\\ruff.exe check .`
+  - `.\\.venv\\Scripts\\black.exe --check .`
+  - `.\\.venv\\Scripts\\python.exe -m pytest -q`
+  - `.\\scripts\\check-local-env.ps1`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/preferences`
+  - `Invoke-RestMethod http://localhost:8000/api/source-links`
+  - 临时调用 `PUT /api/preferences`
+  - 临时调用 `POST/PUT/DELETE /api/source-links`
+  - 临时调用 `POST /api/analyze-jd`
+  - 临时调用 `POST/PUT/DELETE /api/jobs`
+  - 临时调用 `POST/GET /api/jobs/{id}/events`
+  - `Invoke-RestMethod http://localhost:8000/api/jobs?q=RAG`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new?platform=...&job_link=...`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/settings`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - `docker compose config`
+- 执行结果：
+  - 工作树验收前干净
+  - 3000 / 8000 / 5432 均在监听，本机环境检查通过
+  - 后端 `ruff`、`black --check`、`pytest -q` 均通过，pytest 14 项通过
+  - 前端 `lint`、`test`、`build` 均通过，Vitest 12 项通过，Next build 生成全部目标页面
+  - 健康检查返回 `ok`
+  - 偏好配置读取与同值更新成功，默认简历版本为 `v1`
+  - 默认来源入口返回 7 条
+  - 临时来源链接创建、更新为停用、删除成功
+  - 临时 JD 解析返回 `ai_app_dev`、`priority_apply`、`analysis_source=rules`
+  - 临时岗位创建成功，随后更新为 `applied`，投递事件记录成功，事件列表返回 3 条，最后岗位删除成功
+  - `GET /api/jobs?q=RAG` 可命中技能搜索
+  - Dashboard summary 可访问
+  - `/`、`/jobs`、`/jobs/new`、带来源参数的 `/jobs/new`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
+  - `docker compose config` 可解析，未执行 `docker compose up`，符合用户要求的 Docker 暂时搁置口径
+- 风险/备注：
+  - Docker Compose 实际启动与容器内联调仍未验收，原因是用户已要求暂时搁置 Docker 问题
+  - 本次验收后，非 Docker MVP+ 可试用状态成立
+- 对应提交：
+  - `02c9ed8`
+
+---
+
+### LOG-021
+- 时间：2026-05-02 03:08
+- 任务：TASK-J/K / Codex 内置浏览器验收
+- 目标：使用 Codex 内置浏览器对当前本机前端进行可见页面与关键交互验收
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - Browser 打开 `http://localhost:3000/`
+  - Browser 打开并交互 `http://localhost:3000/jobs`
+  - Browser 打开 `http://localhost:3000/jobs?status=ready_to_apply&sort_by=match_score`
+  - Browser 打开并解析测试 JD：`http://localhost:3000/jobs/new`
+  - Browser 打开 `http://localhost:3000/dashboard`
+  - Browser 打开 `http://localhost:3000/sources`
+  - Browser 打开 `http://localhost:3000/guide`
+  - Browser 截取 Dashboard 最终渲染画面
+- 执行结果：
+  - 首页标题、工作流步骤、快捷入口与导航均可见
+  - 岗位列表页标题、统计 Badge、搜索框、下拉筛选、快捷筛选和岗位卡片/空状态均可见
+  - 列表页搜索框可输入，优先投递快捷筛选可点击，筛选后仍可展示结果或空状态
+  - 带 query 的岗位列表入口可保留 URL 参数并正常渲染
+  - 新增岗位页分栏布局、JD 原文区、岗位表单、保存栏均可见
+  - 测试 JD 可通过“一键解析 JD”回填公司、岗位、城市、薪资、方向、匹配等级和技能词；本轮未保存岗位数据
+  - Dashboard KPI、状态分布、方向分布、高分岗位、技能词标签和下一步动作均可见，无加载错误
+  - `/sources` 与 `/guide` 导航目标均非 404
+  - Dashboard 最终渲染截图已在内置浏览器工具中捕获
+- 风险/备注：
+  - 首次 Playwright 截图接口超时，已改用 Browser CUA 截图并成功捕获 Dashboard 画面
+  - Docker Compose 实际启动与容器联调仍按用户要求暂时搁置
+- 对应提交：
+  - `108ab0c`
+
+---
+
+### LOG-022
+- 时间：2026-05-02 03:17
+- 任务：TASK-E/J / 开发模式调试菜单中文化
+- 目标：将内置浏览器左下角 Next.js 开发调试菜单从英文显示改为中文显示
+- 修改文件：
+  - `frontend/next.config.ts`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/components/next-devtools-i18n.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write next.config.ts src/components/next-devtools-i18n.tsx src/app/layout.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - 重启前端 dev server：`scripts/start-frontend.ps1 -Port 3000`
+  - Codex 内置浏览器打开 `http://localhost:3000/dashboard` 并点击左下角开发工具按钮
+- 执行结果：
+  - 已通过 `devIndicators: false` 关闭 Next.js 官方英文 dev indicator
+  - 已新增仅开发环境渲染的中文开发工具菜单，显示“路由 / 静态 / 打包器 / 路由信息 / 偏好设置”
+  - 内置浏览器验证官方英文 `Open Next.js Dev Tools` 按钮不再出现
+  - 内置浏览器验证中文菜单可打开，且 `Route Info`、`Preferences`、`Bundler`、`Route Static` 英文文案不再出现
+  - 前端 `lint`、`test`、`build` 均通过
+- 风险/备注：
+  - 该中文菜单只在 development 环境渲染，生产构建不显示
+  - `Webpack` 为打包器专有名词，保留英文名称
+- 对应提交：
+  - `108ab0c`
+
+---
+
+### LOG-023
+- 时间：2026-05-02 11:25
+- 任务：TASK-M / 页面结构与网页/JD融合优化
+- 目标：运行项目并自主优化页面结构，使招聘网页来源、JD 原文、解析字段和投递状态在页面上形成更清晰的连续流程
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `.\\scripts\\start-local.ps1`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-RestMethod http://localhost:8000/api/health`
+  - `Invoke-RestMethod http://localhost:8000/api/dashboard/summary`
+  - `Invoke-WebRequest http://localhost:3000/`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - Chrome headless 截图：`/` 桌面、`/jobs/new` 桌面、`/` 移动端
+- 执行结果：
+  - 已将全局内容宽度从 `1040px` 放宽到 `1180px`，适配列表与编辑工作台的双栏信息密度
+  - 首页已改为“招聘网页来源 + JD 摘要 + 解析入口”的组合工作台，首屏直接呈现网页来源和 JD 结构化结果的关系
+  - 平台入口页已改为浏览器窗口式来源列表，并补充“打开网页 -> 复制 JD -> 录入岗位 -> 解析跟进”流程提示
+  - 岗位列表页已新增来源网页与 JD 摘要区域，每条记录同时展示来源、JD 片段、匹配分与投递状态
+  - 新增/详情页已新增来源网页上下文、流程条和结构化摘要，使左侧 JD 原文与右侧表单的关系更明确
+  - 已增加横向溢出保护，并针对移动端首页长 URL 做截断收口
+  - 本机项目已启动，3000 / 8000 / 5432 均在监听；`/api/health` 返回 ok
+  - 前端 `lint`、`test`、`build` 均通过；Vitest 12 项测试通过
+  - 首页、岗位列表、新增岗位、平台入口、Dashboard 均返回 HTTP 200
+  - Chrome headless 桌面与移动截图已复查，首页和新增岗位页结构可读
+- 风险/备注：
+  - 本次只调整前端页面结构与视觉层级，不改后端 API、数据库 schema 或业务边界
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `c13c588`
+
+---
+
+### LOG-024
+- 时间：2026-05-02 14:40
+- 任务：TASK-N / UI-UX 作战台重排
+- 目标：在不改变核心业务范围的前提下，将前端从白卡片后台模板重排为 Job Mission Control
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/app/guide/page.tsx`
+  - `frontend/src/components/app-shell.tsx`
+  - `frontend/src/components/ui.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/site-header.tsx`
+  - `frontend/src/lib/project.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write ...`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - Chrome headless 截图：`/jobs` 桌面与移动、`/jobs/new` 桌面、`/dashboard` 桌面
+- 执行结果：
+  - 已新增统一 `AppShell`，使用左侧垂直导航、顶部 Command Bar 和主内容容器替代顶部居中胶囊导航
+  - 已在 `globals.css` 中整理 Job Mission Control 设计 token，使用暖纸色背景、深墨侧栏、赤橙关键动作和语义化状态色
+  - 已新增 `PageHero`、`StatusBadge`、`MatchBadge`、`ScoreRing`、`InsightCard` 与统一控件类
+  - `/jobs` 已重排为岗位决策队列：左侧 FilterDock、右侧 Job Stream、四项紧凑统计和明确空状态 CTA
+  - `/jobs/new` 已重排为 JD Intake Studio：来源、JD 原文、解析、确认四步流程，左侧 JD Studio，右侧 Analysis Inspector，底部 StickyActionBar；JD textarea 默认高度不超过 420px
+  - `/sources` 已重排为招聘入口库：紧凑入口列表、打开平台、录入岗位、右侧配置面板，并保留不保存账号和令牌说明
+  - `/dashboard` 已重排为求职雷达：总岗位数、优先投递、面试中、高分岗位 KPI，以及状态分布、方向分布、高分岗位 Top N、高频技能词
+  - `/guide` 已重排为流程蓝图，使用流程线展示打开平台、复制 JD、录入岗位、解析确认、手动投递、跟进结果
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run test` 通过，Vitest 12 项测试通过
+  - 前端 `npm run build` 通过
+  - `/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
+  - Chrome headless 桌面与移动截图已复查，移动端 Command Bar 操作已收口为整行按钮，未发现主要操作被内部滚动遮挡
+- 风险/备注：
+  - 本次只调整前端布局、视觉系统、组件结构和轻量交互；未新增爬虫、多用户、自动投递、AI 聊天助手或数据库 schema
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `3f561fb`
+
+---
+
+### LOG-025
+- 时间：2026-05-02 16:55
+- 任务：TASK-O / UI-UX 二次重排
+- 目标：按最新浏览器反馈继续降低后台模板感，将 `/jobs` 从大卡片工作台重排为更紧凑的任务队列
+- 修改文件：
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/guide/page.tsx`
+  - `frontend/src/components/app-shell.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/settings-client.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `frontend/src/components/ui.tsx`
+  - `frontend/src/lib/project.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write ...`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - Chrome headless 截图：`/jobs` 桌面、`/jobs` 窄屏、`/jobs/new` 桌面
+- 执行结果：
+  - 已读取并按前端重排技能执行；browser-use 技能已读取，但当前会话未暴露其 Node REPL/browser callable 工具，因此使用 Chrome headless 作为视觉复查 fallback
+  - AppShell 已由宽深色侧栏改为窄任务轨，顶部 Command Bar 调整为更薄的全局搜索与关键动作区
+  - `/jobs` 已取消四个大统计卡和大岗位卡片流，改为紧凑指标条、左侧筛选轨道、中间表格式岗位队列、右侧决策简报
+  - 岗位行已突出匹配分、匹配等级、状态、来源、更新时间和下一步动作，减少重复白卡与首屏空白
+  - PageHero 已压缩为轻量工作区面板；残留的 `workspace`、`Command Bar`、`Job Stream`、`Analysis Inspector` 等结构标签已统一为中文文案
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run test` 通过，Vitest 12 项测试通过
+  - 前端 `npm run build` 通过
+  - `/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
+- 风险/备注：
+  - 本次只调整前端布局、视觉密度、组件结构和文案一致性；未新增爬虫、多用户、自动投递、AI 聊天助手或数据库 schema
+  - Chrome headless 窄屏截图在 390px 宽度下受桌面 headless 最小布局行为影响存在右侧裁切，500px 窄屏截图显示指标数值和主操作正常；实际移动端布局仍保留顶部导航入口与整行主操作
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `481ed25`
+
+---
+
+### LOG-026
+- 时间：2026-05-02 17:05
+- 任务：TASK-P / `/jobs` 作战台视觉强化
+- 目标：继续强化 `/jobs` 第一屏视觉锚点和任务队列感，让页面更接近 Job Mission Control 而不是普通白卡后台
+- 修改文件：
+  - `frontend/src/components/ui.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npx prettier --write src/components/ui.tsx src/components/jobs-list-client.tsx`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `Invoke-WebRequest http://localhost:3000/jobs`
+  - `Invoke-WebRequest http://localhost:3000/jobs/new`
+  - `Invoke-WebRequest http://localhost:3000/sources`
+  - `Invoke-WebRequest http://localhost:3000/dashboard`
+  - `Invoke-WebRequest http://localhost:3000/guide`
+  - Chrome headless 截图：`/jobs` 桌面、`/jobs` 500px 窄屏
+- 执行结果：
+  - 已按前端重排技能继续执行第三轮视觉收口；本次属于既有设计系统内局部强化，未新增 Image Gen 概念图
+  - `PageHero` 已支持 `mission` 变体和 `meta` 区域，`/jobs` 使用深色任务头承载标题、主操作和状态节奏条
+  - 四项统计已从独立白卡移动到深色任务头内，使用语义色节奏线展示当前结果、优先投递、待分析、面试中
+  - 岗位流已加入深色队列表头和桌面列名，岗位行按状态显示左侧语义色
+  - 右侧决策简报已改为深色 Inspector，突出下一轮处理焦点和进入处理按钮
+  - 前端 `npm run lint` 通过
+  - 前端 `npm run test` 通过，Vitest 12 项测试通过
+  - 前端 `npm run build` 通过
+  - `/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
+- 风险/备注：
+  - 本次仍只调整前端布局、视觉层级和轻量组件结构；未新增爬虫、多用户、自动投递、AI 聊天助手或数据库 schema
+  - Docker Compose 实际启动与容器联调仍按既有结论暂时搁置
+- 对应提交：
+  - `3ee6e7f`
 
 ---
 
@@ -264,8 +1098,29 @@
 | 001 | 2026-04-15 18:31 | b6dea80 | chore: initialize repository | A-01 ~ A-08, B-01 ~ B-07, B-09, C-01 ~ C-05 | 初始化治理文档并完成基础目录与脚手架重组 |
 | 002 | 2026-04-15 20:23 | c24d1df | feat(backend): implement jobs analyzer and dashboard api | D-01 ~ D-09, J-01, J-05 | 完成后端 API 主链与测试验证 |
 | 003 | 2026-04-15 20:39 | 328beed | feat(frontend): wire jobs workflow and dashboard | E-05, F-01 ~ F-10, G-01 ~ G-10, H-01 ~ H-04, I-01 ~ I-06, J-04 | 完成前端主链联调与 lint/test 验证 |
-| 004 | 2026-04-16 00:24 | PENDING | fix(frontend): guard job editor id handling | J-06 | 修复前端 build 类型错误并完成构建复验 |
-| 005 | 2026-04-16 00:48 | PENDING | fix(frontend): proxy api requests for codespaces | E-05, G-01 ~ G-10 | 修复 Codespaces 下前端请求后端链路 |
+| 004 | 2026-04-16 00:36 | a1d5f1d | docs(project): sync governance records with git history | K-05, K-06 | 回填历史 commit 记录并同步治理文档 |
+| 005 | 2026-04-16 00:48 | b8cb514 | fix(frontend): repair codespaces jd analyzer request flow | J-06, E-05, G-01 ~ G-10 | 修复前端类型收窄与 Codespaces JD 解析请求链路 |
+| 006 | 2026-04-16 02:59 | b4e3a01 | fix(frontend): support codespaces backend forwarding | E-02, F-10 | 修复 Codespaces 8000 转发地址识别与后端 CORS 配置 |
+| 007 | 2026-04-30 18:25 | c12fc0f | docs(project): record local runtime blockers | J-07, J-08, J-09 | 记录 Docker daemon 不可用、服务未启动和本机 PostgreSQL 缺失状态 |
+| 008 | 2026-04-30 19:06 | c086cb0 | docs(project): record docker install blocker | J-07, J-08 | 记录 Docker Desktop 安装残留与系统服务未注册阻塞 |
+| 009 | 2026-05-01 22:51 | 2f33c2a | docs(project): record docker environment recheck | J-07, J-08 | 复查 Docker CLI / Compose 与 WSL 状态，确认 Docker 路线不可运行 |
+| 010 | 2026-05-01 23:06 | 8423bab | refactor(project): support local postgres workflow | C-06, J-07, K-01 ~ K-04 | 按用户要求支持非 Docker 本机 PostgreSQL 运行路线 |
+| 011 | 2026-05-01 23:32 | b7eb6ac | chore(dev): verify local postgres runtime | C-06, J-09 | 安装并验证本机 PostgreSQL、后端和前端联通 |
+| 012 | 2026-05-01 23:53 | 2aa90b5 | style(frontend): polish jobs page layout | E-01, E-05 | 按浏览器备注优化 `/jobs` 列表页、全局导航和状态信息展示 |
+| 013 | 2026-05-02 00:25 | b97a17d | style(frontend): refactor job editor layout | E-02, F-01, F-10 | 重构 `/jobs/new` 为左右分栏工作流布局，并统一浅色表单控件风格 |
+| 014 | 2026-05-02 00:34 | 37591be | feat(frontend): improve job workflow | E-01 ~ E-05, F-10, G-01 ~ G-03, H-01 ~ H-06, J-08 | 补齐入口、列表、Dashboard 与详情编辑的求职操作链路，并完成关键功能验证 |
+| 015 | 2026-05-02 00:34 | c2fd970 | style(frontend): format workflow components | E-01, E-04 | 收敛流程组件内 SVG 与列表文字格式化差异 |
+| 016 | 2026-05-02 00:44 | 925f71d | chore(project): reconcile runtime validation docs | B-08, J-07, K-05 ~ K-07 | 隔离 Compose 容器内部变量，复验本机流程并同步最终验收结论 |
+| 017 | 2026-05-02 01:48 | 925f71d | feat(project): add compliant automation workflow | L-01 ~ L-21 | 新增平台入口、偏好设置、投递事件时间线、LLM JD 解析与规则回退 |
+| 018 | 2026-05-02 02:45 | b4dae41 | feat(frontend): prefill default resume version | L-22 | 新增岗位页读取偏好配置并自动填入默认简历版本，同时复查 Docker 系统级阻塞 |
+| 019 | 2026-05-02 02:55 | be704d7 | docs(project): defer docker validation | B-08, J-07, L-Docker | 按用户要求暂时搁置 Docker 验证，复核非 Docker MVP+ 已完成 |
+| 020 | 2026-05-02 03:05 | 02c9ed8 | docs(project): record non docker acceptance | K-05 ~ K-07, L-19 ~ L-21 | 执行非 Docker MVP+ 最终验收并记录证据 |
+| 021 | 2026-05-02 03:08 | 108ab0c | docs(project): record browser acceptance | J-08, K-05 ~ K-07 | 使用 Codex 内置浏览器验收首页、列表、新增解析、Dashboard、平台入口与指南 |
+| 022 | 2026-05-02 03:17 | 108ab0c | fix(frontend): localize dev indicator menu | E-05, J-08 | 关闭 Next.js 英文 dev indicator，并新增中文开发调试菜单 |
+| 023 | 2026-05-02 11:25 | c13c588 | style(frontend): integrate source and jd workspace | M-01 ~ M-07 | 优化首页、平台入口、岗位列表和岗位编辑页结构，融合招聘网页来源与 JD 解析流程 |
+| 024 | 2026-05-02 14:40 | 3f561fb | style(frontend): refactor mission control workspace | N-01 ~ N-09 | 重排前端为 Job Mission Control，新增 AppShell、Command Bar、通用 UI 组件并改造五个目标页面 |
+| 025 | 2026-05-02 16:55 | 481ed25 | style(frontend): refine mission control layout | O-01 ~ O-06 | 二次重排 `/jobs` 为更紧凑的任务队列，收窄侧栏、压缩 Hero、改为表格式岗位流与决策简报 |
+| 026 | 2026-05-02 17:05 | 3ee6e7f | style(frontend): strengthen jobs mission cockpit | P-01 ~ P-06 | 强化 `/jobs` 深色任务头、状态节奏条、队列表头、深色决策简报和状态色岗位行 |
 
 ---
 
@@ -273,15 +1128,16 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | 当前 PowerShell 会话无法识别 `docker` 命令，无法执行 Docker Compose 联调 | 高 | open | 需先恢复 Docker CLI 或重新打开正确环境 |
+| ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | Compose 配置已恢复容器内部 `db:5432` / `backend:8000`，但 `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
+| ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | closed | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，后端数据库联通已验证 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
-| ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端的问题已修复 | 低 | closed | 前端已改为同源代理 + Next 转发 |
+| ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
 
 ---
 
 ## 阶段总结
-- 当前阶段：Codespaces 前后端请求链路已修复
-- 已完成任务数：59
-- 未完成任务数：8
-- 当前风险：Docker Compose 联调仍受当前本机 Docker CLI 环境限制
-- 下一步：恢复 `docker` 命令可用后执行 `docker compose up --build`，继续完成数据库联通与手工验收
+- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成 `/jobs` 作战台视觉强化，五个目标页面继续统一到左侧导航、顶部 Command Bar、页面 Hero 与高密度工作区结构，其中 `/jobs` 已具备深色任务头、状态节奏条、表格式岗位流和深色决策简报
+- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务、页面结构优化任务和 UI/UX 作战台重排任务均已完成
+- 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
+- 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
+- 下一步：如恢复 Docker Desktop / WSL，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker

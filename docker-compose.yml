@@ -28,7 +28,14 @@ services:
     container_name: job-tracker-backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://jobtracker:jobtracker@db:5432/jobtracker}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-postgresql+psycopg://jobtracker:jobtracker@db:5432/jobtracker}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      FRONTEND_ORIGIN_REGEX: ${FRONTEND_ORIGIN_REGEX:-https://.*\.app\.github\.dev$|https://.*\.githubpreview\.dev$}
+      LLM_ENABLED: ${LLM_ENABLED:-false}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai_compatible}
+      LLM_API_BASE_URL: ${LLM_API_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-deepseek-v4-flash}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
@@ -40,12 +47,12 @@ services:
       context: ./frontend
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
-        BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL:-http://backend:8000}
+        BACKEND_INTERNAL_URL: ${DOCKER_BACKEND_INTERNAL_URL:-http://backend:8000}
     container_name: job-tracker-frontend
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
-      BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL:-http://backend:8000}
+      BACKEND_INTERNAL_URL: ${DOCKER_BACKEND_INTERNAL_URL:-http://backend:8000}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:

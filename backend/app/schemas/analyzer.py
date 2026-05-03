@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -20,3 +22,4 @@ class JDAnalyzeResponse(BaseModel):
     track: str = "other"
     match_score: int = 0
     match_level: str = "ignore"
+    analysis_source: Literal["rules", "llm", "fallback"] = "rules"

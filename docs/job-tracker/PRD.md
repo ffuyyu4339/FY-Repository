@@ -92,6 +92,15 @@ Job Tracker + JD Analyzer
 4. lint / test / build 可通过
 5. README 可指导本地运行和部署
 
+### F. MVP+ 合规辅助自动化
+1. 提供国内主流招聘平台入口；
+2. 支持保存外部招聘平台搜索链接和筛选条件；
+3. 支持从平台入口预填新增岗位的平台与链接字段；
+4. 支持统一记录投递事件时间线；
+5. 支持新人使用指南页；
+6. 支持求职偏好配置；
+7. 支持 OpenAI-compatible 国内大模型辅助 JD 解析，并保留规则引擎兜底。
+
 ---
 
 ## 4.2 本期不做
@@ -105,6 +114,23 @@ Job Tracker + JD Analyzer
 8. 外部企业画像接口
 9. 消息通知系统
 10. 微服务架构拆分
+
+## 4.3 MVP+ 自动化边界
+本期允许的自动化仅限于合规辅助：
+
+1. 系统可以保存招聘平台入口、搜索链接和筛选条件；
+2. 系统可以打开外部平台链接，使用用户浏览器本地已有登录态；
+3. 系统可以解析用户主动粘贴的 JD 文本；
+4. 系统可以记录用户手动投递后的状态和事件。
+
+本期仍禁止：
+
+1. 保存招聘平台账号、密码、Cookie、验证码或登录令牌；
+2. 模拟用户登录招聘平台；
+3. 绕过验证码、风控、反爬或平台限制；
+4. 自动抓取招聘平台页面内容；
+5. 自动点击投递、自动沟通或自动海投；
+6. 服务端请求招聘平台页面代替用户浏览。
 
 ---
 
@@ -165,6 +191,45 @@ Job Tracker + JD Analyzer
 - notes
 - created_at
 - updated_at
+
+## 6.1.1 数据模型：app_preferences
+单用户偏好配置表：
+
+- id
+- target_cities
+- target_tracks
+- priority_skills
+- min_salary
+- default_resume_version
+- llm_enabled
+- created_at
+- updated_at
+
+## 6.1.2 数据模型：source_links
+招聘平台入口与搜索链接表：
+
+- id
+- source_key
+- platform_name
+- title
+- url
+- city
+- track
+- keywords
+- enabled
+- sort_order
+- created_at
+- updated_at
+
+## 6.1.3 数据模型：job_events
+投递事件时间线表：
+
+- id
+- job_id
+- event_type
+- notes
+- event_at
+- created_at
 
 ---
 
@@ -284,6 +349,9 @@ Job Tracker + JD Analyzer
 2. `/jobs/new`：新增岗位页
 3. `/jobs/[id]`：岗位详情页
 4. `/dashboard`：统计面板页
+5. `/sources`：招聘平台入口页
+6. `/settings`：偏好设置页
+7. `/guide`：新人使用指南页
 
 ---
 
@@ -307,6 +375,26 @@ Job Tracker + JD Analyzer
 - 修改状态
 - 更新备注
 - 记录简历版本
+- 记录投递事件时间线
+
+## 7.4 平台入口页功能
+必须支持：
+
+- 查看默认招聘平台入口；
+- 新增、编辑、删除自定义搜索链接；
+- 启用或停用来源链接；
+- 打开外部平台链接；
+- 从来源链接进入新增岗位并预填平台与链接。
+
+## 7.5 设置页功能
+必须支持：
+
+- 配置目标城市；
+- 配置目标岗位方向；
+- 配置重点技能；
+- 配置最低期望薪资；
+- 配置默认简历版本；
+- 开关 LLM 解析偏好。
 
 ---
 
@@ -341,10 +429,31 @@ FastAPI 至少提供：
 - track
 - match_score
 - match_level
+- analysis_source
 
 ## 8.3 Dashboard API
 FastAPI 至少提供：
 - `GET /api/dashboard/summary`
+
+## 8.4 Preferences API
+FastAPI 至少提供：
+
+- `GET /api/preferences`
+- `PUT /api/preferences`
+
+## 8.5 Source Links API
+FastAPI 至少提供：
+
+- `GET /api/source-links`
+- `POST /api/source-links`
+- `PUT /api/source-links/{id}`
+- `DELETE /api/source-links/{id}`
+
+## 8.6 Job Events API
+FastAPI 至少提供：
+
+- `GET /api/jobs/{id}/events`
+- `POST /api/jobs/{id}/events`
 
 ---
 

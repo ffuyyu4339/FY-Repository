@@ -1,23 +1,35 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { JobEditor } from "./job-editor";
 
 const {
   analyzeJDMock,
+  createJobEventMock,
   createJobMock,
   deleteJobMock,
+  fetchJobEventsMock,
   fetchJobMock,
+  fetchPreferencesMock,
   updateJobMock,
   pushMock,
 } = vi.hoisted(() => ({
   analyzeJDMock: vi.fn(),
+  createJobEventMock: vi.fn(),
   createJobMock: vi.fn(),
   deleteJobMock: vi.fn(),
+  fetchJobEventsMock: vi.fn(),
   fetchJobMock: vi.fn(),
+  fetchPreferencesMock: vi.fn(),
   updateJobMock: vi.fn(),
   pushMock: vi.fn(),
 }));
@@ -30,20 +42,33 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/api", () => ({
   analyzeJD: analyzeJDMock,
+  createJobEvent: createJobEventMock,
   createJob: createJobMock,
   deleteJob: deleteJobMock,
+  fetchJobEvents: fetchJobEventsMock,
   fetchJob: fetchJobMock,
+  fetchPreferences: fetchPreferencesMock,
   updateJob: updateJobMock,
 }));
 
 describe("JobEditor", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   beforeEach(() => {
     analyzeJDMock.mockReset();
+    createJobEventMock.mockReset();
     createJobMock.mockReset();
     deleteJobMock.mockReset();
+    fetchJobEventsMock.mockReset();
     fetchJobMock.mockReset();
+    fetchPreferencesMock.mockReset();
     updateJobMock.mockReset();
     pushMock.mockReset();
+    fetchPreferencesMock.mockResolvedValue({
+      default_resume_version: "v-default",
+    });
   });
 
   it("fills form fields after clicking analyze JD", async () => {
@@ -62,6 +87,7 @@ describe("JobEditor", () => {
       track: "ai_app_dev",
       match_score: 88,
       match_level: "priority_apply",
+      analysis_source: "rules",
     });
 
     render(<JobEditor mode="create" />);
@@ -73,7 +99,7 @@ describe("JobEditor", () => {
       },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
+    fireEvent.click(screen.getByRole("button", { name: "一键解析 JD" }));
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("公司名称")).toHaveValue("星图智能");
@@ -87,9 +113,24 @@ describe("JobEditor", () => {
       expect(screen.getByPlaceholderText("技能关键词，逗号分隔")).toHaveValue(
         "Python, LLM, RAG",
       );
+      expect(screen.getByLabelText("投递状态")).toHaveValue("ready_to_apply");
     });
 
     expect(analyzeJDMock).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("JD 解析完成，结果已写入表单，你可以继续人工修正。")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "JD 解析完成（规则引擎），结果已写入表单，你可以继续人工修正。",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("prefills default resume version from preferences", async () => {
+    render(<JobEditor mode="create" />);
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("简历版本")).toHaveValue("v-default");
+    });
+
+    expect(fetchPreferencesMock).toHaveBeenCalledTimes(1);
   });
 });
