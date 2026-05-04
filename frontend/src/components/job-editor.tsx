@@ -115,7 +115,7 @@ const selectClass = selectControlClass;
 const textareaClass = cn(textareaControlClass, "resize-y");
 
 const paneClass =
-  "rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.76)] backdrop-blur";
+  "rounded-lg border border-white/70 bg-[rgba(255,255,255,0.84)] shadow-[var(--shadow-soft)] backdrop-blur";
 
 const statusHintMap: Record<StatusValue, string> = {
   pending_analysis: "待补 JD 或待解析",
@@ -257,8 +257,8 @@ function StickyActionBar({
   submitLabel: string;
 }) {
   return (
-    <div className="sticky bottom-0 z-20 border-t border-[var(--color-border)] bg-[rgba(246,242,234,0.92)] py-3 backdrop-blur lg:col-span-2">
-      <div className="flex flex-col gap-3 rounded-lg border border-[var(--color-border)] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="sticky bottom-0 z-20 border-t border-[var(--color-border)] bg-[rgba(247,248,251,0.92)] py-3 backdrop-blur lg:col-span-2">
+      <div className="flex flex-col gap-3 rounded-lg border border-white/70 bg-white p-3 shadow-[var(--shadow-crisp)] sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3 text-xs leading-5 text-[var(--color-text-secondary)]">
           <ScoreRing score={Number(formState.match_score || 0)} size="sm" />
           <div className="min-w-0">

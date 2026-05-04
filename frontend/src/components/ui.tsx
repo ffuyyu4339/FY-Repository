@@ -13,21 +13,21 @@ export function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 export const controlClass =
-  "h-11 w-full rounded-lg border border-[var(--color-border)] bg-white px-3.5 text-sm text-[var(--color-text-primary)] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
+  "h-11 w-full rounded-lg border border-[var(--color-border)] bg-white px-3.5 text-sm text-[var(--color-text-primary)] shadow-[inset_0_1px_0_rgba(16,21,34,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:bg-white focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
 
 export const selectControlClass = cn(controlClass, "pr-8");
 
 export const textareaControlClass =
-  "w-full rounded-lg border border-[var(--color-border)] bg-white px-3.5 py-3 text-sm leading-6 text-[var(--color-text-primary)] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
+  "w-full rounded-lg border border-[var(--color-border)] bg-white px-3.5 py-3 text-sm leading-6 text-[var(--color-text-primary)] shadow-[inset_0_1px_0_rgba(16,21,34,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:bg-white focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400";
 
 export const primaryButtonClass =
-  "inline-flex h-10 items-center justify-center rounded-lg bg-[var(--color-ink)] px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-10 items-center justify-center rounded-lg bg-[var(--color-ink)] px-4 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(16,21,34,0.16)] transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
 
 export const accentButtonClass =
-  "inline-flex h-10 items-center justify-center rounded-lg bg-[var(--color-accent)] px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#9f350c] focus:outline-none focus:ring-2 focus:ring-orange-500/30 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-10 items-center justify-center rounded-lg bg-[var(--color-accent)] px-4 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(217,91,43,0.22)] transition hover:-translate-y-0.5 hover:bg-[#b94620] focus:outline-none focus:ring-2 focus:ring-orange-500/30 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
 
 export const secondaryButtonClass =
-  "inline-flex h-10 items-center justify-center rounded-lg border border-[var(--color-border)] bg-white px-4 text-sm font-medium text-[var(--color-text-secondary)] transition hover:border-slate-300 hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex h-10 items-center justify-center rounded-lg border border-[var(--color-border)] bg-white px-4 text-sm font-medium text-[var(--color-text-secondary)] shadow-[0_1px_0_rgba(16,21,34,0.03)] transition hover:-translate-y-0.5 hover:border-slate-300 hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
 
 const statusBadgeTone: Record<StatusValue, string> = {
   pending_analysis: "border-amber-200 bg-amber-50 text-amber-700",
@@ -133,10 +133,10 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-lg border px-4 py-4 backdrop-blur",
+        "relative overflow-hidden rounded-lg border px-4 py-4 shadow-[var(--shadow-crisp)] backdrop-blur",
         mission
           ? "border-black/20 bg-[var(--color-ink)] text-white"
-          : "border-[var(--color-border)] bg-[rgba(255,255,255,0.58)]",
+          : "border-white/70 bg-[rgba(255,255,255,0.78)]",
       )}
     >
       {mission ? (
@@ -145,8 +145,8 @@ export function PageHero({
           className="pointer-events-none absolute inset-0 opacity-30"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
+              "linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(135deg, rgba(217,91,43,.16), rgba(21,134,168,.12) 46%, transparent 68%)",
+            backgroundSize: "36px 36px, 36px 36px, auto",
           }}
         />
       ) : null}
@@ -226,7 +226,7 @@ export function InsightCard({
     return (
       <Link
         href={href}
-        className="block rounded-lg border border-[var(--color-border)] bg-white p-4 transition hover:-translate-y-0.5 hover:border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+        className="block rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[var(--shadow-crisp)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
       >
         {content}
       </Link>
@@ -234,7 +234,7 @@ export function InsightCard({
   }
 
   return (
-    <section className="rounded-lg border border-[var(--color-border)] bg-white p-4">
+    <section className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)]">
       {content}
     </section>
   );

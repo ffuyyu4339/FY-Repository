@@ -47,6 +47,7 @@ export default function GuidePage() {
         breadcrumb="作战台 / 蓝图"
         title="流程蓝图"
         description="把外部招聘网页、JD 解析、手动投递和结果跟进串成一条可回溯流程。"
+        variant="mission"
         actions={
           <>
             <Link href="/sources" className={accentButtonClass}>
@@ -59,7 +60,7 @@ export default function GuidePage() {
         }
       />
 
-      <section className="rounded-lg border border-[var(--color-border)] bg-white p-5">
+      <section className="rounded-lg border border-white/70 bg-white p-5 shadow-[var(--shadow-soft)]">
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
@@ -98,7 +99,7 @@ export default function GuidePage() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-[var(--color-border)] bg-white p-5">
+      <section className="rounded-lg border border-white/70 bg-white p-5 shadow-[var(--shadow-soft)]">
         <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
           边界说明
         </h2>

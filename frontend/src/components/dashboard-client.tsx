@@ -73,7 +73,7 @@ function DistributionPanel({
   total: number;
 }) {
   return (
-    <section className="rounded-lg border border-[var(--color-border)] bg-white p-5">
+    <section className="rounded-lg border border-white/70 bg-white p-5 shadow-[var(--shadow-soft)]">
       <div className="flex items-end justify-between gap-3">
         <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
           {title}
@@ -112,9 +112,9 @@ function DistributionPanel({
 
 function EmptyRadar() {
   return (
-    <section className="rounded-lg border border-dashed border-slate-300 bg-white p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
-        Empty Radar
+    <section className="rounded-lg border border-dashed border-slate-300 bg-white/84 p-6 shadow-[var(--shadow-soft)]">
+      <p className="text-xs font-semibold tracking-[0.14em] text-[var(--color-accent)]">
+        空雷达
       </p>
       <h2 className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
         雷达还没有样本
@@ -217,6 +217,7 @@ export function DashboardClient() {
         breadcrumb="作战台 / 雷达"
         title="求职雷达"
         description="用真实岗位数据观察投递状态、方向分布、高分机会和技能词信号。"
+        variant="mission"
         actions={
           <>
             <Link href="/jobs/new" className={accentButtonClass}>
@@ -280,7 +281,7 @@ export function DashboardClient() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
-        <section className="rounded-lg border border-[var(--color-border)] bg-white p-5">
+        <section className="rounded-lg border border-white/70 bg-white p-5 shadow-[var(--shadow-soft)]">
           <div className="flex items-end justify-between gap-3">
             <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
               高分岗位 Top N
@@ -320,7 +321,7 @@ export function DashboardClient() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-[var(--color-border)] bg-white p-5">
+        <section className="rounded-lg border border-white/70 bg-white p-5 shadow-[var(--shadow-soft)]">
           <div className="flex items-end justify-between gap-3">
             <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
               高频技能词

@@ -213,7 +213,16 @@
 
 ---
 
+## Q. Web UI 视觉美化
+- [x] ~~统一全局视觉 token、纸面背景、基础控件、按钮和通用卡片质感~~
+- [x] ~~美化 AppShell、首页、岗位队列、Dashboard、Sources、Settings、Guide 与 JobEditor 工作区~~
+- [x] ~~补强空队列状态、深色任务头、工作流卡片和页面阴影层级~~
+- [x] ~~执行前端 lint / test / build 与 Docker 前端镜像重建验证~~
+- [x] ~~执行桌面与 390px 移动端截图复查，确认无横向溢出或明显重叠~~
+
+---
+
 ## 当前状态
-- 当前阶段：MVP 与 MVP+ 主路径已完成；Docker Compose 已通过 Colima/Docker CLI 环境完成 `config`、`up -d --build`、容器服务访问、JD Analyzer、岗位 CRUD、投递事件、Dashboard、Sources、Settings 与质量命令复验
+- 当前阶段：MVP 与 MVP+ 主路径已完成；Docker Compose 已通过 Colima/Docker CLI 环境完成 `config`、`up -d --build`、容器服务访问、JD Analyzer、岗位 CRUD、投递事件、Dashboard、Sources、Settings、质量命令复验与 Web UI 视觉美化复查
 - 当前阻塞：无
-- 最新更新时间：2026-05-04 21:04
+- 最新更新时间：2026-05-04 22:01

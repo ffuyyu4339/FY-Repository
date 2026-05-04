@@ -1171,6 +1171,60 @@
 
 ---
 
+### LOG-029
+- 时间：2026-05-04 22:01
+- 任务：TASK-Q / Web UI 视觉美化
+- 目标：在不扩展 MVP 功能范围的前提下，美化现有 Web UI 的视觉层级、控件质感、空状态和桌面/移动端呈现
+- 修改文件：
+  - `.gitignore`
+  - `frontend/src/app/globals.css`
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/app/guide/page.tsx`
+  - `frontend/src/components/app-shell.tsx`
+  - `frontend/src/components/dashboard-client.tsx`
+  - `frontend/src/components/job-editor.tsx`
+  - `frontend/src/components/jobs-list-client.tsx`
+  - `frontend/src/components/settings-client.tsx`
+  - `frontend/src/components/sources-client.tsx`
+  - `frontend/src/components/ui.tsx`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `sed -n '1,240p' docs/job-tracker/PRD.md`
+  - `sed -n '1,260p' docs/job-tracker/TASK_CARD.md`
+  - `npm run format:write`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `docker compose up -d --build frontend`
+  - `docker compose ps`
+  - `curl http://localhost:8000/api/health`
+  - `curl http://localhost:3000/jobs`
+  - `curl http://localhost:3000/dashboard`
+  - `Chrome headless` 截图复查 `/`、`/jobs`、`/dashboard`
+  - `Chrome DevTools Protocol` 390px 设备模拟复查 `/jobs`
+- 执行结果：
+  - 已按治理要求重新阅读 PRD 与任务卡，并确认本轮仅做 Web UI 视觉美化，不新增 PRD 外业务能力
+  - 已统一全局颜色 token、纸面背景、基础输入框、按钮、PageHero、InsightCard 和页面阴影层级
+  - 已美化 AppShell、首页、岗位队列、Dashboard、Sources、Settings、Guide 与 JobEditor 工作区
+  - `/jobs` 空队列状态已从普通文案升级为带工作流步骤和明确入口的空状态面板
+  - 已将 `.DS_Store` 加入 `.gitignore`，避免 macOS 本地文件污染提交
+  - `npm run lint` 通过
+  - `npm run test` 通过，Vitest 12 项测试通过
+  - `npm run build` 通过，Next.js 生成 9 个目标路由
+  - `docker compose up -d --build frontend` 通过，frontend 镜像重建并重新启动，backend/db 保持可用
+  - `docker compose ps` 显示 db/backend/frontend 均运行，db 为 healthy
+  - `GET /api/health` 返回 `{"status":"ok"}`，`/jobs` 与 `/dashboard` 页面访问正常
+  - Chrome headless 已完成桌面截图复查；DevTools 390px 设备模拟显示 `docScrollWidth=390`、无横向溢出元素，空队列内容可见
+- 风险/备注：
+  - 用户提及 Canva/Figma，但本轮没有提供外部设计文件或素材需求，因此未创建 Canva/Figma 设计资产，直接在现有 Next.js 代码中完成视觉优化
+  - 当前会话未暴露 browser-use 可调用浏览器工具，已使用 Chrome headless 与 DevTools Protocol 作为本地浏览器验证 fallback
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -1220,6 +1274,7 @@
 | 026 | 2026-05-02 17:05 | 3ee6e7f | style(frontend): strengthen jobs mission cockpit | P-01 ~ P-06 | 强化 `/jobs` 深色任务头、状态节奏条、队列表头、深色决策简报和状态色岗位行 |
 | 027 | 2026-05-04 20:49 | 0fbdb6f | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
 | 028 | 2026-05-04 21:04 | df1faa6 | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
+| 029 | 2026-05-04 22:01 | PENDING_COMMIT | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
 
 ---
 
@@ -1235,7 +1290,7 @@
 ---
 
 ## 阶段总结
-- 当前阶段：MVP、MVP+、前端作战台重排与 Docker Compose 全量联调均已完成
+- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调均已完成
 - 已关闭任务：任务卡内全部任务均已完成
 - 未关闭验收项：0 项
 - 当前风险：无已知阻塞

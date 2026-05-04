@@ -10,8 +10,8 @@
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
 - 验收范围：MVP + 合规辅助自动化增强
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：MVP+ 与 Docker Compose 全量验收通过
-- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路与质量命令均已通过
+- 当前状态：MVP+、Web UI 视觉美化与 Docker Compose 全量验收通过
+- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路、Web UI 视觉复查与质量命令均已通过
 
 ---
 
@@ -150,6 +150,7 @@
 | I-11 | 前端 Job Mission Control UI/UX 重排 | PASS | 已通过 `npm run lint`、`npm run test`、`npm run build`，目标路由均返回 HTTP 200，并完成 Chrome headless 桌面/移动截图复查 |
 | I-12 | 前端 Job Mission Control 二次重排 | PASS | 已将 `/jobs` 从大卡片流二次调整为紧凑任务队列，AppShell 改为窄任务轨，PageHero 压缩为轻量面板，并通过 `npm run lint`、`npm run test`、`npm run build` 和目标路由访问验证 |
 | I-13 | `/jobs` 作战台视觉强化 | PASS | 已将 `/jobs` 第一屏强化为深色任务头和状态节奏条，岗位流加入深色表头和状态色行，右侧决策简报改为深色 Inspector，并通过 `npm run lint`、`npm run test`、`npm run build` |
+| I-14 | Web UI 视觉美化 | PASS | 已统一全局视觉 token、基础控件、按钮、卡片阴影、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor 视觉层级，并通过前端质量命令、Docker 前端镜像重建和桌面/390px 移动端截图复查 |
 
 ---
 
@@ -199,6 +200,7 @@
 - 本轮 `/jobs` 作战台视觉强化验收：`/jobs` 已将 PageHero 强化为深色任务头，统计合并为状态节奏条，岗位流加入深色表头和桌面列名，岗位行按状态显示左侧语义色，右侧决策简报改为深色 Inspector
 - 本轮第三次视觉复查：Chrome headless 已截图复查 `/jobs` 桌面和 500px 窄屏，深色任务头、状态节奏条、表格式岗位流和主操作均可见
 - 本轮插件/技能使用记录：已读取前端重排技能和 browser-use 技能；当前会话未暴露 browser-use 所需 Node REPL/browser callable 工具，已使用 Chrome headless 截图作为视觉复查 fallback
+- 本轮 Web UI 视觉美化验收：已美化全局视觉 token、纸面背景、基础控件、按钮、通用卡片、AppShell、首页、岗位队列空状态、Dashboard、Sources、Settings、Guide 与 JobEditor；`npm run lint`、`npm run test`、`npm run build` 通过，`docker compose up -d --build frontend` 通过，Chrome headless 已截图复查 `/`、`/jobs`、`/dashboard`，Chrome DevTools 390px 设备模拟确认 `/jobs` `docScrollWidth=390` 且无横向溢出元素
 - 本轮二次重排路由验证：`/jobs`、`/jobs/new`、`/sources`、`/dashboard`、`/guide` 均返回 HTTP 200
 - 本轮二次重排视觉复查：Chrome headless 已截图复查 `/jobs` 桌面、`/jobs` 窄屏、`/jobs/new` 桌面；500px 窄屏截图中指标数值和主操作正常显示
 - 本轮运行验收：已执行 `.\\scripts\\start-local.ps1`，3000 / 8000 / 5432 均在监听；`GET /api/health` 返回 `ok`
@@ -228,5 +230,5 @@
 - 是否达到 MVP 发布条件：是
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-04 21:04
-- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排与 Docker Compose 全量联调。已通过 Colima 提供本机 Docker daemon，`docker compose config` 与 `docker compose up -d --build` 均通过，PostgreSQL/FastAPI/Next.js 容器均可访问；容器环境下 JD Analyzer、岗位 CRUD、投递事件、技能搜索、Dashboard、Preferences、Source Links 与关键页面访问均通过。前端 lint/test/build、后端 ruff/black/pytest 均已复验通过，原 Docker 阻塞关闭。
+- 验收时间：2026-05-04 22:01
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调。已通过 Colima 提供本机 Docker daemon，`docker compose config` 与 `docker compose up -d --build` 均通过，PostgreSQL/FastAPI/Next.js 容器均可访问；容器环境下 JD Analyzer、岗位 CRUD、投递事件、技能搜索、Dashboard、Preferences、Source Links 与关键页面访问均通过。前端 lint/test/build、Docker 前端镜像重建、桌面/390px 移动端截图复查、后端 ruff/black/pytest 均已复验通过，当前无已知阻塞。

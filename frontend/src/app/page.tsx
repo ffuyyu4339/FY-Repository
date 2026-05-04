@@ -59,39 +59,70 @@ const workspaceLinks = [
   },
 ];
 
+const pipelineStats = [
+  { label: "入口", value: "7", tone: "text-[var(--color-cyan)]" },
+  { label: "解析字段", value: "12", tone: "text-[var(--color-accent)]" },
+  { label: "跟进状态", value: "10", tone: "text-[var(--color-blue)]" },
+];
+
 export default function Home() {
   return (
-    <section className="space-y-7">
-      <div className="grid gap-6 border-b border-[var(--color-line)] pb-6 xl:grid-cols-[0.9fr_1.1fr] xl:items-center">
-        <div>
-          <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
-            Job Tracker + JD Analyzer
-          </p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-            把招聘网页里的 JD 变成可比较的投递队列
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--color-muted)]">
-            从来源网页打开岗位，复制
-            JD，解析成结构化字段，再用匹配分和状态流决定下一步。
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Link
-              href="/sources"
-              className="rounded-full bg-[var(--color-ink)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)]"
-            >
-              打开平台入口
-            </Link>
-            <Link
-              href="/jobs/new"
-              className="rounded-full border border-[var(--color-line)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-muted)] shadow-sm transition hover:border-slate-300 hover:text-[var(--color-ink)]"
-            >
-              粘贴 JD 解析
-            </Link>
+    <section className="space-y-6">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-stretch">
+        <div className="relative overflow-hidden rounded-lg border border-black/15 bg-[var(--color-ink)] p-5 text-white shadow-[var(--shadow-crisp)] sm:p-6">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-35"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(135deg, rgba(217,91,43,.22), rgba(21,134,168,.14) 45%, transparent 70%)",
+              backgroundSize: "38px 38px, 38px 38px, auto",
+            }}
+          />
+          <div className="relative">
+            <p className="font-mono text-xs uppercase tracking-[0.16em] text-orange-200">
+              Job Tracker + JD Analyzer
+            </p>
+            <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
+              把招聘网页里的 JD 变成可比较的投递队列
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/68">
+              从来源网页打开岗位，复制
+              JD，解析成结构化字段，再用匹配分和状态流决定下一步。
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Link
+                href="/sources"
+                className="inline-flex h-10 items-center justify-center rounded-lg bg-white px-4 text-sm font-semibold text-[var(--color-ink)] transition hover:-translate-y-0.5 hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+              >
+                打开平台入口
+              </Link>
+              <Link
+                href="/jobs/new"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/12"
+              >
+                粘贴 JD 解析
+              </Link>
+            </div>
+
+            <div className="mt-8 grid gap-2 sm:grid-cols-3">
+              {pipelineStats.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-lg border border-white/10 bg-white/[0.06] p-3"
+                >
+                  <p className="text-xs text-white/52">{item.label}</p>
+                  <p className={`mt-1 text-2xl font-bold ${item.tone}`}>
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="min-w-0 max-w-full overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
-          <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
+        <div className="min-w-0 max-w-full overflow-hidden rounded-lg border border-white/70 bg-white shadow-[var(--shadow-crisp)]">
+          <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
             <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
             <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
@@ -100,7 +131,7 @@ export default function Home() {
             </div>
           </div>
           <div className="grid gap-0 lg:grid-cols-[0.92fr_1.08fr]">
-            <div className="border-b border-slate-100 p-4 lg:border-b-0 lg:border-r">
+            <div className="border-b border-slate-100 bg-slate-50/40 p-4 lg:border-b-0 lg:border-r">
               <p className="text-xs font-semibold text-slate-500">
                 招聘网页来源
               </p>
@@ -115,13 +146,13 @@ export default function Home() {
                 ))}
               </div>
               <div className="mt-4 space-y-3">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-[0_1px_0_rgba(16,21,34,0.03)]">
                   <p className="text-xs text-slate-500">搜索条件</p>
                   <p className="mt-1 text-sm font-semibold text-slate-950">
                     上海 · AI 应用 · Python / LLM / RAG
                   </p>
                 </div>
-                <div className="rounded-xl border border-orange-100 bg-orange-50 p-3">
+                <div className="rounded-lg border border-orange-100 bg-orange-50 p-3 shadow-[0_1px_0_rgba(16,21,34,0.03)]">
                   <p className="text-xs text-orange-700">下一步</p>
                   <p className="mt-1 text-sm font-semibold text-slate-950">
                     打开网页，复制 JD，回到新增岗位
@@ -148,7 +179,7 @@ export default function Home() {
                 {jdSignals.map((item) => (
                   <div
                     key={item.label}
-                    className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2"
+                    className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2"
                   >
                     <p className="text-[11px] text-slate-400">{item.label}</p>
                     <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">
@@ -157,7 +188,7 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+              <div className="mt-4 rounded-lg border border-slate-200 bg-white p-3">
                 <p className="text-xs font-semibold text-slate-500">
                   技能关键词
                 </p>
@@ -183,7 +214,7 @@ export default function Home() {
         {workflowSteps.map((item) => (
           <div
             key={item.label}
-            className="group border-l border-slate-200 bg-white/60 px-4 py-3 transition hover:border-[var(--color-accent)] hover:bg-white"
+            className="group rounded-lg border border-white/70 bg-white/78 px-4 py-3 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-white"
           >
             <span className="font-mono text-xs text-[var(--color-accent)]">
               {item.label}
@@ -203,7 +234,7 @@ export default function Home() {
           <Link
             key={item.href}
             href={item.href}
-            className="rounded-2xl border border-[var(--color-line)] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-[var(--color-accent-soft)]"
+            className="rounded-lg border border-[var(--color-line)] bg-white p-4 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-[var(--color-accent-soft)]"
           >
             <p className="font-mono text-xs text-[var(--color-accent)]">
               {item.eyebrow}

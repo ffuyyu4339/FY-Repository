@@ -11,6 +11,13 @@ import {
   type PreferencePayload,
   type TrackValue,
 } from "@/lib/types";
+import {
+  PageHero,
+  cn,
+  controlClass,
+  primaryButtonClass,
+  secondaryButtonClass,
+} from "@/components/ui";
 
 type SettingsFormState = {
   target_cities: string;
@@ -30,8 +37,7 @@ const defaultFormState: SettingsFormState = {
   llm_enabled: false,
 };
 
-const inputClass =
-  "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20";
+const inputClass = controlClass;
 
 function toPayload(formState: SettingsFormState): PreferencePayload {
   return {
@@ -127,25 +133,16 @@ export function SettingsClient() {
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-5 border-b border-slate-200 pb-5 lg:grid-cols-[1fr_auto] lg:items-end">
-        <div>
-          <p className="font-mono text-xs uppercase text-[var(--color-accent)]">
-            作战台 / 设置
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-            偏好设置
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            设置目标城市、方向、重点技能和 LLM 开关，影响后续 JD 解析评分。
-          </p>
-        </div>
-        <Link
-          href="/sources"
-          className="w-fit rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-950"
-        >
-          管理平台入口
-        </Link>
-      </div>
+      <PageHero
+        breadcrumb="作战台 / 设置"
+        title="偏好设置"
+        description="设置目标城市、方向、重点技能和 LLM 开关，影响后续 JD 解析评分。"
+        actions={
+          <Link href="/sources" className={secondaryButtonClass}>
+            管理平台入口
+          </Link>
+        }
+      />
 
       {error ? (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
@@ -163,7 +160,7 @@ export function SettingsClient() {
         onSubmit={handleSubmit}
         className="grid items-start gap-5 lg:grid-cols-[1fr_320px]"
       >
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)]">
           {loading ? (
             <p className="text-sm text-slate-500">正在加载偏好配置...</p>
           ) : (
@@ -227,7 +224,7 @@ export function SettingsClient() {
                   {trackOptions.map((option) => (
                     <label
                       key={option.value}
-                      className="flex h-10 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm"
+                      className="flex h-10 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_1px_0_rgba(16,21,34,0.03)]"
                     >
                       {option.label}
                       <input
@@ -285,7 +282,7 @@ export function SettingsClient() {
                       className={inputClass}
                     />
                   </label>
-                  <label className="flex h-10 items-center justify-between self-end rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm">
+                  <label className="flex h-10 items-center justify-between self-end rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_1px_0_rgba(16,21,34,0.03)]">
                     启用 LLM 解析
                     <input
                       type="checkbox"
@@ -305,7 +302,7 @@ export function SettingsClient() {
           )}
         </div>
 
-        <aside className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24">
+        <aside className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)] lg:sticky lg:top-24">
           <h2 className="text-base font-semibold text-slate-950">运行边界</h2>
           <div className="mt-3 space-y-3 text-sm leading-6 text-slate-500">
             <p>系统不保存招聘平台账号、密码、Cookie 或验证码。</p>
@@ -315,7 +312,7 @@ export function SettingsClient() {
           <button
             type="submit"
             disabled={saving || loading}
-            className="mt-4 h-10 w-full rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] disabled:translate-y-0 disabled:opacity-60"
+            className={cn("mt-4 w-full", primaryButtonClass)}
           >
             {saving ? "保存中..." : "保存偏好"}
           </button>

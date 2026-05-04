@@ -163,7 +163,7 @@ function FilterDock({
   }
 
   return (
-    <aside className="rounded-lg border border-[var(--color-border)] bg-[rgba(255,255,255,0.72)] p-3 backdrop-blur lg:sticky lg:top-20">
+    <aside className="rounded-lg border border-white/70 bg-[rgba(255,255,255,0.82)] p-3 shadow-[var(--shadow-soft)] backdrop-blur lg:sticky lg:top-20">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--color-accent)]">
@@ -416,7 +416,7 @@ function QueueHeader({ count, loading }: { count: number; loading: boolean }) {
           {loading ? "正在同步..." : `${count} 条岗位`}
         </p>
       </div>
-      <div className="hidden border-b border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--color-text-secondary)] lg:grid lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px]">
+      <div className="hidden border-b border-[var(--color-border)] bg-[rgba(238,242,247,0.72)] px-4 py-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--color-text-secondary)] lg:grid lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px]">
         <span>匹配</span>
         <span>岗位信息</span>
         <span className="text-right">状态与来源</span>
@@ -481,6 +481,63 @@ function DecisionBrief({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
         </p>
       )}
     </aside>
+  );
+}
+
+function EmptyQueuePanel() {
+  const steps = [
+    ["01", "打开入口库", "从平台入口保留岗位来源。"],
+    ["02", "粘贴 JD", "录入原文并执行结构化解析。"],
+    ["03", "进入队列", "按分数、状态和下一步动作处理。"],
+  ];
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-dashed border-slate-300 bg-white/80 shadow-[var(--shadow-soft)]">
+      <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.14em] text-[var(--color-accent)]">
+            空队列
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--color-text-primary)]">
+            当前没有可决策的岗位
+          </h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-secondary)]">
+            先新增岗位或粘贴 JD
+            解析，系统会提取技能、方向、薪资和匹配分，再进入这里排序处理。
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link href="/jobs/new" className={accentButtonClass}>
+              新增岗位
+            </Link>
+            <Link href="/sources" className={secondaryButtonClass}>
+              打开入口库
+            </Link>
+          </div>
+        </div>
+        <div className="grid gap-2">
+          {steps.map(([label, title, body]) => (
+            <div
+              key={label}
+              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+            >
+              <div className="flex items-start gap-3">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white text-xs font-bold text-[var(--color-accent)]">
+                  {label}
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-[var(--color-text-primary)]">
+                    {title}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-5 text-[var(--color-text-secondary)]">
+                    {body}
+                  </span>
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -684,31 +741,10 @@ export function JobsListClient() {
             </div>
           ) : null}
 
-          {!loading && jobs.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-[rgba(255,255,255,0.72)] p-6">
-              <p className="text-xs font-semibold tracking-[0.14em] text-[var(--color-accent)]">
-                空队列
-              </p>
-              <h2 className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
-                当前没有可决策的岗位
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-secondary)]">
-                先新增岗位或粘贴 JD
-                解析，系统会提取技能、方向、薪资和匹配分，再进入这里排序处理。
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Link href="/jobs/new" className={accentButtonClass}>
-                  新增岗位
-                </Link>
-                <Link href="/jobs/new" className={secondaryButtonClass}>
-                  粘贴 JD 解析
-                </Link>
-              </div>
-            </div>
-          ) : null}
+          {!loading && jobs.length === 0 ? <EmptyQueuePanel /> : null}
 
           {jobs.length > 0 ? (
-            <div className="overflow-hidden rounded-lg border border-[var(--color-border)] bg-white/70">
+            <div className="overflow-hidden rounded-lg border border-white/70 bg-white/80 shadow-[var(--shadow-soft)]">
               <QueueHeader count={jobs.length} loading={loading} />
               {jobs.map((job) => (
                 <JobRow key={job.id} job={job} />

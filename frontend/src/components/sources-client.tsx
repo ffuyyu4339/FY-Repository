@@ -173,6 +173,7 @@ export function SourcesClient() {
         breadcrumb="作战台 / 入口"
         title="招聘入口库"
         description="集中保存招聘平台和搜索链接，打开后用浏览器本地登录态查看岗位，再手动复制 JD 回系统解析。"
+        variant="mission"
         actions={
           <>
             <Link href="/jobs/new" className={accentButtonClass}>
@@ -185,7 +186,7 @@ export function SourcesClient() {
         }
       />
 
-      <div className="grid gap-2 rounded-lg border border-[var(--color-border)] bg-white p-3 sm:grid-cols-4">
+      <div className="grid gap-2 rounded-lg border border-white/70 bg-white p-3 shadow-[var(--shadow-soft)] sm:grid-cols-4">
         {intakeSteps.map((step, index) => (
           <div
             key={step}
@@ -244,7 +245,7 @@ export function SourcesClient() {
               <article
                 key={sourceLink.id}
                 className={cn(
-                  "grid gap-4 rounded-lg border bg-white p-4 transition hover:border-orange-200 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center",
+                  "grid gap-4 rounded-lg border bg-white p-4 shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[var(--shadow-crisp)] lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center",
                   sourceLink.enabled
                     ? "border-[var(--color-border)]"
                     : "border-slate-200 opacity-70",
@@ -323,7 +324,7 @@ export function SourcesClient() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-lg border border-[var(--color-border)] bg-white p-4 lg:sticky lg:top-24"
+          className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)] lg:sticky lg:top-24"
         >
           <div className="border-b border-[var(--color-border)] pb-4">
             <div className="flex items-start justify-between gap-3">

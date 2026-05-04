@@ -1,20 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --color-ink: #090e1f;
-  --color-paper: #f6f2ea;
+  --color-ink: #12131a;
+  --color-paper: #f7f8fb;
   --color-surface: #ffffff;
-  --color-surface-muted: #f3f5f8;
-  --color-border: #dde3ea;
-  --color-accent: #c84a16;
-  --color-accent-soft: #fff1e8;
-  --color-blue: #4f6bff;
-  --color-green: #22a881;
-  --color-amber: #f59e0b;
-  --color-danger: #e5484d;
-  --color-text-primary: #07111f;
-  --color-text-secondary: #64748b;
-  --shadow-soft: 0 14px 36px rgba(9, 14, 31, 0.08);
+  --color-surface-muted: #eef2f7;
+  --color-border: #d9e0ea;
+  --color-line: #d9e0ea;
+  --color-accent: #d95b2b;
+  --color-accent-soft: #fff3ec;
+  --color-blue: #3267d6;
+  --color-green: #0f9f82;
+  --color-amber: #d88a00;
+  --color-danger: #d43f52;
+  --color-violet: #7357d2;
+  --color-cyan: #1586a8;
+  --color-text-primary: #101522;
+  --color-text-secondary: #667085;
+  --color-muted: #667085;
+  --shadow-soft: 0 16px 40px rgba(16, 21, 34, 0.09);
+  --shadow-crisp:
+    0 1px 0 rgba(16, 21, 34, 0.04), 0 18px 48px rgba(16, 21, 34, 0.08);
 }
 
 @theme inline {
@@ -36,17 +42,18 @@ body {
   font-family: var(--font-manrope), sans-serif;
   overflow-x: hidden;
   background:
-    linear-gradient(rgba(9, 14, 31, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(9, 14, 31, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(16, 21, 34, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 21, 34, 0.03) 1px, transparent 1px),
     linear-gradient(
       180deg,
-      rgba(255, 241, 232, 0.42),
-      rgba(246, 242, 234, 0) 360px
+      rgba(255, 243, 236, 0.52),
+      rgba(232, 241, 247, 0.36) 320px,
+      rgba(247, 248, 251, 0) 640px
     ),
     var(--color-paper);
   background-size:
-    44px 44px,
-    44px 44px,
+    40px 40px,
+    40px 40px,
     auto,
     auto;
 }

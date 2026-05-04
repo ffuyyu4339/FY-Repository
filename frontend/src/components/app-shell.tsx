@@ -174,14 +174,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] lg:grid lg:grid-cols-[92px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col border-r border-black/10 bg-[var(--color-ink)] px-3 py-4 text-white lg:flex">
+    <div className="min-h-screen bg-[var(--color-paper)] lg:grid lg:grid-cols-[96px_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-black/10 bg-[var(--color-ink)] px-3 py-4 text-white shadow-[12px_0_32px_rgba(16,21,34,0.16)] lg:flex">
         <Link
           href="/jobs"
           title="求职作战台"
-          className="grid place-items-center rounded-lg border border-white/10 bg-white/[0.04] p-2 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+          className="grid place-items-center rounded-lg border border-white/10 bg-white/[0.05] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
         >
-          <span className="grid h-11 w-11 place-items-center rounded-md bg-[var(--color-accent)] text-sm font-bold text-white">
+          <span className="grid h-11 w-11 place-items-center rounded-md bg-[var(--color-accent)] text-sm font-bold text-white shadow-[0_12px_26px_rgba(217,91,43,0.24)]">
             JT
           </span>
           <span className="sr-only">求职作战台</span>
@@ -211,7 +211,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 border-b border-[var(--color-border)] bg-[rgba(246,242,234,0.88)] backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-[var(--color-border)] bg-[rgba(247,248,251,0.88)] backdrop-blur-xl">
           <div className="mx-auto flex min-h-14 w-full max-w-[1500px] flex-wrap items-center gap-2 px-3 py-2 sm:px-5 xl:px-7">
             <button
               type="button"
@@ -244,11 +244,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="搜索岗位、公司、技能"
-                className="h-10 min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white/90 px-3.5 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20"
+                className="h-10 min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-white/95 px-3.5 text-sm shadow-[inset_0_1px_0_rgba(16,21,34,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-[var(--color-accent)] focus:ring-2 focus:ring-orange-500/20"
               />
               <button
                 type="submit"
-                className="h-10 rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-[var(--color-text-primary)] transition hover:border-orange-200 hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+                className="h-10 rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-[var(--color-text-primary)] shadow-[0_1px_0_rgba(16,21,34,0.03)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/20"
               >
                 搜索
               </button>
@@ -256,7 +256,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <Link
               href={commandAction.href}
-              className="order-4 inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--color-ink)] px-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30 sm:order-none sm:ml-auto sm:w-auto"
+              className="order-4 inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--color-ink)] px-4 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(16,21,34,0.16)] transition hover:-translate-y-0.5 hover:bg-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30 sm:order-none sm:ml-auto sm:w-auto"
             >
               {commandAction.label}
             </Link>
