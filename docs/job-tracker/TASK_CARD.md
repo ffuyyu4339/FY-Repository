@@ -34,7 +34,7 @@
 - [x] ~~创建根目录 `docker-compose.yml`~~
 - [x] ~~配置前端 ESLint / Prettier~~
 - [x] ~~配置后端 ruff / black / pytest~~
-- [ ] 验证 Docker Compose 可启动基础服务
+- [x] ~~验证 Docker Compose 可启动基础服务~~
 - [x] ~~验证 Linux 环境运行说明完整~~
 
 ---
@@ -125,7 +125,7 @@
 - [x] ~~确保前端 lint 通过~~
 - [x] ~~确保后端 lint 通过~~
 - [x] ~~确保前端 build 通过~~
-- [ ] 确保 Docker Compose 联调通过
+- [x] ~~确保 Docker Compose 联调通过~~
 - [x] ~~确保关键功能可手工验证~~
 
 ---
@@ -165,7 +165,7 @@
 - [x] ~~执行 MVP+ 本机 API 与页面访问验证~~
 - [x] ~~执行 Codex 内置浏览器页面与交互验收~~
 - [x] ~~将开发模式调试菜单替换为中文显示~~
-- [ ] 执行 MVP+ Docker Compose 联调验证
+- [x] ~~执行 MVP+ Docker Compose 联调验证~~
 
 ---
 
@@ -214,6 +214,6 @@
 ---
 
 ## 当前状态
-- 当前阶段：非 Docker MVP+ 已完成并通过本机验收；本机 PostgreSQL / FastAPI / Next.js 运行路线已打通；平台入口、偏好设置、投递事件时间线、LLM 解析开关和规则回退均已实现；本轮已完成 `/jobs` 作战台视觉强化，岗位决策队列已有深色任务头、状态节奏条、表格式岗位流和深色决策简报
-- 当前阻塞：Docker Compose 既有配置证据已保留且容器内部地址已修正，但本轮复查当前 Shell 无 `docker` 命令，无法执行 `docker compose version` / `docker compose up -d --build`；按既有口径，Docker 相关验证仍暂时搁置，不作为当前继续推进项
-- 最新更新时间：2026-05-04 20:49
+- 当前阶段：MVP 与 MVP+ 主路径已完成；Docker Compose 已通过 Colima/Docker CLI 环境完成 `config`、`up -d --build`、容器服务访问、JD Analyzer、岗位 CRUD、投递事件、Dashboard、Sources、Settings 与质量命令复验
+- 当前阻塞：无
+- 最新更新时间：2026-05-04 21:04

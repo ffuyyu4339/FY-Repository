@@ -10,8 +10,8 @@
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
 - 验收范围：MVP + 合规辅助自动化增强
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：非 Docker MVP+ 验收通过；前端 Job Mission Control UI/UX 重排验收通过；Docker 验证按用户要求暂时搁置
-- 最终结论：本机非 Docker MVP+ 与前端作战台重排验收通过；Docker Compose 全量验收延期，未计入当前继续推进范围
+- 当前状态：MVP+ 与 Docker Compose 全量验收通过
+- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路与质量命令均已通过
 
 ---
 
@@ -43,7 +43,7 @@
 | B-02 | FastAPI 后端初始化完成 | PASS | 已创建 `backend/app` 基础骨架 |
 | B-03 | Dockerfile 已完成 | PASS | 前后端 Dockerfile 均已创建 |
 | B-04 | docker-compose.yml 已完成 | PASS | 已创建根级服务编排文件 |
-| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Compose 既有配置证据显示容器内部地址已修正为 `db:5432` / `backend:8000`；本轮复查当前 Shell 无 `docker` 命令，无法执行基础服务启动；按既有口径暂时搁置 |
+| B-05 | Docker Compose 可启动基础服务 | PASS | 已通过 Homebrew Docker CLI + Compose + buildx + Colima 启动 Docker daemon，`docker compose up -d --build` 成功，db/backend/frontend 三个容器均已启动，db 为 healthy |
 | B-06 | Linux 运行说明完整 | PASS | README 已补充 Linux 部署与运行说明 |
 
 ---
@@ -141,7 +141,7 @@
 | I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
 | I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，14 项测试覆盖 API、分析逻辑、偏好、来源、事件与 LLM 回退 |
 | I-04 | 前端 build 通过 | PASS | `npm run build` 已通过，类型错误与本机构建链路已修复 |
-| I-05 | Docker Compose 联调通过 | BLOCKED | 既有 `docker compose config` 证据已保留；本轮复查 `docker compose version` 失败为 `docker: command not found`，尚未完成容器内联调；按既有口径暂时搁置 |
+| I-05 | Docker Compose 联调通过 | PASS | 已完成容器内联调：`/api/health`、Dashboard、Preferences、Source Links、页面访问、JD Analyzer、岗位创建/更新/事件/搜索/删除均通过 |
 | I-06 | README 完整 | PASS | 已改为本机 PostgreSQL + FastAPI + Next.js 运行说明，并保留 Docker 状态说明 |
 | I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、事件记录、技能搜索、删除、Dashboard、Sources、Settings、Guide 页面 |
 | I-08 | Codex 内置浏览器验收 | PASS | 已通过内置浏览器验证首页、岗位列表筛选、新增页 JD 解析回填、Dashboard、平台入口与指南页面 |
@@ -156,8 +156,13 @@
 ## 验收证据
 - Docker 配置证据：`docker compose config` 已确认后端容器 `DATABASE_URL` 指向 `db:5432`，前端容器 `BACKEND_INTERNAL_URL` 指向 `backend:8000`，本机 `.env` 不再污染容器内部地址
 - Docker LLM 配置证据：`docker compose config` 已确认后端容器包含 `LLM_ENABLED`、`LLM_PROVIDER`、`LLM_API_BASE_URL`、`LLM_API_KEY`、`LLM_MODEL`
-- Docker 启停命令：`docker compose up -d --build` 历史执行仍未通过；本轮复查 `docker compose version` 失败，当前环境无 `docker` 命令（`docker: command not found`）
-- 本轮 Docker 口径：2026-05-02 用户明确要求 Docker 问题暂时搁置；2026-05-04 20:49 仅复查 Docker CLI 是否可用，未将 Docker 验证项标记为完成
+- Docker CLI 修复证据：已通过 `/opt/homebrew/bin/brew install docker docker-compose docker-buildx colima` 补齐 CLI、Compose、buildx 和 Colima；已在 `~/.zshenv` 加入 Homebrew PATH；`docker compose version` 返回 `Docker Compose version 5.1.3`；`docker buildx version` 返回 `v0.33.0`
+- Docker daemon 证据：`colima start --cpu 2 --memory 4 --disk 20` 成功，Docker context 为 `colima`；`docker info` 返回 Docker Server `29.2.1`、`Ubuntu 24.04.4 LTS`、`aarch64`
+- Docker 启停命令：`docker compose config` 通过；`docker compose up -d --build` 通过，db/backend/frontend 容器均启动，`job-tracker-db` 状态为 healthy
+- Docker 构建修复证据：已移除 `frontend` 对 Windows 专用 `lightningcss-win32-x64-msvc` 的显式 devDependency；前端 Dockerfile 改为 `npm ci` 并加入 npm fetch 重试；新增前后端 `.dockerignore`，前端 build context 从约 124MB 降至约 436KB
+- Docker 容器页面访问：`GET http://localhost:3000/jobs`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
+- Docker API 联调：`GET /api/health` 返回 `{"status":"ok"}`；`GET /api/dashboard/summary`、`GET /api/preferences`、`GET /api/source-links` 成功
+- Docker 关键功能链路验证：临时 `POST /api/analyze-jd` 返回 `ai_app_dev`、`priority_apply`、90 分、`analysis_source=rules`；随后临时岗位创建成功、状态更新为 `applied`、新增 `applied` 事件、`q=RAG` 搜索命中、读取事件成功、删除岗位返回 204、删除后读取返回 404
 - 非 Docker 重构证据：已新增 `scripts/check-local-env.ps1`、`scripts/init-local-postgres.ps1`、`scripts/start-backend.ps1`、`scripts/start-frontend.ps1`、`scripts/start-local.ps1`
 - 非 Docker 配置证据：`.env.example` 已指向 `localhost:5432`，`.env.docker.example` 保留 Docker Compose 配置
 - PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
@@ -212,7 +217,7 @@
 
 | 编号 | 问题 | 严重程度 | 是否阻塞验收 | 状态 |
 |---|---|---|---|---|
-| BUG-001 | 当前环境无 `docker` 命令 / Docker Desktop 服务不可用，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | open |
+| BUG-001 | 当前环境无 `docker` 命令 / Docker Desktop 服务不可用，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | closed |
 | BUG-004 | 本机未安装 PostgreSQL，放弃 Docker 后也不能立即运行数据层 | high | 是 | closed |
 | BUG-002 | 前端 build 类型错误已修复，问题已关闭 | low | 否 | closed |
 | BUG-003 | Codespaces 下前端错误请求 `localhost:8000` 且 FastAPI 未显式允许 Codespaces 来源跨域的问题已修复 | low | 否 | closed |
@@ -220,8 +225,8 @@
 ---
 
 ## 最终验收结论
-- 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
+- 是否达到 MVP 发布条件：是
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-04 20:49
-- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；本轮已完成 `/jobs` 作战台视觉强化，统一 AppShell、左侧垂直导航、顶部 Command Bar、页面 Hero、通用 Badge/Score/Insight 组件，并将 `/jobs` 进一步强化为深色任务头、状态节奏条、表格式岗位流和深色决策简报。前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与浏览器/截图复查均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，既有配置证据已保留。本轮复查当前环境无 `docker` 命令，实际 `docker compose up -d --build` 仍无法执行；按既有口径，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
+- 验收时间：2026-05-04 21:04
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排与 Docker Compose 全量联调。已通过 Colima 提供本机 Docker daemon，`docker compose config` 与 `docker compose up -d --build` 均通过，PostgreSQL/FastAPI/Next.js 容器均可访问；容器环境下 JD Analyzer、岗位 CRUD、投递事件、技能搜索、Dashboard、Preferences、Source Links 与关键页面访问均通过。前端 lint/test/build、后端 ruff/black/pytest 均已复验通过，原 Docker 阻塞关闭。

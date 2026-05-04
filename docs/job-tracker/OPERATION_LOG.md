@@ -1099,6 +1099,74 @@
   - 当前阻塞仍是宿主环境缺少可用 Docker CLI / Docker Desktop / daemon，不是项目代码改动可直接修复的问题
   - 恢复 Docker 后需重新执行 `docker compose up -d --build`，并补做容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调验收
 - 对应提交：
+  - `0fbdb6f`
+
+---
+
+### LOG-028
+- 时间：2026-05-04 21:04
+- 任务：TASK-B/J/L / Docker Compose 全量联调完成
+- 目标：继续排查并完成 Docker Compose 基础启动、容器联调和 MVP+ 容器验收，关闭原 Docker 阻塞
+- 修改文件：
+  - `frontend/package.json`
+  - `frontend/package-lock.json`
+  - `frontend/Dockerfile`
+  - `frontend/.dockerignore`
+  - `backend/.dockerignore`
+  - `~/.zshenv`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `/opt/homebrew/bin/brew install docker docker-compose colima`
+  - `docker compose version`
+  - `colima start --cpu 2 --memory 4 --disk 20`
+  - `docker info`
+  - `docker compose config`
+  - `docker compose up -d --build`
+  - `/opt/homebrew/bin/brew install docker-buildx`
+  - `docker buildx version`
+  - `curl http://localhost:8000/api/health`
+  - `curl http://localhost:3000/jobs`
+  - `curl http://localhost:3000/dashboard`
+  - `curl http://localhost:3000/sources`
+  - `curl http://localhost:3000/settings`
+  - `curl http://localhost:3000/guide`
+  - `curl /api/dashboard/summary`
+  - `curl /api/preferences`
+  - `curl /api/source-links`
+  - `curl /api/analyze-jd`
+  - `curl /api/jobs` 创建、更新、搜索、删除临时岗位
+  - `curl /api/jobs/{id}/events` 新增与读取临时投递事件
+  - `docker compose exec -T backend ruff check .`
+  - `docker compose exec -T backend black --check .`
+  - `docker compose exec -T backend pytest -q`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `docker compose version`
+  - `docker buildx version`
+  - `npm --version`
+- 执行结果：
+  - 已补齐 Homebrew Docker CLI、Docker Compose、Docker buildx 与 Colima
+  - 已创建并启动 Colima Docker daemon，Docker context 为 `colima`
+  - `docker compose config` 通过
+  - 首次 `docker compose up -d --build` 推进到项目层失败，原因为前端显式依赖 Windows 专用 `lightningcss-win32-x64-msvc`
+  - 已移除 `lightningcss-win32-x64-msvc` 显式 devDependency，使其回到 `lightningcss` optional 平台包形态
+  - 已将前端 Dockerfile 从 `npm install` 调整为 `npm ci` 并加入 npm fetch 重试参数
+  - 已新增前后端 `.dockerignore`，避免 `node_modules`、缓存和本机环境文件进入 Docker build context
+  - 复跑 `docker compose up -d --build` 成功，`job-tracker-db`、`job-tracker-backend`、`job-tracker-frontend` 均已启动，数据库容器 healthy
+  - `GET /api/health` 返回 `{"status":"ok"}`
+  - `/jobs`、`/dashboard`、`/sources`、`/settings`、`/guide` 均返回 HTTP 200
+  - `GET /api/dashboard/summary`、`GET /api/preferences`、`GET /api/source-links` 均成功
+  - 临时 JD 解析返回 `track=ai_app_dev`、`match_level=priority_apply`、`match_score=90`、`analysis_source=rules`
+  - 临时岗位创建、状态更新为 `applied`、新增投递事件、`q=RAG` 搜索命中、事件读取、删除岗位、删除后 404 验证均通过
+  - 后端 `ruff check .`、`black --check .`、`pytest -q` 通过，14 项测试通过
+  - 前端 `npm run lint`、`npm run test`、`npm run build` 通过，Vitest 12 项测试通过
+  - 已在 `~/.zshenv` 加入 `/opt/homebrew/bin:/opt/homebrew/sbin`，新 shell 中 `docker`、`docker compose`、`docker buildx`、`npm`、`brew` 均可直接找到
+- 风险/备注：
+  - Compose 服务当前保持运行，便于继续手工访问 `http://localhost:3000`
+- 对应提交：
   - `PENDING_COMMIT`
 
 ---
@@ -1150,7 +1218,8 @@
 | 024 | 2026-05-02 14:40 | 3f561fb | style(frontend): refactor mission control workspace | N-01 ~ N-09 | 重排前端为 Job Mission Control，新增 AppShell、Command Bar、通用 UI 组件并改造五个目标页面 |
 | 025 | 2026-05-02 16:55 | 481ed25 | style(frontend): refine mission control layout | O-01 ~ O-06 | 二次重排 `/jobs` 为更紧凑的任务队列，收窄侧栏、压缩 Hero、改为表格式岗位流与决策简报 |
 | 026 | 2026-05-02 17:05 | 3ee6e7f | style(frontend): strengthen jobs mission cockpit | P-01 ~ P-06 | 强化 `/jobs` 深色任务头、状态节奏条、队列表头、深色决策简报和状态色岗位行 |
-| 027 | 2026-05-04 20:49 | PENDING_COMMIT | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
+| 027 | 2026-05-04 20:49 | 0fbdb6f | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
+| 028 | 2026-05-04 21:04 | PENDING_COMMIT | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
 
 ---
 
@@ -1158,7 +1227,7 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | 当前 Shell 无 `docker` 命令 / Docker Desktop 不可用，无法执行 Docker Compose 联调 | 高 | open | Compose 既有配置证据已保留且容器内部地址已修正；本轮 `which docker` 返回 `docker not found`，`docker compose version` 返回 `command not found` |
+| ISSUE-001 | 当前 Shell 无 `docker` 命令 / Docker Desktop 不可用，无法执行 Docker Compose 联调 | 高 | closed | 已通过 Homebrew Docker CLI、Docker Compose、buildx 与 Colima 恢复本机 Docker daemon，并完成 `docker compose up -d --build` 与容器联调 |
 | ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | closed | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，后端数据库联通已验证 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
@@ -1166,8 +1235,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成 `/jobs` 作战台视觉强化，五个目标页面继续统一到左侧导航、顶部 Command Bar、页面 Hero 与高密度工作区结构，其中 `/jobs` 已具备深色任务头、状态节奏条、表格式岗位流和深色决策简报
-- 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务、页面结构优化任务和 UI/UX 作战台重排任务均已完成
-- 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
-- 当前风险：当前 Shell 无 `docker` 命令 / Docker daemon 不可用，阻塞原 PRD 的容器化验收项；该问题已按既有口径暂时搁置
-- 下一步：如恢复 Docker Desktop / Docker CLI / daemon，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker
+- 当前阶段：MVP、MVP+、前端作战台重排与 Docker Compose 全量联调均已完成
+- 已关闭任务：任务卡内全部任务均已完成
+- 未关闭验收项：0 项
+- 当前风险：无已知阻塞
+- 下一步：可继续使用 `docker compose ps` 查看容器，或访问 `http://localhost:3000` 手工试用
