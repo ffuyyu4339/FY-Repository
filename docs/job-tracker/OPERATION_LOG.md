@@ -1167,7 +1167,7 @@
 - 风险/备注：
   - Compose 服务当前保持运行，便于继续手工访问 `http://localhost:3000`
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `df1faa6`
 
 ---
 
@@ -1219,7 +1219,7 @@
 | 025 | 2026-05-02 16:55 | 481ed25 | style(frontend): refine mission control layout | O-01 ~ O-06 | 二次重排 `/jobs` 为更紧凑的任务队列，收窄侧栏、压缩 Hero、改为表格式岗位流与决策简报 |
 | 026 | 2026-05-02 17:05 | 3ee6e7f | style(frontend): strengthen jobs mission cockpit | P-01 ~ P-06 | 强化 `/jobs` 深色任务头、状态节奏条、队列表头、深色决策简报和状态色岗位行 |
 | 027 | 2026-05-04 20:49 | 0fbdb6f | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
-| 028 | 2026-05-04 21:04 | PENDING_COMMIT | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
+| 028 | 2026-05-04 21:04 | df1faa6 | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
 
 ---
 
