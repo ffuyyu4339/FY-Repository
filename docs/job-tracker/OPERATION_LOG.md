@@ -1221,7 +1221,7 @@
   - 用户提及 Canva/Figma，但本轮没有提供外部设计文件或素材需求，因此未创建 Canva/Figma 设计资产，直接在现有 Next.js 代码中完成视觉优化
   - 当前会话未暴露 browser-use 可调用浏览器工具，已使用 Chrome headless 与 DevTools Protocol 作为本地浏览器验证 fallback
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `32a6267`
 
 ---
 
@@ -1274,7 +1274,7 @@
 | 026 | 2026-05-02 17:05 | 3ee6e7f | style(frontend): strengthen jobs mission cockpit | P-01 ~ P-06 | 强化 `/jobs` 深色任务头、状态节奏条、队列表头、深色决策简报和状态色岗位行 |
 | 027 | 2026-05-04 20:49 | 0fbdb6f | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
 | 028 | 2026-05-04 21:04 | df1faa6 | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
-| 029 | 2026-05-04 22:01 | PENDING_COMMIT | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
+| 029 | 2026-05-04 22:01 | 32a6267 | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
 
 ---
 
