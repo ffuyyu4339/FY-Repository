@@ -215,5 +215,5 @@
 
 ## 当前状态
 - 当前阶段：非 Docker MVP+ 已完成并通过本机验收；本机 PostgreSQL / FastAPI / Next.js 运行路线已打通；平台入口、偏好设置、投递事件时间线、LLM 解析开关和规则回退均已实现；本轮已完成 `/jobs` 作战台视觉强化，岗位决策队列已有深色任务头、状态节奏条、表格式岗位流和深色决策简报
-- 当前阻塞：Docker Compose 配置可解析且容器内部地址已修正，但实际 `docker compose up -d --build` 仍因本机 Docker Desktop / WSL 系统级安装未完成而阻塞；按用户要求，Docker 相关验证暂时搁置，不作为当前继续推进项
-- 最新更新时间：2026-05-02 17:05
+- 当前阻塞：Docker Compose 既有配置证据已保留且容器内部地址已修正，但本轮复查当前 Shell 无 `docker` 命令，无法执行 `docker compose version` / `docker compose up -d --build`；按既有口径，Docker 相关验证仍暂时搁置，不作为当前继续推进项
+- 最新更新时间：2026-05-04 20:49

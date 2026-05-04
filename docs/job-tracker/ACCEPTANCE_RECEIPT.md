@@ -43,7 +43,7 @@
 | B-02 | FastAPI 后端初始化完成 | PASS | 已创建 `backend/app` 基础骨架 |
 | B-03 | Dockerfile 已完成 | PASS | 前后端 Dockerfile 均已创建 |
 | B-04 | docker-compose.yml 已完成 | PASS | 已创建根级服务编排文件 |
-| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Docker CLI / Compose 插件存在，Compose 配置可解析且容器内部地址已修正为 `db:5432` / `backend:8000`，但 Docker Desktop Linux Engine 不可连接；按用户要求暂时搁置 |
+| B-05 | Docker Compose 可启动基础服务 | BLOCKED | Compose 既有配置证据显示容器内部地址已修正为 `db:5432` / `backend:8000`；本轮复查当前 Shell 无 `docker` 命令，无法执行基础服务启动；按既有口径暂时搁置 |
 | B-06 | Linux 运行说明完整 | PASS | README 已补充 Linux 部署与运行说明 |
 
 ---
@@ -141,7 +141,7 @@
 | I-02 | 后端 lint 通过 | PASS | `ruff check .` 与 `black --check .` 已通过 |
 | I-03 | 后端 pytest 通过 | PASS | `pytest` 已通过，14 项测试覆盖 API、分析逻辑、偏好、来源、事件与 LLM 回退 |
 | I-04 | 前端 build 通过 | PASS | `npm run build` 已通过，类型错误与本机构建链路已修复 |
-| I-05 | Docker Compose 联调通过 | BLOCKED | `docker compose config` 已通过，实际 `docker compose up -d --build` 因 Docker daemon 不可连接失败，尚未完成容器内联调；按用户要求暂时搁置 |
+| I-05 | Docker Compose 联调通过 | BLOCKED | 既有 `docker compose config` 证据已保留；本轮复查 `docker compose version` 失败为 `docker: command not found`，尚未完成容器内联调；按既有口径暂时搁置 |
 | I-06 | README 完整 | PASS | 已改为本机 PostgreSQL + FastAPI + Next.js 运行说明，并保留 Docker 状态说明 |
 | I-07 | 关键功能手工验证 | PASS | 已通过本机 API 与页面访问验证 JD 解析、岗位创建、事件记录、技能搜索、删除、Dashboard、Sources、Settings、Guide 页面 |
 | I-08 | Codex 内置浏览器验收 | PASS | 已通过内置浏览器验证首页、岗位列表筛选、新增页 JD 解析回填、Dashboard、平台入口与指南页面 |
@@ -156,8 +156,8 @@
 ## 验收证据
 - Docker 配置证据：`docker compose config` 已确认后端容器 `DATABASE_URL` 指向 `db:5432`，前端容器 `BACKEND_INTERNAL_URL` 指向 `backend:8000`，本机 `.env` 不再污染容器内部地址
 - Docker LLM 配置证据：`docker compose config` 已确认后端容器包含 `LLM_ENABLED`、`LLM_PROVIDER`、`LLM_API_BASE_URL`、`LLM_API_KEY`、`LLM_MODEL`
-- Docker 启停命令：`docker compose up -d --build` 已执行，但 Docker daemon / Docker Desktop Linux Engine 不可用而阻塞
-- 本轮 Docker 口径：2026-05-02 用户明确要求 Docker 问题暂时搁置，本次验收仅执行 `docker compose config`，不执行 `docker compose up`
+- Docker 启停命令：`docker compose up -d --build` 历史执行仍未通过；本轮复查 `docker compose version` 失败，当前环境无 `docker` 命令（`docker: command not found`）
+- 本轮 Docker 口径：2026-05-02 用户明确要求 Docker 问题暂时搁置；2026-05-04 20:49 仅复查 Docker CLI 是否可用，未将 Docker 验证项标记为完成
 - 非 Docker 重构证据：已新增 `scripts/check-local-env.ps1`、`scripts/init-local-postgres.ps1`、`scripts/start-backend.ps1`、`scripts/start-frontend.ps1`、`scripts/start-local.ps1`
 - 非 Docker 配置证据：`.env.example` 已指向 `localhost:5432`，`.env.docker.example` 保留 Docker Compose 配置
 - PostgreSQL 验证：`postgresql-x64-16` 服务 Running，5432 端口监听，`jobtracker.jobs` 表存在
@@ -212,7 +212,7 @@
 
 | 编号 | 问题 | 严重程度 | 是否阻塞验收 | 状态 |
 |---|---|---|---|---|
-| BUG-001 | Docker Desktop 服务未注册，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | open |
+| BUG-001 | 当前环境无 `docker` 命令 / Docker Desktop 服务不可用，Docker Compose 联调与数据库实连验证被阻塞 | high | 是 | open |
 | BUG-004 | 本机未安装 PostgreSQL，放弃 Docker 后也不能立即运行数据层 | high | 是 | closed |
 | BUG-002 | 前端 build 类型错误已修复，问题已关闭 | low | 否 | closed |
 | BUG-003 | Codespaces 下前端错误请求 `localhost:8000` 且 FastAPI 未显式允许 Codespaces 来源跨域的问题已修复 | low | 否 | closed |
@@ -223,5 +223,5 @@
 - 是否达到 MVP 发布条件：非 Docker MVP+ 可试用；严格按 PRD 的 Docker Compose 验收仍延期
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-02 17:05
-- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；本轮已完成 `/jobs` 作战台视觉强化，统一 AppShell、左侧垂直导航、顶部 Command Bar、页面 Hero、通用 Badge/Score/Insight 组件，并将 `/jobs` 进一步强化为深色任务头、状态节奏条、表格式岗位流和深色决策简报。前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与浏览器/截图复查均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，配置层可解析。实际 `docker compose up -d --build` 仍受本机 Docker Desktop / WSL daemon 不可用阻塞；按用户要求，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。
+- 验收时间：2026-05-04 20:49
+- 最终说明：当前已完成前后端 MVP 主链和 MVP+ 合规辅助自动化增强，包括平台入口、搜索链接管理、偏好设置、投递事件时间线、LLM JD 解析与规则回退；本轮已完成 `/jobs` 作战台视觉强化，统一 AppShell、左侧垂直导航、顶部 Command Bar、页面 Hero、通用 Badge/Score/Insight 组件，并将 `/jobs` 进一步强化为深色任务头、状态节奏条、表格式岗位流和深色决策简报。前端 lint/test/build、后端 ruff/black/pytest、PostgreSQL 本机联通、页面访问、关键 API 闭环验证与浏览器/截图复查均已通过。Compose 文件已完成本机 `.env` 与容器内部地址隔离，并透传 LLM 环境变量，既有配置证据已保留。本轮复查当前环境无 `docker` 命令，实际 `docker compose up -d --build` 仍无法执行；按既有口径，Docker 验证暂时搁置，当前交付口径为非 Docker MVP+ 可试用。

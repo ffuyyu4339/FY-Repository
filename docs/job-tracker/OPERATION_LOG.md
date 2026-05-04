@@ -1074,6 +1074,35 @@
 
 ---
 
+### LOG-027
+- 时间：2026-05-04 20:49
+- 任务：TASK-B/J/L / Docker Compose 环境复查
+- 目标：按“继续”指令复查剩余 Docker Compose 验证项，确认当前是否可以推进基础服务启动、联调和 MVP+ 容器验收
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `sed -n '1,240p' docs/job-tracker/PRD.md`
+  - `sed -n '1,260p' docs/job-tracker/TASK_CARD.md`
+  - `git status --short --branch`
+  - `which docker`
+  - `docker compose version`
+- 执行结果：
+  - 已按治理要求重新阅读 PRD 与任务卡
+  - 已确认任务卡剩余未完成项仍仅为 Docker Compose 基础启动、联调与 MVP+ 容器验证
+  - `which docker` 返回 `docker not found`
+  - `docker compose version` 失败：`zsh:1: command not found: docker`
+  - 未将任何 Docker 任务标记为完成
+  - 已同步更新任务卡当前状态、操作日志与验收回执单
+- 风险/备注：
+  - 当前阻塞仍是宿主环境缺少可用 Docker CLI / Docker Desktop / daemon，不是项目代码改动可直接修复的问题
+  - 恢复 Docker 后需重新执行 `docker compose up -d --build`，并补做容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调验收
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -1121,6 +1150,7 @@
 | 024 | 2026-05-02 14:40 | 3f561fb | style(frontend): refactor mission control workspace | N-01 ~ N-09 | 重排前端为 Job Mission Control，新增 AppShell、Command Bar、通用 UI 组件并改造五个目标页面 |
 | 025 | 2026-05-02 16:55 | 481ed25 | style(frontend): refine mission control layout | O-01 ~ O-06 | 二次重排 `/jobs` 为更紧凑的任务队列，收窄侧栏、压缩 Hero、改为表格式岗位流与决策简报 |
 | 026 | 2026-05-02 17:05 | 3ee6e7f | style(frontend): strengthen jobs mission cockpit | P-01 ~ P-06 | 强化 `/jobs` 深色任务头、状态节奏条、队列表头、深色决策简报和状态色岗位行 |
+| 027 | 2026-05-04 20:49 | PENDING_COMMIT | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
 
 ---
 
@@ -1128,7 +1158,7 @@
 
 | 编号 | 问题 | 影响 | 状态 | 备注 |
 |---|---|---|---|---|
-| ISSUE-001 | Docker Desktop 安装仍处于不可用状态，Docker 服务未注册，无法执行 Docker Compose 联调 | 高 | open | Compose 配置已恢复容器内部 `db:5432` / `backend:8000`，但 `docker info` 仍无法连接 `npipe:////./pipe/dockerDesktopLinuxEngine`；WSL 无可用发行版 |
+| ISSUE-001 | 当前 Shell 无 `docker` 命令 / Docker Desktop 不可用，无法执行 Docker Compose 联调 | 高 | open | Compose 既有配置证据已保留且容器内部地址已修正；本轮 `which docker` 返回 `docker not found`，`docker compose version` 返回 `command not found` |
 | ISSUE-004 | 本机未安装 PostgreSQL，非 Docker 路线无法直接运行数据层 | 高 | closed | PostgreSQL 16 已安装，`jobtracker` 数据库已初始化，后端数据库联通已验证 |
 | ISSUE-002 | 前端 build 类型错误与本机构建链路问题已修复 | 低 | closed | `npm run build` 已通过 |
 | ISSUE-003 | Codespaces 浏览器使用 `localhost:8000` 请求后端且 FastAPI 未显式放行 Codespaces 来源的问题已修复 | 低 | closed | 前端现会自动推导 8000 转发地址，后端已补充 CORS 正则 |
@@ -1139,5 +1169,5 @@
 - 当前阶段：本机 PostgreSQL / FastAPI / Next.js 路线已通过最终非 Docker MVP+ 验收；本轮已完成 `/jobs` 作战台视觉强化，五个目标页面继续统一到左侧导航、顶部 Command Bar、页面 Hero 与高密度工作区结构，其中 `/jobs` 已具备深色任务头、状态节奏条、表格式岗位流和深色决策简报
 - 已关闭任务：除 Docker Compose 实际启动 / 联调外，其余 MVP 主路径、MVP+ 合规辅助自动化任务、页面结构优化任务和 UI/UX 作战台重排任务均已完成
 - 未关闭验收项：2 项，分别为“验证 Docker Compose 可启动基础服务”和“确保 Docker Compose 联调通过”
-- 当前风险：Docker daemon / Docker Desktop Linux Engine 不可用，阻塞原 PRD 的容器化验收项；该问题已按用户要求暂时搁置
-- 下一步：如恢复 Docker Desktop / WSL，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker
+- 当前风险：当前 Shell 无 `docker` 命令 / Docker daemon 不可用，阻塞原 PRD 的容器化验收项；该问题已按既有口径暂时搁置
+- 下一步：如恢复 Docker Desktop / Docker CLI / daemon，再执行 `docker compose up -d --build` 并进行一次容器内 CRUD / JD Analyzer / Dashboard / Sources / Settings 联调复验；在此之前无需继续处理 Docker
