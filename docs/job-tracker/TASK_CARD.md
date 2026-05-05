@@ -223,9 +223,9 @@
 ---
 
 ## 当前状态
-- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 公共访问验证，前端可在本机后端模式与部署 Supabase 模式间切换
+- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 公共访问验证与生产 Supabase 默认兜底，前端可在本机后端模式与部署 Supabase 模式间切换
 - 当前阻塞：无
-- 最新更新时间：2026-05-05 22:48
+- 最新更新时间：2026-05-05 23:27
 
 ---
 
@@ -237,3 +237,4 @@
 - [x] ~~补充 Vercel / Supabase 免费部署说明与环境变量模板~~
 - [x] ~~执行前端 `npm install`、`lint`、`test`、`build` 验证~~
 - [x] ~~验证 Vercel 公共访问并关闭部署登录保护~~
+- [x] ~~补充 Vercel 生产环境 Supabase 默认兜底，修复线上页面配置差异~~

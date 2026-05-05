@@ -2,11 +2,28 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let supabaseClient: SupabaseClient | null = null;
 
-function getPublicSupabaseConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || "";
+const DEFAULT_SUPABASE_URL =
+  "https://blyvyokkyjadlvlnpscg.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY =
+  "sb_publishable_l20x2W4tZAscqMm1BDl9gw_egc76Hir";
 
-  if (!url || !anonKey) {
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function getPublicSupabaseConfig() {
+  const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
+  const envAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || "";
+  const isProduction = process.env.NODE_ENV === "production";
+  const url = envUrl || (isProduction ? DEFAULT_SUPABASE_URL : "");
+  const anonKey = envAnonKey || (isProduction ? DEFAULT_SUPABASE_ANON_KEY : "");
+
+  if (!url || !anonKey || !isValidHttpUrl(url)) {
     return null;
   }
 
@@ -40,4 +57,3 @@ export function getSupabaseClient(): SupabaseClient {
 
   return supabaseClient;
 }
-
