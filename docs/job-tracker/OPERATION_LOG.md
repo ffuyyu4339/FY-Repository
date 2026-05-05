@@ -1304,7 +1304,7 @@
 - 风险/备注：
   - 兜底值仅用于公开的单用户演示站点，仍建议在 Vercel 中补齐正式环境变量以保持配置明确
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `1cf0a1a`
 
 ---
 
@@ -1359,7 +1359,7 @@
 | 028 | 2026-05-04 21:04 | df1faa6 | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
 | 029 | 2026-05-04 22:01 | 32a6267 | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
 | 030 | 2026-05-05 22:48 | 83c517a | docs(deploy): verify public vercel access | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
-| 031 | 2026-05-05 23:27 | PENDING_COMMIT | docs(deploy): add production supabase fallback | R-08 | 为 Vercel 生产环境补充 Supabase 默认兜底，修复线上页面配置差异 |
+| 031 | 2026-05-05 23:27 | 1cf0a1a | fix(frontend): add production supabase fallback | R-08 | 为 Vercel 生产环境补充 Supabase 默认兜底，修复线上页面配置差异 |
 
 ---
 
