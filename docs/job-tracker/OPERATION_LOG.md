@@ -241,6 +241,44 @@
 ---
 
 ### LOG-006
+- 时间：2026-05-05 19:45
+- 任务：免费部署准备 / Vercel + Supabase 双模式切换
+- 目标：为 GitHub + Vercel Hobby + Supabase Free 补齐可部署的前端数据层、Supabase schema、环境变量模板与部署说明，同时保留本机后端兼容
+- 修改文件：
+  - `frontend/src/lib/analyzer.ts`
+  - `frontend/src/lib/analyzer.test.ts`
+  - `frontend/src/lib/api.ts`
+  - `frontend/src/lib/supabase.ts`
+  - `frontend/src/lib/supabase-data.ts`
+  - `frontend/.env.local.example`
+  - `frontend/package.json`
+  - `frontend/package-lock.json`
+  - `README.md`
+  - `.gitignore`
+  - `supabase/schema.sql`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm install @supabase/supabase-js`
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+- 执行结果：
+  - 已完成前端数据层双模式切换：本机继续使用 FastAPI，Vercel 部署可切换到 Supabase 直连
+  - 已新增纯前端 JD Analyzer，Supabase 模式下不再依赖独立后端
+  - 已补充 Supabase schema、默认偏好和默认来源链接脚本
+  - 已补充 Vercel / Supabase 免费部署说明与 env 模板
+  - 前端 `lint`、`test`、`build` 均已通过
+- 风险/备注：
+  - 免费部署路线默认使用匿名读写策略，适合个人单用户演示，不适合公开多用户场景
+  - 当前尚未代为创建 Vercel / Supabase 云项目，实际接入需要你的账号和项目参数
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
+### LOG-006
 - 时间：2026-04-16 02:59
 - 任务：TASK-E/G / Codespaces 8000 转发地址与后端 CORS 收口修复
 - 目标：确保 Codespaces 浏览器侧请求不再落到 `localhost:8000`，而是自动命中当前 8000 转发地址，并允许对应前端来源跨域访问 FastAPI

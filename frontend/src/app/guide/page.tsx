@@ -8,8 +8,8 @@ import {
 
 const flowSteps = [
   {
-    title: "打开平台",
-    body: "从招聘入口库打开外部平台或搜索链接，使用浏览器本地登录态查看岗位。",
+    title: "打开网页",
+    body: "从入口库打开外部招聘平台或搜索链接，使用浏览器本地登录态查看岗位。",
   },
   {
     title: "复制 JD",
@@ -51,7 +51,7 @@ export default function GuidePage() {
         actions={
           <>
             <Link href="/sources" className={accentButtonClass}>
-              打开平台入口
+              打开入口库
             </Link>
             <Link href="/jobs/new" className={secondaryButtonClass}>
               录入岗位

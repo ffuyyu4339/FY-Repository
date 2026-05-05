@@ -99,7 +99,7 @@ describe("JobEditor", () => {
       },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "一键解析 JD" }));
+    fireEvent.click(screen.getByRole("button", { name: "解析 JD" }));
 
     await waitFor(() => {
       expect(screen.getByPlaceholderText("公司名称")).toHaveValue("星图智能");

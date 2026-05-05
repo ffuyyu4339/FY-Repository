@@ -83,4 +83,10 @@ describe("frontend helpers", () => {
       ),
     ).toBe("https://fuzzy-space-guide-abc123-8000.app.github.dev");
   });
+
+  it("uses same-origin api requests for local browser sessions", () => {
+    expect(
+      resolveApiBaseUrl("http://localhost:8000", "http://127.0.0.1:3000"),
+    ).toBe("");
+  });
 });

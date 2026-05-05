@@ -19,8 +19,12 @@ export function NextDevtoolsI18n() {
     return null;
   }
 
+  if (process.env.NEXT_PUBLIC_SHOW_DEVTOOLS !== "1") {
+    return null;
+  }
+
   return (
-    <div className="fixed bottom-4 left-4 z-[2147483647] font-sans text-slate-950">
+    <div className="fixed bottom-4 left-4 z-[2147483647] hidden font-sans text-slate-950 lg:block">
       {open ? (
         <div
           aria-label="Next.js 开发工具菜单"

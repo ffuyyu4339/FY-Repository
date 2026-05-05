@@ -3,17 +3,57 @@
 个人求职管理系统 MVP。当前提供两条运行路线：
 
 - 本机开发：PostgreSQL 本机服务 + FastAPI 本机进程 + Next.js 本机进程。
-- 容器联调：保留 Dockerfile 与 `docker-compose.yml`，用于 Docker daemon 可用的 Linux / Docker Desktop 环境。
+- 免费部署：Vercel Hobby + Supabase Free + GitHub 仓库，前端直接切换到 Supabase 数据源，不再依赖独立后端托管。
 
 当前 MVP+ 已加入合规辅助自动化能力：平台入口与搜索链接管理、浏览器本地登录态打开外部平台、投递事件时间线、偏好配置和 OpenAI-compatible 国内大模型 JD 解析。系统不保存招聘平台账号、密码、Cookie、验证码或登录令牌，也不自动爬取或自动投递。
 
 ## 技术栈
 
 - 前端：Next.js + React + TypeScript + Tailwind CSS
-- 后端：FastAPI + Python 3.12
-- 数据库：PostgreSQL
+- 后端：FastAPI + Python 3.12（仅本机开发模式）
+- 部署：Vercel Hobby + GitHub
+- 数据库：PostgreSQL / Supabase Postgres
 - 测试：Vitest、pytest
 - 代码规范：ESLint、Prettier、ruff、black
+
+## 免费部署路径
+
+### 1. Vercel 项目设置
+
+- 在 Vercel 创建项目时，将 Root Directory 指向 `frontend/`
+- Build Command 使用默认的 `npm run build`
+- Install Command 使用默认的 `npm install`
+- Output Directory 保持默认
+
+### 2. Supabase 项目设置
+
+- 在 Supabase Free 创建项目
+- 在 SQL Editor 执行 `supabase/schema.sql`
+- 这份 schema 已包含表结构、默认偏好、默认来源链接和匿名读写策略
+
+### 3. Vercel 环境变量
+
+部署到 Vercel 时设置：
+
+```env
+NEXT_PUBLIC_DATA_SOURCE=supabase
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+NEXT_PUBLIC_API_BASE_URL=
+LLM_ENABLED=false
+```
+
+说明：
+
+- `NEXT_PUBLIC_DATA_SOURCE=supabase` 会让前端在部署环境里直接读写 Supabase
+- `NEXT_PUBLIC_API_BASE_URL` 留空即可，不再依赖 FastAPI 端点
+- 线上建议先关闭 `LLM_ENABLED`，避免把外部模型 API 作为免费部署的硬依赖
+
+### 4. 验证方式
+
+- 打开 Vercel 域名后访问 `/jobs`
+- 新增一条岗位，确认列表、详情、Dashboard、Sources、Settings 可读写
+- 如需恢复本地后端模式，只要把 `NEXT_PUBLIC_DATA_SOURCE` 改回 `backend`
 
 ## 目录结构
 
@@ -171,6 +211,8 @@ npm run build
 ```
 
 ## Docker Compose
+
+这部分仅保留给本机/容器联调，不作为免费部署路线。
 
 当前仓库保留 Docker Compose 联调入口：
 

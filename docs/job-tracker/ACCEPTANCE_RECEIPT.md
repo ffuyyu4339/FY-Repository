@@ -8,10 +8,10 @@
 ## 项目信息
 - 项目名称：Job Tracker + JD Analyzer
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
-- 验收范围：MVP + 合规辅助自动化增强
+- 验收范围：MVP + 合规辅助自动化增强 + Vercel / Supabase 免费部署准备
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：MVP+、Web UI 视觉美化与 Docker Compose 全量验收通过
-- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路、Web UI 视觉复查与质量命令均已通过
+- 当前状态：MVP+、Web UI 视觉美化、Docker Compose 既有验收与 Vercel / Supabase 免费部署准备均已通过
+- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路、Web UI 视觉复查、免费部署准备与质量命令均已通过
 
 ---
 
@@ -151,6 +151,18 @@
 | I-12 | 前端 Job Mission Control 二次重排 | PASS | 已将 `/jobs` 从大卡片流二次调整为紧凑任务队列，AppShell 改为窄任务轨，PageHero 压缩为轻量面板，并通过 `npm run lint`、`npm run test`、`npm run build` 和目标路由访问验证 |
 | I-13 | `/jobs` 作战台视觉强化 | PASS | 已将 `/jobs` 第一屏强化为深色任务头和状态节奏条，岗位流加入深色表头和状态色行，右侧决策简报改为深色 Inspector，并通过 `npm run lint`、`npm run test`、`npm run build` |
 | I-14 | Web UI 视觉美化 | PASS | 已统一全局视觉 token、基础控件、按钮、卡片阴影、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor 视觉层级，并通过前端质量命令、Docker 前端镜像重建和桌面/390px 移动端截图复查 |
+
+---
+
+## J. 免费部署准备验收
+
+| 编号 | 验收项 | 状态 | 验收说明 |
+|---|---|---|---|
+| J-01 | Vercel 免费部署入口已准备 | PASS | 已补充 `frontend/` 作为 Vercel Root Directory 的说明，保留 GitHub 仓库接入方式 |
+| J-02 | Supabase 免费数据库 schema 已准备 | PASS | 已新增 `supabase/schema.sql`，包含 jobs / preferences / source_links / job_events 表和默认数据 |
+| J-03 | 前端 Supabase 双模式数据层已完成 | PASS | 前端可在本机后端模式与 Supabase 部署模式间切换，部署时不再依赖独立 FastAPI 托管 |
+| J-04 | 纯前端 JD Analyzer 已完成 | PASS | 已新增分析器前端实现，Supabase 模式下可离线完成规则解析与评分 |
+| J-05 | 前端质量命令已复验 | PASS | `npm install @supabase/supabase-js`、`npm run lint`、`npm run test`、`npm run build` 均通过 |
 
 ---
 

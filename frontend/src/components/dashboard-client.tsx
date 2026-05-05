@@ -29,20 +29,20 @@ const statusToneMap: Record<StatusValue, string> = {
   pending_analysis: "bg-[var(--color-amber)]",
   ready_to_apply: "bg-[var(--color-accent)]",
   applied: "bg-[var(--color-accent)]",
-  online_test: "bg-[var(--color-blue)]",
-  interview_1: "bg-[var(--color-blue)]",
-  interview_2: "bg-[var(--color-blue)]",
-  hr_interview: "bg-[var(--color-blue)]",
-  offer: "bg-[var(--color-green)]",
-  rejected: "bg-[var(--color-danger)]",
+  online_test: "bg-slate-500",
+  interview_1: "bg-slate-500",
+  interview_2: "bg-slate-500",
+  hr_interview: "bg-slate-500",
+  offer: "bg-slate-700",
+  rejected: "bg-slate-500",
   archived: "bg-slate-400",
 };
 
 const trackToneMap = new Map<string, string>([
-  ["data_analyst", "bg-[var(--color-blue)]"],
+  ["data_analyst", "bg-slate-600"],
   ["ai_app_dev", "bg-[var(--color-accent)]"],
-  ["android_client", "bg-[var(--color-green)]"],
-  ["model_deployment", "bg-violet-500"],
+  ["android_client", "bg-slate-500"],
+  ["model_deployment", "bg-slate-400"],
   ["general_software", "bg-slate-600"],
   ["other", "bg-slate-400"],
 ]);
@@ -117,7 +117,7 @@ function EmptyRadar() {
         空雷达
       </p>
       <h2 className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
-        雷达还没有样本
+        数据看板还没有样本
       </h2>
       <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--color-text-secondary)]">
         新增岗位并解析 JD 后，这里会展示状态分布、方向分布、高分岗位和技能词。
@@ -172,14 +172,14 @@ export function DashboardClient() {
   if (loading) {
     return (
       <div className="rounded-lg border border-[var(--color-border)] bg-white px-4 py-6 text-sm text-[var(--color-text-secondary)]">
-        正在加载求职雷达...
+        正在加载数据看板...
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-700">
+      <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-6 text-sm text-slate-700">
         {error}
       </div>
     );
@@ -214,9 +214,9 @@ export function DashboardClient() {
   return (
     <section className="space-y-5">
       <PageHero
-        breadcrumb="作战台 / 雷达"
-        title="求职雷达"
-        description="用真实岗位数据观察投递状态、方向分布、高分机会和技能词信号。"
+        breadcrumb="作战台 / 看板"
+        title="数据看板"
+        description="用本地岗位数据观察投递状态、方向分布、高分机会和技能词信号。"
         variant="mission"
         actions={
           <>
@@ -252,12 +252,12 @@ export function DashboardClient() {
           value={interviewingCount}
           description="一面、二面和 HR 面阶段"
           href="/jobs?status_group=interviewing"
-          tone="blue"
+          tone="gray"
         />
         <InsightCard
           label="高分岗位"
           value={summary.top_jobs.length}
-          description="Dashboard Top N 候选"
+          description="当前高分候选"
           href="/jobs?sort_by=match_score"
           tone="green"
         />
@@ -359,7 +359,7 @@ export function DashboardClient() {
                 保留 PRD 统计项，用于城市偏好复盘
               </span>
             </span>
-            <span className="text-2xl font-bold text-[var(--color-blue)]">
+            <span className="text-2xl font-bold text-[var(--color-ink)]">
               {summary.shanghai_jobs}
             </span>
           </Link>

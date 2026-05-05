@@ -35,19 +35,19 @@ const statusBadgeTone: Record<StatusValue, string> = {
     "border-orange-200 bg-[var(--color-accent-soft)] text-[var(--color-accent)]",
   applied:
     "border-orange-200 bg-[var(--color-accent-soft)] text-[var(--color-accent)]",
-  online_test: "border-blue-200 bg-blue-50 text-blue-700",
-  interview_1: "border-blue-200 bg-blue-50 text-blue-700",
-  interview_2: "border-blue-200 bg-blue-50 text-blue-700",
-  hr_interview: "border-blue-200 bg-blue-50 text-blue-700",
-  offer: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  rejected: "border-red-200 bg-red-50 text-red-700",
+  online_test: "border-slate-200 bg-slate-100 text-slate-700",
+  interview_1: "border-slate-200 bg-slate-100 text-slate-700",
+  interview_2: "border-slate-200 bg-slate-100 text-slate-700",
+  hr_interview: "border-slate-200 bg-slate-100 text-slate-700",
+  offer: "border-slate-300 bg-slate-100 text-slate-700",
+  rejected: "border-slate-300 bg-slate-100 text-slate-700",
   archived: "border-slate-200 bg-slate-100 text-slate-600",
 };
 
 const matchBadgeTone: Record<MatchLevelValue, string> = {
   priority_apply:
     "border-orange-200 bg-[var(--color-accent-soft)] text-[var(--color-accent)]",
-  apply: "border-blue-200 bg-blue-50 text-blue-700",
+  apply: "border-amber-200 bg-amber-50 text-amber-700",
   stretch: "border-amber-200 bg-amber-50 text-amber-700",
   ignore: "border-slate-200 bg-slate-100 text-slate-600",
 };
@@ -200,8 +200,8 @@ export function InsightCard({
   const toneClass = {
     ink: "text-[var(--color-ink)]",
     accent: "text-[var(--color-accent)]",
-    blue: "text-[var(--color-blue)]",
-    green: "text-[var(--color-green)]",
+    blue: "text-slate-700",
+    green: "text-slate-700",
     amber: "text-[var(--color-amber)]",
     danger: "text-[var(--color-danger)]",
     gray: "text-slate-500",

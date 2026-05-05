@@ -287,7 +287,7 @@ function StickyActionBar({
               type="button"
               onClick={onDelete}
               disabled={deleting}
-              className="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 bg-white px-4 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {deleting ? "删除中..." : "删除岗位"}
             </button>
@@ -593,14 +593,15 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
       ? "保存岗位"
       : "保存修改";
   const sourceUrlLabel =
-    formState.job_link || "从平台入口进入时会自动带入岗位链接";
+    formState.job_link || "从入口库进入时会自动带入岗位链接";
 
   return (
     <section className="space-y-5 pb-4">
       <PageHero
         breadcrumb={pageLabel}
         title={title}
-        description="左侧完成来源链接、平台信息和 JD 原文录入，右侧检查解析字段、匹配结果和投递流程。"
+        description="手动粘贴 JD 原文后解析结构化字段，右侧检查匹配结果和投递流程。"
+        variant="mission"
         actions={
           <>
             <Link href="/jobs" className={secondaryButtonClass}>
@@ -631,13 +632,13 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
       </div>
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700">
           {error}
         </div>
       ) : null}
 
       {successMessage ? (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div className="rounded-lg border border-orange-200 bg-[var(--color-accent-soft)] px-4 py-3 text-sm text-[var(--color-accent)]">
           {successMessage}
         </div>
       ) : null}
@@ -653,7 +654,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                 JD 录入台
               </h2>
               <p className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
-                保留来源链接、平台信息和原始 JD，解析结果会自动写入右侧 检查台。
+                保留来源链接、平台信息和原始 JD，解析结果会自动写入右侧检查台。
               </p>
             </div>
             <button
@@ -662,15 +663,15 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
               disabled={analyzing}
               className={cn(accentButtonClass, "shrink-0")}
             >
-              {analyzing ? "解析中..." : "一键解析 JD"}
+              {analyzing ? "解析中..." : "解析 JD"}
             </button>
           </div>
           <div className="p-4">
             <div className="mb-4 overflow-hidden rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-muted)]">
               <div className="flex items-center gap-2 border-b border-slate-200 px-3 py-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-slate-400" />
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-orange-300" />
                 <p className="ml-2 min-w-0 flex-1 truncate rounded-full bg-white px-3 py-1.5 font-mono text-[11px] text-slate-500 ring-1 ring-slate-200">
                   {sourceUrlLabel}
                 </p>
@@ -719,7 +720,8 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
                   解析检查台
                 </h2>
                 <p className="mt-1 text-xs leading-5 text-[var(--color-text-secondary)]">
-                  基础信息、分析结果和投递流程合并维护。
+                  基于 JD
+                  解析字段、偏好配置和状态流给出排序建议，结果需人工确认。
                 </p>
               </div>
               <StatusBadge status={formState.status} />
@@ -838,7 +840,7 @@ export function JobEditor({ mode, jobId }: JobEditorProps) {
 
             <SectionBlock
               title="分析结果"
-              description="匹配分、方向和关键词会影响后续筛选与 Dashboard。"
+              description="匹配分、方向和关键词会影响后续筛选与数据看板。"
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="经验要求">

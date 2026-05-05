@@ -135,30 +135,31 @@ export function SettingsClient() {
     <section className="space-y-5">
       <PageHero
         breadcrumb="作战台 / 设置"
-        title="偏好设置"
-        description="设置目标城市、方向、重点技能和 LLM 开关，影响后续 JD 解析评分。"
+        title="系统设置"
+        description="配置匹配偏好、本地存储和可选 JD 解析增强；排序建议基于 JD 解析字段、偏好配置和状态流。"
+        variant="mission"
         actions={
           <Link href="/sources" className={secondaryButtonClass}>
-            管理平台入口
+            管理入口库
           </Link>
         }
       />
 
       {error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+        <div className="rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700 shadow-sm">
           {error}
         </div>
       ) : null}
 
       {successMessage ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 shadow-sm">
+        <div className="rounded-xl border border-orange-200 bg-[var(--color-accent-soft)] px-4 py-3 text-sm text-[var(--color-accent)] shadow-sm">
           {successMessage}
         </div>
       ) : null}
 
       <form
         onSubmit={handleSubmit}
-        className="grid items-start gap-5 lg:grid-cols-[1fr_320px]"
+        className="grid items-start gap-5 lg:grid-cols-[1fr_340px]"
       >
         <div className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)]">
           {loading ? (
@@ -283,7 +284,7 @@ export function SettingsClient() {
                     />
                   </label>
                   <label className="flex h-10 items-center justify-between self-end rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-[0_1px_0_rgba(16,21,34,0.03)]">
-                    启用 LLM 解析
+                    启用 LLM 解析增强
                     <input
                       type="checkbox"
                       checked={formState.llm_enabled}
@@ -302,17 +303,44 @@ export function SettingsClient() {
           )}
         </div>
 
-        <aside className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)] lg:sticky lg:top-24">
-          <h2 className="text-base font-semibold text-slate-950">运行边界</h2>
-          <div className="mt-3 space-y-3 text-sm leading-6 text-slate-500">
-            <p>系统不保存招聘平台账号、密码、Cookie 或验证码。</p>
-            <p>LLM 只解析用户主动粘贴的 JD，不抓取外部页面。</p>
-            <p>未配置后端 LLM 环境变量时，即使打开开关也会回退规则引擎。</p>
-          </div>
+        <aside className="space-y-3 lg:sticky lg:top-24">
+          <section className="rounded-lg border border-black/20 bg-[var(--color-ink)] p-4 text-white shadow-[var(--shadow-soft)]">
+            <p className="text-[11px] font-semibold tracking-[0.16em] text-orange-200">
+              安全边界
+            </p>
+            <h2 className="mt-1 text-base font-semibold">
+              手动流程，不接管账号
+            </h2>
+            <div className="mt-3 space-y-2 text-sm leading-6 text-white/62">
+              <p>不保存招聘平台账号、密码、Cookie 或验证码。</p>
+              <p>不自动投递；不抓取招聘网站；不模拟平台登录态。</p>
+              <p>用户手动打开网页、复制 JD、手动投递，并在系统内记录状态。</p>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)]">
+            <h2 className="text-base font-semibold text-slate-950">
+              本地存储 (PostgreSQL)
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              岗位、偏好、入口链接和投递事件写入本地数据库，用于个人求职档案和数据看板。
+            </p>
+          </section>
+
+          <section className="rounded-lg border border-white/70 bg-white p-4 shadow-[var(--shadow-soft)]">
+            <h2 className="text-base font-semibold text-slate-950">
+              JD 解析增强
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              LLM 开关只影响用户主动粘贴 JD
+              后的字段提取增强；未配置后端环境变量时会回退规则引擎。
+            </p>
+          </section>
+
           <button
             type="submit"
             disabled={saving || loading}
-            className={cn("mt-4 w-full", primaryButtonClass)}
+            className={cn("w-full", primaryButtonClass)}
           >
             {saving ? "保存中..." : "保存偏好"}
           </button>

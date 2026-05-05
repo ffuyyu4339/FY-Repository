@@ -64,7 +64,9 @@ describe("MVP+ pages", () => {
 
     await waitFor(() => {
       expect(screen.getByText("BOSS直聘职位搜索")).toBeInTheDocument();
-      expect(screen.getByText("打开平台")).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "打开网页" }),
+      ).toBeInTheDocument();
     });
   });
 

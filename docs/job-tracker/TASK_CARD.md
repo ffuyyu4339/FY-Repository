@@ -223,6 +223,16 @@
 ---
 
 ## 当前状态
-- 当前阶段：MVP 与 MVP+ 主路径已完成；Docker Compose 已通过 Colima/Docker CLI 环境完成 `config`、`up -d --build`、容器服务访问、JD Analyzer、岗位 CRUD、投递事件、Dashboard、Sources、Settings、质量命令复验与 Web UI 视觉美化复查
+- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，前端可在本机后端模式与部署 Supabase 模式间切换
 - 当前阻塞：无
-- 最新更新时间：2026-05-04 22:01
+- 最新更新时间：2026-05-05 19:45
+
+---
+
+## R. 免费部署准备（Vercel + Supabase）
+- [x] ~~检查当前项目状态与免费部署边界~~
+- [x] ~~新增前端 Supabase 直连数据层，保留本机后端兼容~~
+- [x] ~~新增纯前端 JD Analyzer，支持 Supabase 部署模式~~
+- [x] ~~补充 Supabase schema 与默认数据初始化脚本~~
+- [x] ~~补充 Vercel / Supabase 免费部署说明与环境变量模板~~
+- [x] ~~执行前端 `npm install`、`lint`、`test`、`build` 验证~~

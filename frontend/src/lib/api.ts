@@ -11,6 +11,24 @@ import type {
   SourceLink,
   SourceLinkPayload,
 } from "@/lib/types";
+import {
+  analyzeJdSupabase,
+  createJobEventSupabase,
+  createJobSupabase,
+  createSourceLinkSupabase,
+  deleteJobSupabase,
+  deleteSourceLinkSupabase,
+  fetchDashboardSummarySupabase,
+  fetchJobEventsSupabase,
+  fetchJobSupabase,
+  fetchJobsSupabase,
+  fetchPreferencesSupabase,
+  fetchSourceLinksSupabase,
+  updateJobSupabase,
+  updatePreferencesSupabase,
+  updateSourceLinkSupabase,
+} from "@/lib/supabase-data";
+import { isSupabaseMode } from "@/lib/supabase";
 
 const LOCALHOST_HOSTNAMES = new Set(["localhost", "127.0.0.1"]);
 const LOCALHOST_API_PATTERN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
@@ -58,6 +76,10 @@ export function resolveApiBaseUrl(
       browserUrl.hostname,
     );
 
+    if (!isCodespacesLikeBrowser && LOCALHOST_API_PATTERN.test(trimmedBaseUrl)) {
+      return "";
+    }
+
     if (isCodespacesLikeBrowser && LOCALHOST_API_PATTERN.test(trimmedBaseUrl)) {
       return deriveCodespacesApiBaseUrl(browserOrigin) || "";
     }
@@ -73,6 +95,10 @@ function getApiBaseUrl(): string {
     process.env.NEXT_PUBLIC_API_BASE_URL,
     typeof window !== "undefined" ? window.location.origin : undefined,
   );
+}
+
+function shouldUseSupabase(): boolean {
+  return isSupabaseMode();
 }
 
 type RequestOptions = RequestInit & {
@@ -125,14 +151,23 @@ export function buildJobsQuery(filters: JobListFilters): string {
 }
 
 export async function fetchJobs(filters: JobListFilters): Promise<Job[]> {
+  if (shouldUseSupabase()) {
+    return fetchJobsSupabase(filters);
+  }
   return request<Job[]>(`/api/jobs${buildJobsQuery(filters)}`);
 }
 
 export async function fetchJob(jobId: string): Promise<Job> {
+  if (shouldUseSupabase()) {
+    return fetchJobSupabase(jobId);
+  }
   return request<Job>(`/api/jobs/${jobId}`);
 }
 
 export async function createJob(payload: JobPayload): Promise<Job> {
+  if (shouldUseSupabase()) {
+    return createJobSupabase(payload);
+  }
   return request<Job>("/api/jobs", {
     method: "POST",
     body: JSON.stringify(payload),
@@ -143,6 +178,9 @@ export async function updateJob(
   jobId: string,
   payload: JobPayload,
 ): Promise<Job> {
+  if (shouldUseSupabase()) {
+    return updateJobSupabase(jobId, payload);
+  }
   return request<Job>(`/api/jobs/${jobId}`, {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -150,6 +188,9 @@ export async function updateJob(
 }
 
 export async function deleteJob(jobId: string): Promise<void> {
+  if (shouldUseSupabase()) {
+    return deleteJobSupabase(jobId);
+  }
   return request<void>(`/api/jobs/${jobId}`, {
     method: "DELETE",
     parseJson: false,
@@ -157,6 +198,9 @@ export async function deleteJob(jobId: string): Promise<void> {
 }
 
 export async function analyzeJD(jdRawText: string): Promise<JDAnalysisResult> {
+  if (shouldUseSupabase()) {
+    return analyzeJdSupabase(jdRawText);
+  }
   return request<JDAnalysisResult>("/api/analyze-jd", {
     method: "POST",
     body: JSON.stringify({ jd_raw_text: jdRawText }),
@@ -164,16 +208,25 @@ export async function analyzeJD(jdRawText: string): Promise<JDAnalysisResult> {
 }
 
 export async function fetchDashboardSummary(): Promise<DashboardSummary> {
+  if (shouldUseSupabase()) {
+    return fetchDashboardSummarySupabase();
+  }
   return request<DashboardSummary>("/api/dashboard/summary");
 }
 
 export async function fetchPreferences(): Promise<Preference> {
+  if (shouldUseSupabase()) {
+    return fetchPreferencesSupabase();
+  }
   return request<Preference>("/api/preferences");
 }
 
 export async function updatePreferences(
   payload: PreferencePayload,
 ): Promise<Preference> {
+  if (shouldUseSupabase()) {
+    return updatePreferencesSupabase(payload);
+  }
   return request<Preference>("/api/preferences", {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -183,6 +236,9 @@ export async function updatePreferences(
 export async function fetchSourceLinks(
   includeDisabled = false,
 ): Promise<SourceLink[]> {
+  if (shouldUseSupabase()) {
+    return fetchSourceLinksSupabase(includeDisabled);
+  }
   const query = includeDisabled ? "?include_disabled=true" : "";
   return request<SourceLink[]>(`/api/source-links${query}`);
 }
@@ -190,6 +246,9 @@ export async function fetchSourceLinks(
 export async function createSourceLink(
   payload: SourceLinkPayload,
 ): Promise<SourceLink> {
+  if (shouldUseSupabase()) {
+    return createSourceLinkSupabase(payload);
+  }
   return request<SourceLink>("/api/source-links", {
     method: "POST",
     body: JSON.stringify(payload),
@@ -200,6 +259,9 @@ export async function updateSourceLink(
   sourceLinkId: number,
   payload: SourceLinkPayload,
 ): Promise<SourceLink> {
+  if (shouldUseSupabase()) {
+    return updateSourceLinkSupabase(sourceLinkId, payload);
+  }
   return request<SourceLink>(`/api/source-links/${sourceLinkId}`, {
     method: "PUT",
     body: JSON.stringify(payload),
@@ -207,6 +269,9 @@ export async function updateSourceLink(
 }
 
 export async function deleteSourceLink(sourceLinkId: number): Promise<void> {
+  if (shouldUseSupabase()) {
+    return deleteSourceLinkSupabase(sourceLinkId);
+  }
   return request<void>(`/api/source-links/${sourceLinkId}`, {
     method: "DELETE",
     parseJson: false,
@@ -214,6 +279,9 @@ export async function deleteSourceLink(sourceLinkId: number): Promise<void> {
 }
 
 export async function fetchJobEvents(jobId: string): Promise<JobEvent[]> {
+  if (shouldUseSupabase()) {
+    return fetchJobEventsSupabase(jobId);
+  }
   return request<JobEvent[]>(`/api/jobs/${jobId}/events`);
 }
 
@@ -221,6 +289,9 @@ export async function createJobEvent(
   jobId: string,
   payload: JobEventPayload,
 ): Promise<JobEvent> {
+  if (shouldUseSupabase()) {
+    return createJobEventSupabase(jobId, payload);
+  }
   return request<JobEvent>(`/api/jobs/${jobId}/events`, {
     method: "POST",
     body: JSON.stringify(payload),

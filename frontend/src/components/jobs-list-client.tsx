@@ -120,12 +120,12 @@ const rowAccentClass: Record<StatusValue, string> = {
   pending_analysis: "border-l-[var(--color-amber)]",
   ready_to_apply: "border-l-[var(--color-accent)]",
   applied: "border-l-[var(--color-accent)]",
-  online_test: "border-l-[var(--color-blue)]",
-  interview_1: "border-l-[var(--color-blue)]",
-  interview_2: "border-l-[var(--color-blue)]",
-  hr_interview: "border-l-[var(--color-blue)]",
-  offer: "border-l-[var(--color-green)]",
-  rejected: "border-l-[var(--color-danger)]",
+  online_test: "border-l-slate-500",
+  interview_1: "border-l-slate-500",
+  interview_2: "border-l-slate-500",
+  hr_interview: "border-l-slate-500",
+  offer: "border-l-slate-600",
+  rejected: "border-l-slate-500",
   archived: "border-l-slate-400",
 };
 
@@ -345,13 +345,13 @@ function MissionStrip({
 }) {
   const metrics = [
     {
-      label: "当前结果",
+      label: "总岗位",
       value: jobsLength,
       tone: "text-white",
       line: "bg-white/70",
     },
     {
-      label: "优先投递",
+      label: "优先处理",
       value: priorityJobs,
       tone: "text-orange-200",
       line: "bg-[var(--color-accent)]",
@@ -365,8 +365,8 @@ function MissionStrip({
     {
       label: "面试中",
       value: interviewingJobs,
-      tone: "text-blue-200",
-      line: "bg-[var(--color-blue)]",
+      tone: "text-slate-200",
+      line: "bg-slate-400",
     },
   ];
 
@@ -410,13 +410,15 @@ function QueueHeader({ count, loading }: { count: number; loading: boolean }) {
           <p className="text-[11px] font-semibold tracking-[0.16em] text-white/45">
             岗位流
           </p>
-          <h2 className="mt-1 text-base font-semibold">按下一步动作处理</h2>
+          <h2 className="mt-1 text-base font-semibold">
+            按排序建议和下一步动作处理
+          </h2>
         </div>
         <p className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/70">
           {loading ? "正在同步..." : `${count} 条岗位`}
         </p>
       </div>
-      <div className="hidden border-b border-[var(--color-border)] bg-[rgba(238,242,247,0.72)] px-4 py-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--color-text-secondary)] lg:grid lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px]">
+      <div className="hidden border-b border-[var(--color-border)] bg-[rgba(239,239,241,0.82)] px-4 py-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--color-text-secondary)] lg:grid lg:grid-cols-[76px_minmax(0,1.2fr)_minmax(170px,0.45fr)_168px]">
         <span>匹配</span>
         <span>岗位信息</span>
         <span className="text-right">状态与来源</span>
@@ -435,58 +437,76 @@ function DecisionBrief({ jobs, loading }: { jobs: Job[]; loading: boolean }) {
   const nextFocus = topPriority[0] ?? pending[0] ?? jobs[0];
 
   return (
-    <aside className="hidden rounded-lg border border-black/20 bg-[var(--color-ink)] p-4 text-white xl:sticky xl:top-20 xl:block">
-      <p className="text-[11px] font-semibold tracking-[0.16em] text-orange-200">
-        决策简报
-      </p>
-      <h2 className="mt-1 text-base font-semibold">下一轮处理</h2>
+    <section className="mx-auto w-full max-w-[1120px] rounded-lg border border-black/20 bg-[var(--color-ink)] p-5 text-white shadow-[var(--shadow-crisp)] sm:p-6">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-orange-200">
+            决策简报
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">
+            下一轮处理
+          </h2>
 
-      {loading ? (
-        <p className="mt-4 text-sm text-white/55">正在整理队列...</p>
-      ) : nextFocus ? (
-        <div className="mt-4 space-y-4">
-          <div className="rounded-md border border-orange-300/30 bg-white/[0.06] p-3">
-            <p className="text-xs font-semibold text-orange-200">优先看这个</p>
-            <p className="mt-2 line-clamp-2 text-sm font-semibold text-white">
-              {nextFocus.job_title || "未填写岗位名称"}
-            </p>
-            <p className="mt-1 truncate text-xs text-white/50">
-              {nextFocus.company_name || "未填写公司"}
-            </p>
-          </div>
-          <div className="grid gap-2 text-sm">
-            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
-              <span className="text-white/55">待解析</span>
-              <span className="font-semibold text-amber-200">
-                {pending.length}
+          {loading ? (
+            <p className="mt-4 text-sm text-white/55">正在整理队列...</p>
+          ) : nextFocus ? (
+            <Link
+              href={`/jobs/${nextFocus.id}`}
+              className="mt-4 grid gap-4 rounded-lg border border-orange-300/25 bg-white/[0.07] p-4 transition hover:border-orange-300/50 hover:bg-white/[0.1] sm:grid-cols-[4.5rem_minmax(0,1fr)] sm:items-center"
+            >
+              <ScoreRing score={nextFocus.match_score} size="md" />
+              <span className="min-w-0">
+                <span className="block text-xs font-semibold text-orange-200">
+                  优先看这个
+                </span>
+                <span className="mt-1 block truncate text-lg font-semibold text-white">
+                  {nextFocus.job_title || "未填写岗位名称"}
+                </span>
+                <span className="mt-1 block truncate text-sm text-white/55">
+                  {nextFocus.company_name || "未填写公司"} ·{" "}
+                  {getNextAction(nextFocus)}
+                </span>
               </span>
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-white/55">高分候选</span>
-              <span className="font-semibold text-orange-200">
-                {topPriority.length}
-              </span>
-            </div>
-          </div>
-          <Link
-            href={`/jobs/${nextFocus.id}`}
-            className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-white px-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30"
-          >
-            进入处理
-          </Link>
+            </Link>
+          ) : (
+            <p className="mt-4 text-sm leading-6 text-white/55">
+              队列为空。先粘贴 JD，解析后这里会给出下一步处理建议。
+            </p>
+          )}
         </div>
-      ) : (
-        <p className="mt-4 text-sm leading-6 text-white/55">
-          队列为空。先粘贴 JD，解析后这里会给出下一步处理建议。
-        </p>
-      )}
-    </aside>
+
+        <div className="grid gap-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-lg border border-white/10 bg-white/[0.055] px-3 py-3">
+              <p className="text-xs text-white/50">待解析</p>
+              <p className="mt-1 text-2xl font-bold text-amber-200">
+                {loading ? "..." : pending.length}
+              </p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/[0.055] px-3 py-3">
+              <p className="text-xs text-white/50">高分候选</p>
+              <p className="mt-1 text-2xl font-bold text-orange-200">
+                {loading ? "..." : topPriority.length}
+              </p>
+            </div>
+          </div>
+          {nextFocus ? (
+            <Link
+              href={`/jobs/${nextFocus.id}`}
+              className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-white px-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-orange-500/30"
+            >
+              进入处理
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }
 
 function EmptyQueuePanel() {
   const steps = [
-    ["01", "打开入口库", "从平台入口保留岗位来源。"],
+    ["01", "打开入口库", "从入口库保留岗位来源。"],
     ["02", "粘贴 JD", "录入原文并执行结构化解析。"],
     ["03", "进入队列", "按分数、状态和下一步动作处理。"],
   ];
@@ -697,7 +717,7 @@ export function JobsListClient() {
       <PageHero
         breadcrumb="作战台 / 岗位"
         title="岗位决策队列"
-        description="用一屏队列完成判断：先看匹配分、状态和下一步动作，再进入详情处理。"
+        description="基于 JD 解析字段、偏好配置和状态流给出排序建议，最终由你手动判断和投递。"
         variant="mission"
         meta={
           <MissionStrip
@@ -721,12 +741,14 @@ export function JobsListClient() {
       />
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700">
           {error}
         </div>
       ) : null}
 
-      <div className="grid items-start gap-4 lg:grid-cols-[248px_minmax(0,1fr)] xl:grid-cols-[248px_minmax(0,1fr)_260px]">
+      <DecisionBrief jobs={jobs} loading={loading} />
+
+      <div className="grid items-start gap-4 lg:grid-cols-[248px_minmax(0,1fr)]">
         <FilterDock
           activeFilterCount={activeFilterCount}
           cityFilterOptions={cityFilterOptions}
@@ -752,8 +774,6 @@ export function JobsListClient() {
             </div>
           ) : null}
         </div>
-
-        <DecisionBrief jobs={jobs} loading={loading} />
       </div>
     </section>
   );

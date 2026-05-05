@@ -171,8 +171,8 @@ export function SourcesClient() {
     <section className="space-y-5">
       <PageHero
         breadcrumb="作战台 / 入口"
-        title="招聘入口库"
-        description="集中保存招聘平台和搜索链接，打开后用浏览器本地登录态查看岗位，再手动复制 JD 回系统解析。"
+        title="入口库"
+        description="保存招聘平台和搜索链接，打开网页后使用浏览器本地登录态查看岗位，再手动复制 JD 回系统解析。"
         variant="mission"
         actions={
           <>
@@ -201,13 +201,13 @@ export function SourcesClient() {
       </div>
 
       {error ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-700">
           {error}
         </div>
       ) : null}
 
       {successMessage ? (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div className="rounded-lg border border-orange-200 bg-[var(--color-accent-soft)] px-4 py-3 text-sm text-[var(--color-accent)]">
           {successMessage}
         </div>
       ) : null}
@@ -220,7 +220,7 @@ export function SourcesClient() {
                 来源列表
               </p>
               <h2 className="mt-1 text-lg font-semibold text-[var(--color-text-primary)]">
-                平台入口
+                保存的网页与搜索链接
               </h2>
             </div>
             <p className="text-sm text-[var(--color-text-secondary)]">
@@ -230,13 +230,13 @@ export function SourcesClient() {
 
           {loading ? (
             <div className="rounded-lg border border-[var(--color-border)] bg-white px-4 py-6 text-sm text-[var(--color-text-secondary)]">
-              正在加载平台入口...
+              正在加载入口链接...
             </div>
           ) : null}
 
           {!loading && sourceLinks.length === 0 ? (
             <div className="rounded-lg border border-dashed border-slate-300 bg-white p-5 text-sm text-[var(--color-text-secondary)]">
-              还没有平台入口，右侧添加第一个搜索链接。
+              还没有入口链接，右侧添加第一个搜索链接。
             </div>
           ) : null}
 
@@ -296,7 +296,7 @@ export function SourcesClient() {
                     onClick={() => openSource(sourceLink)}
                     className={accentButtonClass}
                   >
-                    打开平台
+                    打开网页
                   </button>
                   <Link
                     href={`/jobs/new?platform=${encodeURIComponent(
@@ -458,7 +458,7 @@ export function SourcesClient() {
               <button
                 type="button"
                 onClick={() => handleDelete(editingId)}
-                className="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 bg-white px-4 text-sm font-medium text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
               >
                 删除
               </button>

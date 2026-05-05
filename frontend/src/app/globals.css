@@ -2,14 +2,14 @@
 
 :root {
   --color-ink: #12131a;
-  --color-paper: #f7f8fb;
+  --color-paper: #f5f5f6;
   --color-surface: #ffffff;
-  --color-surface-muted: #eef2f7;
-  --color-border: #d9e0ea;
-  --color-line: #d9e0ea;
+  --color-surface-muted: #efeff1;
+  --color-border: #d8d9de;
+  --color-line: #d8d9de;
   --color-accent: #d95b2b;
   --color-accent-soft: #fff3ec;
-  --color-blue: #3267d6;
+  --color-blue: #5f6f86;
   --color-green: #0f9f82;
   --color-amber: #d88a00;
   --color-danger: #d43f52;
@@ -46,9 +46,9 @@ body {
     linear-gradient(90deg, rgba(16, 21, 34, 0.03) 1px, transparent 1px),
     linear-gradient(
       180deg,
-      rgba(255, 243, 236, 0.52),
-      rgba(232, 241, 247, 0.36) 320px,
-      rgba(247, 248, 251, 0) 640px
+      rgba(255, 243, 236, 0.4),
+      rgba(244, 244, 246, 0.35) 320px,
+      rgba(245, 245, 246, 0) 640px
     ),
     var(--color-paper);
   background-size:

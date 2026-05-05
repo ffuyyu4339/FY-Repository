@@ -6,9 +6,48 @@ import { useState, type FormEvent, type ReactNode } from "react";
 
 import { navigationItems } from "@/lib/project";
 
-function NavGlyph({ index }: { index: number }) {
-  const glyphs = ["队", "录", "入", "雷", "图"];
-  return <span aria-hidden="true">{glyphs[index] ?? "•"}</span>;
+function NavIcon({ index }: { index: number }) {
+  const icons = [
+    <path key="queue" d="M5 7h14M5 12h14M5 17h9" strokeLinecap="round" />,
+    <path
+      key="intake"
+      d="M8 4h6l4 4v12H8V4Zm6 0v5h5M12 13h4m-2-2v4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />,
+    <path
+      key="source"
+      d="M9.5 8.5 8 7a4 4 0 0 0-5.6 5.7l2 2a4 4 0 0 0 5.6 0m4.5.8 1.5 1.5a4 4 0 0 0 5.6-5.7l-2-2a4 4 0 0 0-5.6 0M8.5 15.5l7-7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />,
+    <path key="dashboard" d="M5 19V9m7 10V5m7 14v-7" strokeLinecap="round" />,
+    <path
+      key="settings"
+      d="M12 3.8 13.7 5l2.1-.3 1 1.9 2 .8-.2 2.2L20 11l-1.4 1.4.2 2.2-2 .8-1 1.9-2.1-.3L12 18.2 10.3 17l-2.1.3-1-1.9-2-.8.2-2.2L4 11l1.4-1.4-.2-2.2 2-.8 1-1.9 2.1.3L12 3.8Zm0 4.3a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Z"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />,
+    <path
+      key="guide"
+      d="m5 6 5-2 5 2 4-2v14l-4 2-5-2-5 2V6Zm5-2v14m5-12v14"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />,
+  ];
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="h-[1.375rem] w-[1.375rem]"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="1.9"
+    >
+      {icons[index] ?? icons[0]}
+    </svg>
+  );
 }
 
 function isActiveRoute(pathname: string, href: string) {
@@ -62,7 +101,8 @@ function getShortNavLabel(href: string) {
     "/jobs": "队列",
     "/jobs/new": "录入",
     "/sources": "入口",
-    "/dashboard": "雷达",
+    "/dashboard": "看板",
+    "/settings": "设置",
     "/guide": "蓝图",
   };
 
@@ -81,7 +121,7 @@ function NavigationList({
   return (
     <nav
       aria-label="主导航"
-      className={compact ? "grid gap-2" : "grid gap-1.5"}
+      className={compact ? "grid gap-[1.15rem]" : "grid gap-1.5"}
     >
       {navigationItems.map((item, index) => {
         const active = isActiveRoute(pathname, item.href);
@@ -92,25 +132,19 @@ function NavigationList({
               key={item.href}
               href={item.href}
               onClick={onNavigate}
+              aria-label={item.label}
               title={`${item.label}：${item.description}`}
-              className={`group grid h-[4.25rem] place-items-center rounded-lg border px-1.5 text-center transition focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
+              className={`group relative mx-auto grid h-12 w-12 place-items-center rounded-2xl border transition focus:outline-none focus:ring-2 focus:ring-orange-500/35 ${
                 active
-                  ? "border-white/80 bg-white text-[var(--color-ink)]"
-                  : "border-white/10 bg-white/[0.03] text-white/60 hover:border-white/25 hover:bg-white/10 hover:text-white"
+                  ? "border-white/75 bg-white text-[var(--color-ink)] shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+                  : "border-white/10 bg-white/[0.025] text-white/45 hover:border-white/20 hover:bg-white/[0.07] hover:text-white/78"
               }`}
             >
-              <span
-                className={`grid h-8 w-8 place-items-center rounded-md text-xs font-bold ${
-                  active
-                    ? "bg-[var(--color-accent-soft)] text-[var(--color-accent)]"
-                    : "bg-white/5 text-white/70"
-                }`}
-              >
-                <NavGlyph index={index} />
-              </span>
-              <span className="mt-1 block max-w-full truncate text-[11px] font-semibold leading-none">
-                {getShortNavLabel(item.href)}
-              </span>
+              {active ? (
+                <span className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-[var(--color-accent)]" />
+              ) : null}
+              <NavIcon index={index} />
+              <span className="sr-only">{getShortNavLabel(item.href)}</span>
             </Link>
           );
         }
@@ -133,7 +167,7 @@ function NavigationList({
                   : "border-white/10 bg-white/5 text-white/60 group-hover:border-white/20"
               }`}
             >
-              <NavGlyph index={index} />
+              <NavIcon index={index} />
             </span>
             <span className="min-w-0">
               <span className="block truncate font-semibold">{item.label}</span>
@@ -174,40 +208,23 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-paper)] lg:grid lg:grid-cols-[96px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col border-r border-black/10 bg-[var(--color-ink)] px-3 py-4 text-white shadow-[12px_0_32px_rgba(16,21,34,0.16)] lg:flex">
+    <div className="min-h-screen bg-[var(--color-paper)] lg:grid lg:grid-cols-[88px_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-white/5 bg-[#10131b] px-3 py-4 text-white shadow-[10px_0_28px_rgba(16,21,34,0.12)] lg:flex">
         <Link
-          href="/jobs"
-          title="求职作战台"
-          className="grid place-items-center rounded-lg border border-white/10 bg-white/[0.05] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+          href="/"
+          title="个人工作区"
+          className="mx-auto grid h-[4.15rem] w-[4.15rem] place-items-center rounded-[1.35rem] border border-white/10 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-orange-500/35"
         >
-          <span className="grid h-11 w-11 place-items-center rounded-md bg-[var(--color-accent)] text-sm font-bold text-white shadow-[0_12px_26px_rgba(217,91,43,0.24)]">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--color-accent)] text-[15px] font-bold text-white shadow-[0_12px_24px_rgba(217,91,43,0.26)]">
             JT
           </span>
-          <span className="sr-only">求职作战台</span>
+          <span className="sr-only">个人工作区</span>
         </Link>
 
-        <div className="mt-5">
-          <p className="mb-2 text-center text-[10px] font-semibold tracking-[0.14em] text-white/35">
-            导航
-          </p>
+        <div className="mt-9">
           <NavigationList compact />
         </div>
 
-        <div className="mt-auto grid gap-2">
-          <Link
-            href="/settings"
-            title="偏好设置"
-            className="grid h-12 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-xs font-semibold text-white/60 transition hover:border-white/25 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-500/40"
-          >
-            设置
-          </Link>
-          <p className="px-1 text-center text-[10px] leading-4 text-white/35">
-            手动投递
-            <br />
-            不存令牌
-          </p>
-        </div>
       </aside>
 
       <div className="min-w-0">
@@ -269,7 +286,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           ) : null}
         </header>
 
-        <main className="w-full px-3 py-5 sm:px-5 xl:px-7">
+        <main className="w-full px-3 py-3 sm:px-5 sm:py-4 xl:px-7">
           <div className="mx-auto w-full max-w-[1500px]">{children}</div>
         </main>
       </div>

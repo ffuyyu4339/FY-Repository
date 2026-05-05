@@ -8,10 +8,14 @@ __pycache__/
 .ruff_cache/
 .venv/
 .env
+.env.local
+.env*.local
 frontend/node_modules/
 frontend/.next/
 frontend/coverage/
 backend/.venv/
 backend/.pytest_cache/
 backend/.ruff_cache/
+.playwright-cli/
+supabase/.temp/
 *.pyc
