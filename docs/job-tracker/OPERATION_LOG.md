@@ -1282,7 +1282,7 @@
 - 风险/备注：
   - 关闭部署保护后该演示站点面向公网开放，适合验收与演示，不适合放置敏感数据
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `83c517a`
 
 ---
 
@@ -1336,7 +1336,7 @@
 | 027 | 2026-05-04 20:49 | 0fbdb6f | docs(project): log docker cli blocker | B-08, J-07, L-Docker | 复查当前 Shell 无 `docker` 命令，Docker Compose 启动与联调仍阻塞，治理文档同步保持未完成状态 |
 | 028 | 2026-05-04 21:04 | df1faa6 | fix(frontend): restore docker compose validation | B-08, J-07, L-Docker | 补齐 Docker CLI/Colima/buildx，修复前端 Linux 容器构建依赖问题，完成 Compose 全量联调与治理文档收口 |
 | 029 | 2026-05-04 22:01 | 32a6267 | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
-| 030 | 2026-05-05 22:48 | PENDING_COMMIT | docs(project): record public vercel access verification | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
+| 030 | 2026-05-05 22:48 | 83c517a | docs(deploy): verify public vercel access | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
 
 ---
 
