@@ -49,11 +49,29 @@ LLM_ENABLED=false
 - `NEXT_PUBLIC_API_BASE_URL` 留空即可，不再依赖 FastAPI 端点
 - 线上建议先关闭 `LLM_ENABLED`，避免把外部模型 API 作为免费部署的硬依赖
 
+构建稳定性保护：
+
+- `frontend` 已接入 `prebuild` 环境校验，生产/CI 构建会强制检查：
+  - `NEXT_PUBLIC_SUPABASE_URL` 必须是有效 `http/https` URL
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` 必须符合 Supabase 公钥格式
+- 校验失败会直接中断 `npm run build`，避免坏配置上线
+
 ### 4. 验证方式
 
 - 打开 Vercel 域名后访问 `/jobs`
 - 新增一条岗位，确认列表、详情、Dashboard、Sources、Settings 可读写
 - 如需恢复本地后端模式，只要把 `NEXT_PUBLIC_DATA_SOURCE` 改回 `backend`
+
+### 5. 线上健康巡检（建议每次部署后执行）
+
+```bash
+./scripts/check-production-health.sh https://fy-repository.vercel.app
+```
+
+检查项：
+
+- `GET /dashboard` 和 `GET /jobs` 返回 2xx/3xx
+- 页面内容不包含高风险错误标记：`Invalid API key`、`Invalid supabaseUrl`、`Supabase 配置缺失`
 
 ## 目录结构
 
