@@ -182,6 +182,23 @@ http://localhost:3000
 
 该脚本会打开两个 PowerShell 窗口，分别启动后端和前端。
 
+macOS / Linux 可执行：
+
+```bash
+./scripts/start-local.sh
+```
+
+停止服务：
+
+```bash
+./scripts/stop-local.sh
+```
+
+默认同样启动后端 `8000` 与前端 `3000`，并写入日志：
+
+- `/tmp/jobtracker-backend.screen.log`
+- `/tmp/jobtracker-frontend.screen.log`
+
 ## 环境检查
 
 ```powershell
