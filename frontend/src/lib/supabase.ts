@@ -20,8 +20,11 @@ function getPublicSupabaseConfig() {
   const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || "";
   const envAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || "";
   const isProduction = process.env.NODE_ENV === "production";
-  const url = envUrl || (isProduction ? DEFAULT_SUPABASE_URL : "");
-  const anonKey = envAnonKey || (isProduction ? DEFAULT_SUPABASE_ANON_KEY : "");
+  const fallbackUrl = isProduction ? DEFAULT_SUPABASE_URL : "";
+  const fallbackAnonKey = isProduction ? DEFAULT_SUPABASE_ANON_KEY : "";
+
+  const url = isValidHttpUrl(envUrl) ? envUrl : fallbackUrl;
+  const anonKey = envAnonKey || fallbackAnonKey;
 
   if (!url || !anonKey || !isValidHttpUrl(url)) {
     return null;
