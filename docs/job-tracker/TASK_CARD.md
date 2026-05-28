@@ -223,9 +223,9 @@
 ---
 
 ## 当前状态
-- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 公共访问验证与生产 Supabase 默认兜底，前端可在本机后端模式与部署 Supabase 模式间切换
+- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 公共访问验证与生产 Supabase 默认兜底；已新增作品集真实项目详情文档，作为后续前端展示页和 Stitch UI 修改的数据源
 - 当前阻塞：无
-- 最新更新时间：2026-05-05 23:27
+- 最新更新时间：2026-05-28 12:52
 
 ---
 
@@ -238,3 +238,8 @@
 - [x] ~~执行前端 `npm install`、`lint`、`test`、`build` 验证~~
 - [x] ~~验证 Vercel 公共访问并关闭部署登录保护~~
 - [x] ~~补充 Vercel 生产环境 Supabase 默认兜底，修复线上页面配置差异~~
+
+## S. 作品集真实项目资料
+- [x] ~~新增 Job Tracker + JD Analyzer 作品集项目详情文档~~
+- [x] ~~新增个人简约记账本 APP 作品集项目详情文档~~
+- [x] ~~确认文档不再使用 AI 教育健康、医疗教育、公益健康平台等旧项目内容~~

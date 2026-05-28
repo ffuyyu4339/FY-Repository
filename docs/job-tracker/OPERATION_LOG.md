@@ -1308,6 +1308,33 @@
 
 ---
 
+### LOG-032
+- 时间：2026-05-28 12:52
+- 任务：TASK-S / 作品集真实项目资料
+- 目标：基于真实简历项目生成两个作品集项目详情文档，作为后续前端展示页和 Stitch UI 修改的数据源
+- 修改文件：
+  - `docs/projects/job-tracker-jd-analyzer.md`
+  - `docs/projects/simple-accounting-app.md`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `sed -n '1,220p' docs/job-tracker/PRD.md`
+  - `sed -n '1,280p' docs/job-tracker/TASK_CARD.md`
+  - `rg -n "个人简约记账|记账|bookkeeping|expense|Job Tracker|JD Analyzer|AI 教育|健康|医疗|公益" .`
+  - `git diff --check`
+- 执行结果：
+  - 已按治理要求重新阅读 PRD 与任务卡
+  - 已新增 Job Tracker + JD Analyzer 项目详情文档，并按 17 个章节重排为作品集和面试可直接使用的结构
+  - 已新增个人简约记账本 APP 项目详情文档，覆盖收支记录、分类管理、账单列表、月度统计、预算提醒、技术方案、数据结构和作品集展示重点
+  - 已确认新文档不使用“AI 教育健康”“医疗教育”“公益健康平台”等旧项目方向
+- 风险/备注：
+  - 当前仓库未检索到个人简约记账本 APP 的既有源码或详细历史文档，本次按用户给出的真实项目名称生成作品集资料级描述，后续如补充实际截图、技术栈或代码仓库，可继续收敛为更精确版本
+- 对应提交：
+  - `9a0d295`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -1360,6 +1387,7 @@
 | 029 | 2026-05-04 22:01 | 32a6267 | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
 | 030 | 2026-05-05 22:48 | 83c517a | docs(deploy): verify public vercel access | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
 | 031 | 2026-05-05 23:27 | 1cf0a1a | fix(frontend): add production supabase fallback | R-08 | 为 Vercel 生产环境补充 Supabase 默认兜底，修复线上页面配置差异 |
+| 032 | 2026-05-28 12:52 | 9a0d295 | docs(projects): add real portfolio project details | S-01 ~ S-03 | 新增两个真实项目的作品集详情文档，并同步治理记录 |
 
 ---
 
@@ -1375,8 +1403,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调均已完成
+- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调与作品集真实项目资料均已完成
 - 已关闭任务：任务卡内全部任务均已完成
 - 未关闭验收项：0 项
 - 当前风险：无已知阻塞
-- 下一步：可继续使用 `docker compose ps` 查看容器，或访问 `http://localhost:3000` 手工试用
+- 下一步：可继续将 `docs/projects/` 下的项目详情接入作品集前端展示页或 Stitch UI 修改流程

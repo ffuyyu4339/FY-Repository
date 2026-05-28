@@ -8,10 +8,10 @@
 ## 项目信息
 - 项目名称：Job Tracker + JD Analyzer
 - 技术栈：React + Next.js + Python + FastAPI + PostgreSQL + Docker + Linux
-- 验收范围：MVP + 合规辅助自动化增强 + Vercel / Supabase 免费部署准备
+- 验收范围：MVP + 合规辅助自动化增强 + Vercel / Supabase 免费部署准备 + 作品集真实项目资料
 - 验收基准：`docs/job-tracker/PRD.md`
-- 当前状态：MVP+、Web UI 视觉美化、Docker Compose 既有验收与 Vercel / Supabase 免费部署准备均已通过
-- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路、Web UI 视觉复查、免费部署准备与质量命令均已通过
+- 当前状态：MVP+、Web UI 视觉美化、Docker Compose 既有验收、Vercel / Supabase 免费部署准备与作品集真实项目资料均已通过
+- 最终结论：本机 Docker Compose、前后端、PostgreSQL、MVP+ API/页面链路、Web UI 视觉复查、免费部署准备、作品集项目详情文档与质量命令均已通过
 
 ---
 
@@ -168,6 +168,16 @@
 
 ---
 
+## K. 作品集真实项目资料验收
+
+| 编号 | 验收项 | 状态 | 验收说明 |
+|---|---|---|---|
+| K-01 | Job Tracker + JD Analyzer 项目详情文档已生成 | PASS | 已新增 `docs/projects/job-tracker-jd-analyzer.md`，并按 17 个章节覆盖项目概述、背景、用户、痛点、目标、功能、流程、架构、AI 能力、工程化实践和面试讲述版本 |
+| K-02 | 个人简约记账本 APP 项目详情文档已生成 | PASS | 已新增 `docs/projects/simple-accounting-app.md`，覆盖项目定位、核心价值、收支记录、分类管理、统计分析、技术方案和作品集展示重点 |
+| K-03 | 已排除旧虚构项目内容 | PASS | 新增文档未使用“AI 教育健康”“医疗教育”“公益健康平台”等旧项目方向 |
+
+---
+
 ## 验收证据
 - Docker 配置证据：`docker compose config` 已确认后端容器 `DATABASE_URL` 指向 `db:5432`，前端容器 `BACKEND_INTERNAL_URL` 指向 `backend:8000`，本机 `.env` 不再污染容器内部地址
 - Docker LLM 配置证据：`docker compose config` 已确认后端容器包含 `LLM_ENABLED`、`LLM_PROVIDER`、`LLM_API_BASE_URL`、`LLM_API_KEY`、`LLM_MODEL`
@@ -228,6 +238,7 @@
 - Vercel 公共访问证据：已在 Vercel Dashboard 关闭 `Require Log In`，`curl -I -L --max-time 20 https://fy-repository-69otp72b7-fuyus-projects-11d155d9.vercel.app` 返回 `HTTP/2 200`，页面标题为 `个人求职档案 + JD 解析`
 - 生产兜底证据：`frontend/src/lib/supabase.ts` 已在 `NODE_ENV=production` 时对缺失或无效的公开 Supabase 配置回退到 `blyvyokkyjadlvlnpscg.supabase.co` 与对应 publishable key
 - Linux 部署说明：已写入 `README.md`
+- 作品集项目资料证据：已新增 `docs/projects/job-tracker-jd-analyzer.md` 与 `docs/projects/simple-accounting-app.md`，可作为后续作品集展示页和 Stitch UI 修改的数据源
 
 ---
 
@@ -247,4 +258,4 @@
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
 - 验收时间：2026-05-04 22:01
-- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证及生产环境 Supabase 默认兜底。已通过 Colima 提供本机 Docker daemon，`docker compose config` 与 `docker compose up -d --build` 均通过，PostgreSQL/FastAPI/Next.js 容器均可访问；容器环境下 JD Analyzer、岗位 CRUD、投递事件、技能搜索、Dashboard、Preferences、Source Links 与关键页面访问均通过。前端 lint/test/build、Docker 前端镜像重建、桌面/390px 移动端截图复查、后端 ruff/black/pytest 均已复验通过，当前无已知阻塞。
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底和作品集真实项目资料沉淀。已通过 Colima 提供本机 Docker daemon，`docker compose config` 与 `docker compose up -d --build` 均通过，PostgreSQL/FastAPI/Next.js 容器均可访问；容器环境下 JD Analyzer、岗位 CRUD、投递事件、技能搜索、Dashboard、Preferences、Source Links 与关键页面访问均通过。前端 lint/test/build、Docker 前端镜像重建、桌面/390px 移动端截图复查、后端 ruff/black/pytest 均已复验通过，当前无已知阻塞。
