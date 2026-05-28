@@ -1331,7 +1331,7 @@
 - 风险/备注：
   - 当前仓库未检索到个人简约记账本 APP 的既有源码或详细历史文档，本次按用户给出的真实项目名称生成作品集资料级描述，后续如补充实际截图、技术栈或代码仓库，可继续收敛为更精确版本
 - 对应提交：
-  - `9a0d295`
+  - `c431f0f`
 
 ---
 
@@ -1387,7 +1387,7 @@
 | 029 | 2026-05-04 22:01 | 32a6267 | style(frontend): polish mission control ui | Q-01 ~ Q-05 | 美化 Web UI 全局视觉 token、AppShell、首页、队列、Dashboard、Sources、Settings、Guide 与 JobEditor，并完成前端质量命令、Docker 前端镜像重建和桌面/移动截图复查 |
 | 030 | 2026-05-05 22:48 | 83c517a | docs(deploy): verify public vercel access | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
 | 031 | 2026-05-05 23:27 | 1cf0a1a | fix(frontend): add production supabase fallback | R-08 | 为 Vercel 生产环境补充 Supabase 默认兜底，修复线上页面配置差异 |
-| 032 | 2026-05-28 12:52 | 9a0d295 | docs(projects): add real portfolio project details | S-01 ~ S-03 | 新增两个真实项目的作品集详情文档，并同步治理记录 |
+| 032 | 2026-05-28 12:52 | c431f0f | docs(projects): add real portfolio project details | S-01 ~ S-03 | 新增两个真实项目的作品集详情文档，并同步治理记录 |
 
 ---
 
