@@ -1310,11 +1310,10 @@
 
 ### LOG-032
 - 时间：2026-05-28 12:52
-- 任务：TASK-S / 作品集真实项目资料
-- 目标：基于真实简历项目生成两个作品集项目详情文档，作为后续前端展示页和 Stitch UI 修改的数据源
+- 任务：TASK-S / Job Tracker 项目资料
+- 目标：生成 Job Tracker + JD Analyzer 项目详情文档，作为后续项目展示和面试讲述的数据源
 - 修改文件：
   - `docs/projects/job-tracker-jd-analyzer.md`
-  - `docs/projects/simple-accounting-app.md`
   - `docs/job-tracker/TASK_CARD.md`
   - `docs/job-tracker/OPERATION_LOG.md`
   - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
@@ -1326,12 +1325,34 @@
 - 执行结果：
   - 已按治理要求重新阅读 PRD 与任务卡
   - 已新增 Job Tracker + JD Analyzer 项目详情文档，并按 17 个章节重排为作品集和面试可直接使用的结构
-  - 已新增个人简约记账本 APP 项目详情文档，覆盖收支记录、分类管理、账单列表、月度统计、预算提醒、技术方案、数据结构和作品集展示重点
   - 已确认新文档不使用“AI 教育健康”“医疗教育”“公益健康平台”等旧项目方向
 - 风险/备注：
-  - 当前仓库未检索到个人简约记账本 APP 的既有源码或详细历史文档，本次按用户给出的真实项目名称生成作品集资料级描述，后续如补充实际截图、技术栈或代码仓库，可继续收敛为更精确版本
+  - 本仓库仅保留 Job Tracker + JD Analyzer 相关资料；其他项目素材应放在对应独立仓库或作品集仓库中
 - 对应提交：
   - `c431f0f`
+
+---
+
+### LOG-033
+- 时间：2026-06-01
+- 任务：清理与 Job Tracker + JD Analyzer 无关的仓库内容
+- 目标：移除个人记账本资料、本地缓存、构建产物和临时环境，保持仓库聚焦 Job Tracker 主项目
+- 修改文件：
+  - 删除 `docs/projects/simple-accounting-app.md`
+  - 更新 `docs/job-tracker/TASK_CARD.md`
+  - 更新 `docs/job-tracker/OPERATION_LOG.md`
+  - 更新 `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 本地清理：
+  - 删除 `.DS_Store`
+  - 删除 `.env`
+  - 删除 `.playwright-cli/`
+  - 删除 `.tmp-venv-crop/`
+  - 删除 `backend/.venv/`
+  - 删除 `frontend/.next/`
+  - 删除未跟踪的 `docs/projects/screenshots/`
+- 验证：
+  - `gh issue list --repo ffuyyu4339/FY-Repository --state all --limit 100`：无 GitHub Issues
+  - `git diff --check`：通过
 
 ---
 

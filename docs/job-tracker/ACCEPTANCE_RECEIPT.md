@@ -168,13 +168,12 @@
 
 ---
 
-## K. 作品集真实项目资料验收
+## K. Job Tracker 项目资料验收
 
 | 编号 | 验收项 | 状态 | 验收说明 |
 |---|---|---|---|
 | K-01 | Job Tracker + JD Analyzer 项目详情文档已生成 | PASS | 已新增 `docs/projects/job-tracker-jd-analyzer.md`，并按 17 个章节覆盖项目概述、背景、用户、痛点、目标、功能、流程、架构、AI 能力、工程化实践和面试讲述版本 |
-| K-02 | 个人简约记账本 APP 项目详情文档已生成 | PASS | 已新增 `docs/projects/simple-accounting-app.md`，覆盖项目定位、核心价值、收支记录、分类管理、统计分析、技术方案和作品集展示重点 |
-| K-03 | 已排除旧虚构项目内容 | PASS | 新增文档未使用“AI 教育健康”“医疗教育”“公益健康平台”等旧项目方向 |
+| K-02 | 已排除旧虚构项目内容 | PASS | 新增文档未使用“AI 教育健康”“医疗教育”“公益健康平台”等旧项目方向 |
 
 ---
 
@@ -238,7 +237,7 @@
 - Vercel 公共访问证据：已在 Vercel Dashboard 关闭 `Require Log In`，`curl -I -L --max-time 20 https://fy-repository-69otp72b7-fuyus-projects-11d155d9.vercel.app` 返回 `HTTP/2 200`，页面标题为 `个人求职档案 + JD 解析`
 - 生产兜底证据：`frontend/src/lib/supabase.ts` 已在 `NODE_ENV=production` 时对缺失或无效的公开 Supabase 配置回退到 `blyvyokkyjadlvlnpscg.supabase.co` 与对应 publishable key
 - Linux 部署说明：已写入 `README.md`
-- 作品集项目资料证据：已新增 `docs/projects/job-tracker-jd-analyzer.md` 与 `docs/projects/simple-accounting-app.md`，可作为后续作品集展示页和 Stitch UI 修改的数据源
+- 项目资料证据：已保留 `docs/projects/job-tracker-jd-analyzer.md`，可作为后续项目展示和面试讲述的数据源
 
 ---
 
