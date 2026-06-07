@@ -1487,6 +1487,42 @@
 - 对应提交：
   - `2b6f977`
 
+---
+
+### LOG-037
+- 时间：2026-06-07 15:07
+- 任务：TASK-U / 生产错误修复与域名优化最终复验
+- 目标：将 Supabase 读取超时兜底推送到 GitHub `master`，部署到 Vercel 生产环境，并确认简洁域名下入口库、数据看板和 JD Analyzer 可访问
+- 修改文件：
+  - `frontend/src/lib/supabase-data.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `git push --force-with-lease origin HEAD:master`
+  - `vercel deploy --prod --yes --project job-lens --logs`
+  - `vercel alias set job-lens-hgxvwr565-fuyus-projects-11d155d9.vercel.app jobtracker-lens.vercel.app`
+  - `curl -I https://jobtracker-lens.vercel.app/sources`
+  - `curl -I https://jobtracker-lens.vercel.app/dashboard`
+  - `curl -I https://jobtracker-lens.vercel.app/jobs/new`
+  - `node - <<'NODE' ... playwright chromium verification ... NODE`
+- 执行结果：
+  - 已将包含 2.5 秒 Supabase 读取超时兜底的修复提交 `6b32211` 推送到 GitHub `master`
+  - Vercel 生产部署 `job-lens-hgxvwr565-fuyus-projects-11d155d9.vercel.app` 构建完成并进入 Ready 状态
+  - 已将简洁别名 `https://jobtracker-lens.vercel.app` 重新指向最新生产部署
+  - 线上 `/sources`、`/dashboard`、`/jobs/new` 均返回 HTTP 200
+  - Chrome headless 验证 `https://jobtracker-lens.vercel.app/sources` 可见 `BOSS直聘`，正文未出现 `Failed to fetch` 或 `TypeError`
+  - Chrome headless 验证 `https://jobtracker-lens.vercel.app/dashboard` 可见 `总岗位数`，正文未出现 `Failed to fetch` 或 `TypeError`
+  - Chrome headless 验证 `https://jobtracker-lens.vercel.app/jobs/new` 可见 `JD` 录入相关内容，正文未出现 `Failed to fetch` 或 `TypeError`
+- 风险/备注：
+  - 浏览器控制台仍可观察到 Supabase REST 资源请求 `net::ERR_CONNECTION_CLOSED`，说明用户当前网络到 Supabase 仍可能被关闭；页面已通过读取超时兜底正常渲染 MVP 数据
+  - `job-lens.vercel.app` 已被其他项目占用，本轮使用 `jobtracker-lens.vercel.app` 作为清晰可读的生产地址
+- 对应提交：
+  - `6b32211`
+
 ## 提交记录
 
 | 序号 | 时间 | Commit Hash | Commit Message | 关联任务 | 说明 |
@@ -1527,6 +1563,7 @@
 | 034 | 2026-06-07 14:03 | f6add03 | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
 | 035 | 2026-06-07 14:22 | ae8c537 | chore(deploy): configure vercel root build | T-06 ~ T-08 | 同步 GitHub master，完成 Vercel 生产部署和线上关键功能验收，并补充根目录 Vercel 构建配置 |
 | 036 | 2026-06-07 14:56 | 2b6f977 | fix(frontend): fallback when supabase fetch fails | U-01 ~ U-06 | 修复生产入口库和数据看板 Supabase 网络失败报错，并绑定简洁 Vercel 别名 |
+| 037 | 2026-06-07 15:07 | 6b32211 | fix(frontend): timeout supabase read fallback | U-01 ~ U-06 | 为 Supabase 读取增加 2.5 秒超时兜底，推送 master、重新部署生产并复验简洁域名 |
 
 ---
 
@@ -1542,8 +1579,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚、GitHub `master` 清理、Vercel 生产部署、线上关键功能验收、Supabase 网络失败兜底与简洁域名绑定均已完成
+- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚、GitHub `master` 清理、Vercel 生产部署、线上关键功能验收、Supabase 网络失败和读取超时兜底、最新生产复验与简洁域名绑定均已完成
 - 已关闭任务：任务卡内全部任务均已完成
 - 未关闭验收项：0 项
 - 当前风险：无已知阻塞
-- 下一步：部署最新修复并复验 `https://jobtracker-lens.vercel.app/sources`、`/dashboard` 与 JD Analyzer
+- 下一步：无；如需彻底消除浏览器控制台 Supabase 网络错误，可后续改为服务端 API 代理读取数据源

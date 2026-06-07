@@ -249,6 +249,11 @@
 - 本轮生产错误复现证据：Chrome headless 访问 `/sources` 时 `source_links` Supabase REST 请求出现 `net::ERR_CONNECTION_CLOSED`；访问 `/dashboard` 时 `jobs` Supabase REST 请求出现 `net::ERR_CONNECTION_CLOSED`
 - 本轮生产错误修复证据：`frontend/src/lib/supabase-data.ts` 已在 Supabase 网络失败或读取超时时返回本地演示入口、岗位和偏好兜底数据，并设置 2.5 秒读取超时避免页面卡在加载态；`npm run lint`、`npm run test`、根目录 `npm run build` 均通过
 - 本轮简洁域名证据：`job-lens.vercel.app` 已被占用；已成功绑定可读性更好的 `https://jobtracker-lens.vercel.app`
+- 本轮最终生产部署证据：已将修复提交 `6b32211` 推送至 GitHub `master`，并通过 `vercel deploy --prod --yes --project job-lens --logs` 部署最新生产版本 `job-lens-hgxvwr565-fuyus-projects-11d155d9.vercel.app`
+- 本轮最终简洁域名复验：`vercel alias set job-lens-hgxvwr565-fuyus-projects-11d155d9.vercel.app jobtracker-lens.vercel.app` 成功，`https://jobtracker-lens.vercel.app` 已指向最新生产部署
+- 本轮最终线上访问证据：`https://jobtracker-lens.vercel.app/sources`、`/dashboard`、`/jobs/new` 均返回 HTTP 200
+- 本轮最终浏览器验收：Chrome headless 验证 `/sources` 可见 `BOSS直聘`，`/dashboard` 可见 `总岗位数`，`/jobs/new` 可见 `JD` 录入相关内容；三页正文均未出现 `Failed to fetch` 或 `TypeError`
+- 本轮剩余观察项：浏览器控制台仍可看到 Supabase REST 资源请求 `net::ERR_CONNECTION_CLOSED`，说明当前网络到 Supabase 仍可能被关闭；页面已通过读取超时兜底正常渲染 MVP 数据，不阻塞当前验收
 
 ---
 
@@ -267,5 +272,5 @@
 - 是否达到 MVP 发布条件：是
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-06-07 14:56
-- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀、Vercel 错误部署回滚、GitHub `master` 清理、生产重新部署、线上关键功能验收、Supabase 网络失败兜底和简洁域名绑定。推荐生产访问地址为 `https://jobtracker-lens.vercel.app`，当前无已知阻塞。
+- 验收时间：2026-06-07 15:07
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀、Vercel 错误部署回滚、GitHub `master` 清理、生产重新部署、线上关键功能验收、Supabase 网络失败和读取超时兜底、最新生产部署复验和简洁域名绑定。推荐生产访问地址为 `https://jobtracker-lens.vercel.app`，当前无已知阻塞。
