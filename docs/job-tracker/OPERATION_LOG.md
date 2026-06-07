@@ -1356,6 +1356,44 @@
 
 ---
 
+### LOG-033
+- 时间：2026-06-07 14:03
+- 任务：TASK-T / 部署清理与生产复验
+- 目标：确认当前仓库仅包含 Job Tracker + JD Analyzer 项目内容，回滚 Vercel 最新错误部署，复跑本地前端质量命令与关键链路，并准备将当前仓库推送到 GitHub `master` 后重新部署
+- 修改文件：
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `find . -maxdepth 2 -not -path './.git*' -print`
+  - `rg -n "AI 教育健康|医疗教育|公益健康平台|health|medical|education|公益|爬虫|自动投递|Firebase|Supabase|microservice|微服务" -S .`
+  - `npm install`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run dev`
+  - `curl -I -L --max-time 15 http://localhost:3000/jobs`
+  - `curl -I -L --max-time 15 http://localhost:3000/dashboard`
+  - `curl -fsS --max-time 10 http://localhost:8000/api/health`
+  - `curl -fsS --max-time 10 -H 'Content-Type: application/json' -d ... http://localhost:8000/api/analyze-jd`
+  - `vercel ls --yes`
+  - `vercel inspect https://fy-repository-iu06qa7cr-fuyus-projects-11d155d9.vercel.app`
+  - `vercel rollback https://fy-repository-kdveoa4sg-fuyus-projects-11d155d9.vercel.app --yes --timeout 5m`
+- 执行结果：
+  - 仓库根目录当前为 `frontend/`、`backend/`、`db/`、`supabase/`、`docs/job-tracker/`、`docs/projects/` 与项目脚本等 Job Tracker 相关内容；未发现旧虚构项目代码残留
+  - `docs/job-tracker/` 下 PRD、任务卡、操作日志、验收回执单均存在
+  - 前端 `npm install`、`npm run lint`、`npm run build` 通过，`npm run dev` 已在 `http://localhost:3000` 启动
+  - 本机 `/jobs`、`/dashboard`、`/jobs/new` 均返回 HTTP 200
+  - Docker Compose 中 db/backend/frontend 已运行，`/api/health` 返回 `{"status":"ok"}`，JD Analyzer API 返回规则解析结果
+  - Vercel 最新错误生产部署 `dpl_A4kspdU9pkzFZ2FWL2EW3pBKcq4W` 已回滚到最后正确部署 `dpl_3YcuNC126icxzGjanbGtaJ3Wcy2Q`
+- 风险/备注：
+  - `npm install` 报告 8 个依赖漏洞；当前不阻塞 lint/build/dev，后续可单独评估 `npm audit fix`
+  - Vercel MCP 插件握手失败，本轮改用已登录的 Vercel CLI 完成部署检查与回滚
+  - 远端 `master` 当前包含错误的 portfolio 项目历史，普通推送被 non-fast-forward 拒绝；需使用 `--force-with-lease` 将当前 Job Tracker 仓库安全同步到 `master`
+- 对应提交：
+  - `PENDING_COMMIT`
+
+---
+
 ### LOG-TEMPLATE
 - 时间：YYYY-MM-DD HH:mm
 - 任务：TASK-XXX / 任务名称
@@ -1409,6 +1447,7 @@
 | 030 | 2026-05-05 22:48 | 83c517a | docs(deploy): verify public vercel access | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
 | 031 | 2026-05-05 23:27 | 1cf0a1a | fix(frontend): add production supabase fallback | R-08 | 为 Vercel 生产环境补充 Supabase 默认兜底，修复线上页面配置差异 |
 | 032 | 2026-05-28 12:52 | c431f0f | docs(projects): add real portfolio project details | S-01 ~ S-03 | 新增两个真实项目的作品集详情文档，并同步治理记录 |
+| 033 | 2026-06-07 14:03 | PENDING_COMMIT | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
 
 ---
 
@@ -1424,8 +1463,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调与作品集真实项目资料均已完成
+- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚与 master 清理部署准备均已完成
 - 已关闭任务：任务卡内全部任务均已完成
 - 未关闭验收项：0 项
 - 当前风险：无已知阻塞
-- 下一步：可继续将 `docs/projects/` 下的项目详情接入作品集前端展示页或 Stitch UI 修改流程
+- 下一步：完成 GitHub `master` 同步、触发 Vercel 生产重新部署并复验线上 `/jobs`、`/dashboard` 与 JD Analyzer

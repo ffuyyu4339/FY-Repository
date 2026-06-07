@@ -238,6 +238,9 @@
 - 生产兜底证据：`frontend/src/lib/supabase.ts` 已在 `NODE_ENV=production` 时对缺失或无效的公开 Supabase 配置回退到 `blyvyokkyjadlvlnpscg.supabase.co` 与对应 publishable key
 - Linux 部署说明：已写入 `README.md`
 - 项目资料证据：已保留 `docs/projects/job-tracker-jd-analyzer.md`，可作为后续项目展示和面试讲述的数据源
+- 本轮仓库清理证据：根目录当前仅包含 Job Tracker + JD Analyzer 前端、后端、数据库、Supabase 部署脚本、治理文档、项目资料和运行脚本；远端 `master` 的错误 portfolio 项目内容已识别为需替换对象
+- 本轮 Vercel 回滚证据：最新错误生产部署 `dpl_A4kspdU9pkzFZ2FWL2EW3pBKcq4W` 已通过 `vercel rollback` 回滚到最后正确部署 `dpl_3YcuNC126icxzGjanbGtaJ3Wcy2Q`
+- 本轮本地验证证据：`npm install`、`npm run lint`、`npm run build` 通过，`npm run dev` 已启动；`/jobs`、`/dashboard`、`/jobs/new` 返回 HTTP 200；`/api/health` 返回 `ok`；`POST /api/analyze-jd` 返回规则解析结果
 
 ---
 
@@ -256,5 +259,5 @@
 - 是否达到 MVP 发布条件：是
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-05-04 22:01
-- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底和作品集真实项目资料沉淀。已通过 Colima 提供本机 Docker daemon，`docker compose config` 与 `docker compose up -d --build` 均通过，PostgreSQL/FastAPI/Next.js 容器均可访问；容器环境下 JD Analyzer、岗位 CRUD、投递事件、技能搜索、Dashboard、Preferences、Source Links 与关键页面访问均通过。前端 lint/test/build、Docker 前端镜像重建、桌面/390px 移动端截图复查、后端 ruff/black/pytest 均已复验通过，当前无已知阻塞。
+- 验收时间：2026-06-07 14:03
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀和本轮 Vercel 错误部署回滚。已通过 Colima 提供本机 Docker daemon，PostgreSQL/FastAPI/Next.js 容器均可访问；本轮 `npm install`、`npm run lint`、`npm run build`、`npm run dev`、页面 HTTP 访问、后端健康检查与 JD Analyzer API 均已复验通过，当前无已知阻塞。

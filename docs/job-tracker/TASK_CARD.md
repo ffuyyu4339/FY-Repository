@@ -223,9 +223,9 @@
 ---
 
 ## 当前状态
-- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 公共访问验证与生产 Supabase 默认兜底；已保留 Job Tracker + JD Analyzer 项目详情文档，作为后续项目展示与面试讲述的数据源
+- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 错误部署回滚、本地质量验证、GitHub `master` 清理部署准备；已保留 Job Tracker + JD Analyzer 项目详情文档，作为后续项目展示与面试讲述的数据源
 - 当前阻塞：无
-- 最新更新时间：2026-05-28 12:52
+- 最新更新时间：2026-06-07 14:03
 
 ---
 
@@ -242,3 +242,12 @@
 ## S. Job Tracker 项目资料
 - [x] ~~新增 Job Tracker + JD Analyzer 作品集项目详情文档~~
 - [x] ~~确认文档不再使用 AI 教育健康、医疗教育、公益健康平台等旧项目内容~~
+
+## T. 部署清理与生产复验
+- [x] ~~确认仓库根目录仅保留 Job Tracker + JD Analyzer 代码与本项目文档资料~~
+- [x] ~~回滚 Vercel 最新错误生产部署到最后正确部署~~
+- [x] ~~确认 `docs/job-tracker/` 治理文档完整~~
+- [x] ~~执行前端 `npm install`、`npm run lint`、`npm run build`、`npm run dev` 验证~~
+- [x] ~~验证本机 `/jobs`、`/dashboard` 与 JD Analyzer API 可用~~
+- [ ] 推送当前 Job Tracker 仓库到 GitHub `master` 分支
+- [ ] 触发 Vercel 生产重新部署并验证线上关键页面
