@@ -246,6 +246,9 @@
 - 本轮线上页面证据：`/jobs`、`/dashboard`、`/jobs/new` 均返回 HTTP 200；Chrome headless 可见“岗位决策队列”和“数据看板”，未发现 `Application error`、`Supabase 配置缺失`、`Invalid API key` 等错误标记
 - 本轮线上 JD Analyzer 证据：生产 `/jobs/new` 粘贴测试 JD 后点击“解析 JD”，页面显示“JD 解析完成”，并回填公司、岗位、城市、薪资和技能字段
 - 本轮 Vercel Git 构建兜底证据：已新增根目录 `vercel.json` 和代理 `package.json` / `package-lock.json`，在 Vercel Root Directory 仍为 `.` 时也会进入 `frontend/` 安装与构建；`frontend/next.config.ts` 已固定 `turbopack.root`，根目录 `npm run build` 与前端 `npm run lint` 均通过
+- 本轮生产错误复现证据：Chrome headless 访问 `/sources` 时 `source_links` Supabase REST 请求出现 `net::ERR_CONNECTION_CLOSED`；访问 `/dashboard` 时 `jobs` Supabase REST 请求出现 `net::ERR_CONNECTION_CLOSED`
+- 本轮生产错误修复证据：`frontend/src/lib/supabase-data.ts` 已在 Supabase 网络失败时返回本地演示入口、岗位和偏好兜底数据；`npm run lint`、`npm run test`、根目录 `npm run build` 均通过
+- 本轮简洁域名证据：`job-lens.vercel.app` 已被占用；已成功绑定可读性更好的 `https://jobtracker-lens.vercel.app`
 
 ---
 
@@ -264,5 +267,5 @@
 - 是否达到 MVP 发布条件：是
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-06-07 14:22
-- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀、本轮 Vercel 错误部署回滚、GitHub `master` 清理、生产重新部署和线上关键功能验收。生产地址 `https://job-lens-fuyus-projects-11d155d9.vercel.app` 已可访问，`/jobs`、`/dashboard`、`/jobs/new` 与 JD Analyzer 交互均已验证通过，当前无已知阻塞。
+- 验收时间：2026-06-07 14:56
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀、Vercel 错误部署回滚、GitHub `master` 清理、生产重新部署、线上关键功能验收、Supabase 网络失败兜底和简洁域名绑定。推荐生产访问地址为 `https://jobtracker-lens.vercel.app`，当前无已知阻塞。

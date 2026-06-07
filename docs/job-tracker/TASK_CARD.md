@@ -223,9 +223,9 @@
 ---
 
 ## 当前状态
-- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 错误部署回滚、本地质量验证、GitHub `master` 清理、生产重新部署与线上关键功能验收；已保留 Job Tracker + JD Analyzer 项目详情文档，作为后续项目展示与面试讲述的数据源
+- 当前阶段：MVP 与 MVP+ 主路径已完成；已补充 Vercel Hobby + Supabase Free 免费部署准备，并完成 Vercel 错误部署回滚、本地质量验证、GitHub `master` 清理、生产重新部署、线上关键功能验收、Supabase 网络失败兜底与简洁域名绑定；已保留 Job Tracker + JD Analyzer 项目详情文档，作为后续项目展示与面试讲述的数据源
 - 当前阻塞：无
-- 最新更新时间：2026-06-07 14:22
+- 最新更新时间：2026-06-07 14:56
 
 ---
 
@@ -252,3 +252,11 @@
 - [x] ~~推送当前 Job Tracker 仓库到 GitHub `master` 分支~~
 - [x] ~~触发 Vercel 生产重新部署并验证线上关键页面~~
 - [x] ~~补充根目录 Vercel 配置，避免 Git 自动部署从错误目录构建~~
+
+## U. 生产错误修复与域名优化
+- [x] ~~复现生产 `/sources` 与 `/dashboard` 的 `TypeError: Failed to fetch`~~
+- [x] ~~定位 Supabase REST 请求 `ERR_CONNECTION_CLOSED` 根因~~
+- [x] ~~为 Supabase 网络失败增加本地演示数据兜底，覆盖入口库、数据看板、岗位列表和偏好读取~~
+- [x] ~~执行前端 `npm run lint`、`npm run test`、根目录 `npm run build` 验证~~
+- [x] ~~绑定简洁生产别名 `jobtracker-lens.vercel.app`~~
+- [ ] 部署最新修复并复验线上 `/sources`、`/dashboard` 与简洁域名

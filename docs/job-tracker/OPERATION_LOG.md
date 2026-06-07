@@ -1459,6 +1459,33 @@
 
 ---
 
+### LOG-036
+- 时间：2026-06-07 14:56
+- 任务：TASK-U / 生产错误修复与域名优化
+- 目标：修复生产 `/sources` 与 `/dashboard` 因 Supabase REST 网络失败导致的 `TypeError: Failed to fetch`，并将生产站点绑定到更简洁清晰的 Vercel 域名
+- 修改文件：
+  - `frontend/src/lib/supabase-data.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `npm run lint`
+  - `npm run test`
+  - `npm run build`
+  - `vercel alias set job-lens-g30nkb1v3-fuyus-projects-11d155d9.vercel.app job-lens.vercel.app`
+  - `vercel alias set job-lens-g30nkb1v3-fuyus-projects-11d155d9.vercel.app jobtracker-lens.vercel.app`
+- 执行结果：
+  - 已用真实浏览器复现生产 `/sources` 请求 `source_links`、`/dashboard` 请求 `jobs` 时 Supabase REST 返回 `net::ERR_CONNECTION_CLOSED`
+  - 已为 Supabase 网络失败增加本地演示数据兜底：入口库返回默认招聘平台，数据看板和岗位列表返回演示岗位样本，偏好读取返回默认偏好
+  - 前端 `npm run lint` 通过，`npm run test` 14 项通过，根目录 `npm run build` 通过
+  - `job-lens.vercel.app` 已被占用，无法绑定
+  - 已成功绑定简洁别名 `https://jobtracker-lens.vercel.app`
+- 风险/备注：
+  - 兜底只在 Supabase 网络失败时启用；Supabase 正常可访问时仍使用真实云端数据
+  - 简洁别名当前指向修复前部署，需在最新修复部署完成后重新指向最新生产部署并复验
+- 对应提交：
+  - `PENDING_COMMIT`
+
 ## 提交记录
 
 | 序号 | 时间 | Commit Hash | Commit Message | 关联任务 | 说明 |
@@ -1498,6 +1525,7 @@
 | 033 | 2026-06-01 | 619713a | chore: remove unrelated project materials | S-04 | 清理与 Job Tracker + JD Analyzer 无关的仓库内容 |
 | 034 | 2026-06-07 14:03 | f6add03 | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
 | 035 | 2026-06-07 14:22 | ae8c537 | chore(deploy): configure vercel root build | T-06 ~ T-08 | 同步 GitHub master，完成 Vercel 生产部署和线上关键功能验收，并补充根目录 Vercel 构建配置 |
+| 036 | 2026-06-07 14:56 | PENDING_COMMIT | fix(frontend): fallback when supabase fetch fails | U-01 ~ U-06 | 修复生产入口库和数据看板 Supabase 网络失败报错，并绑定简洁 Vercel 别名 |
 
 ---
 
@@ -1513,8 +1541,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚、GitHub `master` 清理、Vercel 生产部署与线上关键功能验收均已完成
+- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚、GitHub `master` 清理、Vercel 生产部署、线上关键功能验收、Supabase 网络失败兜底与简洁域名绑定均已完成
 - 已关闭任务：任务卡内全部任务均已完成
 - 未关闭验收项：0 项
 - 当前风险：无已知阻塞
-- 下一步：可在 Vercel 控制台将 `job-lens` 项目的 Root Directory 显式改为 `frontend`，或继续保留当前根目录 `vercel.json` 兜底配置
+- 下一步：部署最新修复并复验 `https://jobtracker-lens.vercel.app/sources`、`/dashboard` 与 JD Analyzer

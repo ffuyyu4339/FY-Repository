@@ -113,9 +113,136 @@ const INITIAL_PREFERENCES_ROW: Preference = {
   updated_at: new Date().toISOString(),
 };
 
+const FALLBACK_TIMESTAMP = "2026-06-07T00:00:00.000Z";
+
+const FALLBACK_SOURCE_LINKS: SourceLink[] = DEFAULT_SOURCE_LINKS.map(
+  (sourceLink, index) => ({
+    id: index + 1,
+    source_key: sourceLink.source_key || `default_${index + 1}`,
+    platform_name: sourceLink.platform_name || "招聘平台",
+    title: sourceLink.title || "招聘入口",
+    url: sourceLink.url || "https://example.com",
+    city: sourceLink.city ?? null,
+    track: sourceLink.track ?? null,
+    keywords: normalizeList(sourceLink.keywords),
+    enabled: sourceLink.enabled ?? true,
+    sort_order: sourceLink.sort_order ?? (index + 1) * 10,
+    created_at: FALLBACK_TIMESTAMP,
+    updated_at: FALLBACK_TIMESTAMP,
+  }),
+);
+
+const FALLBACK_JOBS: Job[] = [
+  {
+    id: 1,
+    company_name: "星图智能",
+    job_title: "AI 应用开发工程师",
+    city: "上海 / 远程",
+    platform: "BOSS直聘",
+    job_link: "https://www.zhipin.com/",
+    salary_text: "25k-40k",
+    salary_min: 25,
+    salary_max: 40,
+    experience_required: "3年",
+    degree_required: "本科",
+    remote_allowed: true,
+    jd_raw_text:
+      "负责 AI 应用、RAG 检索增强和前后端工程化落地，熟悉 Python、React、FastAPI。",
+    skills_extracted: ["Python", "React", "RAG", "FastAPI"],
+    keywords: ["AI 应用", "LLM", "Docker"],
+    track: "ai_app_dev",
+    match_score: 92,
+    match_level: "priority_apply",
+    status: "ready_to_apply",
+    resume_version: "v1",
+    notes: "Supabase 网络不可达时的演示岗位，可继续验证看板与筛选体验。",
+    created_at: FALLBACK_TIMESTAMP,
+    updated_at: FALLBACK_TIMESTAMP,
+  },
+  {
+    id: 2,
+    company_name: "海澜数据",
+    job_title: "数据分析师",
+    city: "上海",
+    platform: "拉勾",
+    job_link: "https://www.lagou.com/",
+    salary_text: "18k-28k",
+    salary_min: 18,
+    salary_max: 28,
+    experience_required: "1-3年",
+    degree_required: "本科",
+    remote_allowed: false,
+    jd_raw_text:
+      "负责业务指标分析、Dashboard 建设和 SQL 数据建模，熟悉 Python、SQL、BI。",
+    skills_extracted: ["SQL", "Python", "BI"],
+    keywords: ["指标体系", "Dashboard", "数据建模"],
+    track: "data_analyst",
+    match_score: 86,
+    match_level: "priority_apply",
+    status: "applied",
+    resume_version: "v1",
+    notes: "用于展示状态分布、方向分布和高频技能词。",
+    created_at: FALLBACK_TIMESTAMP,
+    updated_at: FALLBACK_TIMESTAMP,
+  },
+  {
+    id: 3,
+    company_name: "云栈科技",
+    job_title: "模型部署工程师",
+    city: "杭州",
+    platform: "猎聘",
+    job_link: "https://www.liepin.com/",
+    salary_text: "22k-35k",
+    salary_min: 22,
+    salary_max: 35,
+    experience_required: "3-5年",
+    degree_required: "本科",
+    remote_allowed: false,
+    jd_raw_text:
+      "负责模型服务部署、容器化和 Linux 运维，熟悉 Docker、Kubernetes、Python。",
+    skills_extracted: ["Docker", "Linux", "Python"],
+    keywords: ["模型部署", "容器化", "服务稳定性"],
+    track: "model_deployment",
+    match_score: 78,
+    match_level: "apply",
+    status: "pending_analysis",
+    resume_version: "v1",
+    notes: "用于展示待分析和模型部署方向样本。",
+    created_at: FALLBACK_TIMESTAMP,
+    updated_at: FALLBACK_TIMESTAMP,
+  },
+];
+
+function isNetworkFetchError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /Failed to fetch|ERR_CONNECTION|NetworkError|fetch failed/i.test(
+    error.message,
+  );
+}
+
+async function withNetworkFallback<T>(
+  operation: () => Promise<T>,
+  fallback: () => T,
+): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    if (isNetworkFetchError(error)) {
+      return fallback();
+    }
+
+    throw error;
+  }
+}
+
 function assertSupabaseError(error: unknown, fallbackMessage: string): never {
   if (error && typeof error === "object" && "message" in error) {
-    throw new Error(String((error as { message?: string }).message || fallbackMessage));
+    throw new Error(
+      String((error as { message?: string }).message || fallbackMessage),
+    );
   }
 
   throw new Error(fallbackMessage);
@@ -470,7 +597,10 @@ function buildDashboardSummary(jobs: Job[], topN: number): DashboardSummary {
 }
 
 export async function fetchJobsSupabase(filters: JobListFilters): Promise<Job[]> {
-  return filterJobsByQuery(await loadJobs(), filters);
+  return withNetworkFallback(
+    async () => filterJobsByQuery(await loadJobs(), filters),
+    () => filterJobsByQuery([...FALLBACK_JOBS], filters),
+  );
 }
 
 export async function fetchJobSupabase(jobId: string): Promise<Job> {
@@ -508,11 +638,17 @@ export async function analyzeJdSupabase(
 export async function fetchDashboardSummarySupabase(
   topN = 5,
 ): Promise<DashboardSummary> {
-  return buildDashboardSummary(await loadJobs(), topN);
+  return withNetworkFallback(
+    async () => buildDashboardSummary(await loadJobs(), topN),
+    () => buildDashboardSummary([...FALLBACK_JOBS], topN),
+  );
 }
 
 export async function fetchPreferencesSupabase(): Promise<Preference> {
-  return ensurePreferenceRow();
+  return withNetworkFallback(
+    () => ensurePreferenceRow(),
+    () => ({ ...INITIAL_PREFERENCES_ROW }),
+  );
 }
 
 export async function updatePreferencesSupabase(
@@ -548,20 +684,30 @@ export async function updatePreferencesSupabase(
 export async function fetchSourceLinksSupabase(
   includeDisabled = false,
 ): Promise<SourceLink[]> {
-  await ensureSourceLinkSeeds();
-  const client = getSupabaseClient();
-  let query = client.from("source_links").select("*");
-  if (!includeDisabled) {
-    query = query.eq("enabled", true);
-  }
+  return withNetworkFallback(
+    async () => {
+      await ensureSourceLinkSeeds();
+      const client = getSupabaseClient();
+      let query = client.from("source_links").select("*");
+      if (!includeDisabled) {
+        query = query.eq("enabled", true);
+      }
 
-  const { data, error } = await query.order("sort_order", { ascending: true }).order("id", { ascending: true });
+      const { data, error } = await query
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true });
 
-  if (error) {
-    assertSupabaseError(error, "来源链接读取失败");
-  }
+      if (error) {
+        assertSupabaseError(error, "来源链接读取失败");
+      }
 
-  return (data || []) as SourceLink[];
+      return (data || []) as SourceLink[];
+    },
+    () =>
+      FALLBACK_SOURCE_LINKS.filter(
+        (sourceLink) => includeDisabled || sourceLink.enabled,
+      ),
+  );
 }
 
 export async function createSourceLinkSupabase(
@@ -661,4 +807,3 @@ export async function createJobEventSupabase(
 ): Promise<JobEvent> {
   return persistJobEvent(Number(jobId), payload);
 }
-
