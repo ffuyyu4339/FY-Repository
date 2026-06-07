@@ -1438,7 +1438,7 @@
   - 本地 `vercel build --prod` 已能识别根目录 Next.js 版本并进入 `frontend` 构建，但本地生产环境变量注入与 Vercel 云端不完全一致；云端生产部署已通过 `validate-public-env` 并成功上线
   - `npm install` / 临时 Playwright 安装均报告依赖漏洞，当前不影响 lint/build/deploy，后续可单独做依赖安全修复任务
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `ae8c537`
 
 ---
 
@@ -1497,7 +1497,7 @@
 | 032 | 2026-05-28 12:52 | c431f0f | docs(projects): add real portfolio project details | S-01 ~ S-03 | 新增两个真实项目的作品集详情文档，并同步治理记录 |
 | 033 | 2026-06-01 | 619713a | chore: remove unrelated project materials | S-04 | 清理与 Job Tracker + JD Analyzer 无关的仓库内容 |
 | 034 | 2026-06-07 14:03 | f6add03 | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
-| 035 | 2026-06-07 14:22 | PENDING_COMMIT | chore(deploy): configure vercel root build | T-06 ~ T-08 | 同步 GitHub master，完成 Vercel 生产部署和线上关键功能验收，并补充根目录 Vercel 构建配置 |
+| 035 | 2026-06-07 14:22 | ae8c537 | chore(deploy): configure vercel root build | T-06 ~ T-08 | 同步 GitHub master，完成 Vercel 生产部署和线上关键功能验收，并补充根目录 Vercel 构建配置 |
 
 ---
 
