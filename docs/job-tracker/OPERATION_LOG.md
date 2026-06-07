@@ -274,7 +274,7 @@
   - 免费部署路线默认使用匿名读写策略，适合个人单用户演示，不适合公开多用户场景
   - 当前尚未代为创建 Vercel / Supabase 云项目，实际接入需要你的账号和项目参数
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `28c1394`
 
 ---
 
@@ -1353,10 +1353,12 @@
 - 验证：
   - `gh issue list --repo ffuyyu4339/FY-Repository --state all --limit 100`：无 GitHub Issues
   - `git diff --check`：通过
+- 对应提交：
+  - `619713a`
 
 ---
 
-### LOG-033
+### LOG-034
 - 时间：2026-06-07 14:03
 - 任务：TASK-T / 部署清理与生产复验
 - 目标：确认当前仓库仅包含 Job Tracker + JD Analyzer 项目内容，回滚 Vercel 最新错误部署，复跑本地前端质量命令与关键链路，并准备将当前仓库推送到 GitHub `master` 后重新部署
@@ -1389,6 +1391,52 @@
   - `npm install` 报告 8 个依赖漏洞；当前不阻塞 lint/build/dev，后续可单独评估 `npm audit fix`
   - Vercel MCP 插件握手失败，本轮改用已登录的 Vercel CLI 完成部署检查与回滚
   - 远端 `master` 当前包含错误的 portfolio 项目历史，普通推送被 non-fast-forward 拒绝；需使用 `--force-with-lease` 将当前 Job Tracker 仓库安全同步到 `master`
+- 对应提交：
+  - `f6add03`
+
+---
+
+### LOG-035
+- 时间：2026-06-07 14:22
+- 任务：TASK-T / GitHub master 同步、Vercel 生产部署与线上验收
+- 目标：将当前 Job Tracker + JD Analyzer 仓库同步到 GitHub `master`，触发并完成 Vercel 生产部署，验证线上关键页面与 JD Analyzer 功能，并补齐根目录 Vercel 配置防止后续 Git 自动部署从错误目录构建
+- 修改文件：
+  - `.gitignore`
+  - `package.json`
+  - `package-lock.json`
+  - `vercel.json`
+  - `frontend/next.config.ts`
+  - `docs/job-tracker/TASK_CARD.md`
+  - `docs/job-tracker/OPERATION_LOG.md`
+  - `docs/job-tracker/ACCEPTANCE_RECEIPT.md`
+- 执行命令：
+  - `git push --force-with-lease origin HEAD:master`
+  - `vercel ls --yes`
+  - `vercel inspect https://job-lens-3uai6pb5f-fuyus-projects-11d155d9.vercel.app --logs`
+  - `vercel deploy --prod --yes --project job-lens --logs`
+  - `vercel inspect https://job-lens-qxb2jlejp-fuyus-projects-11d155d9.vercel.app`
+  - `curl -I -L --max-time 20 https://job-lens-fuyus-projects-11d155d9.vercel.app/jobs`
+  - `curl -I -L --max-time 20 https://job-lens-fuyus-projects-11d155d9.vercel.app/dashboard`
+  - `curl -I -L --max-time 20 https://job-lens-fuyus-projects-11d155d9.vercel.app/jobs/new`
+  - `npm install --no-save @playwright/test@latest`
+  - `npm exec playwright test prod-smoke.spec.js --reporter=line`
+  - `vercel build --prod`
+  - `npm run build`
+  - `npm run lint`
+- 执行结果：
+  - 已使用 `--force-with-lease` 将当前 Job Tracker 提交推送到 GitHub `master`，替换远端 `master` 上错误的 portfolio 项目内容
+  - Vercel Git 自动触发的 `job-lens` Preview 暴露 Root Directory 仍为 `.`，构建失败原因为找不到根目录 `app` 或 `pages`
+  - 已从 `frontend/` 目录手动触发 `job-lens` 生产部署，生产部署 `dpl_44fo3TvBLtnEdrXYGUa7EtW3n7c7` 状态为 Ready，并绑定 `https://job-lens-fuyus-projects-11d155d9.vercel.app`
+  - 线上 `/jobs`、`/dashboard`、`/jobs/new` 均返回 HTTP 200
+  - Chrome headless 可读取线上 `/jobs` 的“岗位决策队列”和 `/dashboard` 的“数据看板”，未出现 `Application error`、`Supabase 配置缺失`、`Invalid API key` 等错误标记
+  - 线上 JD Analyzer 交互验收通过：在 `/jobs/new` 粘贴测试 JD 后点击“解析 JD”，页面显示“JD 解析完成”，并回填公司、岗位、城市、薪资和技能字段
+  - 已新增根目录 `vercel.json`、代理 `package.json` 与 `package-lock.json`，并将 `.vercel` 加入 `.gitignore`，用于让 Vercel 在 Root Directory 为 `.` 时进入 `frontend/` 安装与构建
+  - 已在 `frontend/next.config.ts` 固定 `turbopack.root` 为前端工作目录，消除根目录代理 lockfile 带来的 workspace root 推断警告
+  - 根目录 `npm run build` 通过，前端 `npm run lint` 通过
+- 风险/备注：
+  - Vercel CLI/MCP 未提供可用的 Root Directory 修改命令；本轮采用仓库侧配置兜底
+  - 本地 `vercel build --prod` 已能识别根目录 Next.js 版本并进入 `frontend` 构建，但本地生产环境变量注入与 Vercel 云端不完全一致；云端生产部署已通过 `validate-public-env` 并成功上线
+  - `npm install` / 临时 Playwright 安装均报告依赖漏洞，当前不影响 lint/build/deploy，后续可单独做依赖安全修复任务
 - 对应提交：
   - `PENDING_COMMIT`
 
@@ -1447,7 +1495,9 @@
 | 030 | 2026-05-05 22:48 | 83c517a | docs(deploy): verify public vercel access | R-07 | 关闭 Vercel 部署登录保护并验证免费部署入口已可公网直接访问 |
 | 031 | 2026-05-05 23:27 | 1cf0a1a | fix(frontend): add production supabase fallback | R-08 | 为 Vercel 生产环境补充 Supabase 默认兜底，修复线上页面配置差异 |
 | 032 | 2026-05-28 12:52 | c431f0f | docs(projects): add real portfolio project details | S-01 ~ S-03 | 新增两个真实项目的作品集详情文档，并同步治理记录 |
-| 033 | 2026-06-07 14:03 | PENDING_COMMIT | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
+| 033 | 2026-06-01 | 619713a | chore: remove unrelated project materials | S-04 | 清理与 Job Tracker + JD Analyzer 无关的仓库内容 |
+| 034 | 2026-06-07 14:03 | f6add03 | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
+| 035 | 2026-06-07 14:22 | PENDING_COMMIT | chore(deploy): configure vercel root build | T-06 ~ T-08 | 同步 GitHub master，完成 Vercel 生产部署和线上关键功能验收，并补充根目录 Vercel 构建配置 |
 
 ---
 
@@ -1463,8 +1513,8 @@
 ---
 
 ## 阶段总结
-- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚与 master 清理部署准备均已完成
+- 当前阶段：MVP、MVP+、前端作战台重排、Web UI 视觉美化、Docker Compose 全量联调、作品集真实项目资料、Vercel 错误部署回滚、GitHub `master` 清理、Vercel 生产部署与线上关键功能验收均已完成
 - 已关闭任务：任务卡内全部任务均已完成
 - 未关闭验收项：0 项
 - 当前风险：无已知阻塞
-- 下一步：完成 GitHub `master` 同步、触发 Vercel 生产重新部署并复验线上 `/jobs`、`/dashboard` 与 JD Analyzer
+- 下一步：可在 Vercel 控制台将 `job-lens` 项目的 Root Directory 显式改为 `frontend`，或继续保留当前根目录 `vercel.json` 兜底配置

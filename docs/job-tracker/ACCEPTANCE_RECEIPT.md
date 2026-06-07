@@ -241,6 +241,11 @@
 - 本轮仓库清理证据：根目录当前仅包含 Job Tracker + JD Analyzer 前端、后端、数据库、Supabase 部署脚本、治理文档、项目资料和运行脚本；远端 `master` 的错误 portfolio 项目内容已识别为需替换对象
 - 本轮 Vercel 回滚证据：最新错误生产部署 `dpl_A4kspdU9pkzFZ2FWL2EW3pBKcq4W` 已通过 `vercel rollback` 回滚到最后正确部署 `dpl_3YcuNC126icxzGjanbGtaJ3Wcy2Q`
 - 本轮本地验证证据：`npm install`、`npm run lint`、`npm run build` 通过，`npm run dev` 已启动；`/jobs`、`/dashboard`、`/jobs/new` 返回 HTTP 200；`/api/health` 返回 `ok`；`POST /api/analyze-jd` 返回规则解析结果
+- 本轮 GitHub 证据：`git push --force-with-lease origin HEAD:master` 成功，远端 `master` 已从错误 portfolio 项目内容切换为当前 Job Tracker + JD Analyzer 仓库内容
+- 本轮 Vercel 生产部署证据：`vercel deploy --prod --yes --project job-lens --logs` 成功，部署 `dpl_44fo3TvBLtnEdrXYGUa7EtW3n7c7` 状态为 Ready，生产别名为 `https://job-lens-fuyus-projects-11d155d9.vercel.app`
+- 本轮线上页面证据：`/jobs`、`/dashboard`、`/jobs/new` 均返回 HTTP 200；Chrome headless 可见“岗位决策队列”和“数据看板”，未发现 `Application error`、`Supabase 配置缺失`、`Invalid API key` 等错误标记
+- 本轮线上 JD Analyzer 证据：生产 `/jobs/new` 粘贴测试 JD 后点击“解析 JD”，页面显示“JD 解析完成”，并回填公司、岗位、城市、薪资和技能字段
+- 本轮 Vercel Git 构建兜底证据：已新增根目录 `vercel.json` 和代理 `package.json` / `package-lock.json`，在 Vercel Root Directory 仍为 `.` 时也会进入 `frontend/` 安装与构建；`frontend/next.config.ts` 已固定 `turbopack.root`，根目录 `npm run build` 与前端 `npm run lint` 均通过
 
 ---
 
@@ -259,5 +264,5 @@
 - 是否达到 MVP 发布条件：是
 - 本机功能是否可试用：是
 - 验收人：Codex / 你本人
-- 验收时间：2026-06-07 14:03
-- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀和本轮 Vercel 错误部署回滚。已通过 Colima 提供本机 Docker daemon，PostgreSQL/FastAPI/Next.js 容器均可访问；本轮 `npm install`、`npm run lint`、`npm run build`、`npm run dev`、页面 HTTP 访问、后端健康检查与 JD Analyzer API 均已复验通过，当前无已知阻塞。
+- 验收时间：2026-06-07 14:22
+- 最终说明：当前已完成前后端 MVP 主链、MVP+ 合规辅助自动化增强、前端作战台重排、Web UI 视觉美化与 Docker Compose 全量联调，并完成 Vercel + Supabase 免费部署准备、Vercel 公共访问验证、生产环境 Supabase 默认兜底、作品集真实项目资料沉淀、本轮 Vercel 错误部署回滚、GitHub `master` 清理、生产重新部署和线上关键功能验收。生产地址 `https://job-lens-fuyus-projects-11d155d9.vercel.app` 已可访问，`/jobs`、`/dashboard`、`/jobs/new` 与 JD Analyzer 交互均已验证通过，当前无已知阻塞。

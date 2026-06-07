@@ -19,3 +19,4 @@ backend/.ruff_cache/
 .playwright-cli/
 supabase/.temp/
 *.pyc
+.vercel

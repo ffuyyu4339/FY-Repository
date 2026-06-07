@@ -7,6 +7,9 @@ const backendInternalUrl =
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   devIndicators: false,
+  turbopack: {
+    root: process.cwd(),
+  },
   async rewrites() {
     return [
       {
