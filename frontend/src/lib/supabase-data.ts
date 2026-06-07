@@ -20,6 +20,7 @@ const INTERVIEWING_STATUSES = new Set([
 ]);
 
 const INACTIVE_TOP_JOB_STATUSES = new Set(["rejected", "archived"]);
+const SUPABASE_READ_TIMEOUT_MS = 2500;
 
 const DEFAULT_PREFERENCES: PreferencePayload = {
   target_cities: ["上海", "远程"],
@@ -218,7 +219,7 @@ function isNetworkFetchError(error: unknown): boolean {
     return false;
   }
 
-  return /Failed to fetch|ERR_CONNECTION|NetworkError|fetch failed/i.test(
+  return /Failed to fetch|ERR_CONNECTION|NetworkError|fetch failed|timed out/i.test(
     error.message,
   );
 }
@@ -228,7 +229,15 @@ async function withNetworkFallback<T>(
   fallback: () => T,
 ): Promise<T> {
   try {
-    return await operation();
+    return await Promise.race([
+      operation(),
+      new Promise<T>((_, reject) => {
+        globalThis.setTimeout(
+          () => reject(new Error("Supabase request timed out")),
+          SUPABASE_READ_TIMEOUT_MS,
+        );
+      }),
+    ]);
   } catch (error) {
     if (isNetworkFetchError(error)) {
       return fallback();

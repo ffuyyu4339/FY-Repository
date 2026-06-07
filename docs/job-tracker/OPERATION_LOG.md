@@ -1476,12 +1476,13 @@
   - `vercel alias set job-lens-g30nkb1v3-fuyus-projects-11d155d9.vercel.app jobtracker-lens.vercel.app`
 - 执行结果：
   - 已用真实浏览器复现生产 `/sources` 请求 `source_links`、`/dashboard` 请求 `jobs` 时 Supabase REST 返回 `net::ERR_CONNECTION_CLOSED`
-  - 已为 Supabase 网络失败增加本地演示数据兜底：入口库返回默认招聘平台，数据看板和岗位列表返回演示岗位样本，偏好读取返回默认偏好
-  - 前端 `npm run lint` 通过，`npm run test` 14 项通过，根目录 `npm run build` 通过
+  - 已为 Supabase 网络失败和读取超时增加本地演示数据兜底：入口库返回默认招聘平台，数据看板和岗位列表返回演示岗位样本，偏好读取返回默认偏好
+  - 已增加 2.5 秒 Supabase 读取超时，避免 Supabase SDK 长时间重试导致页面停留在加载态
+  - 前端 `npm run lint` 通过，`npm run test` 14 项通过，根目录 `npm run build` 通过；追加超时兜底后已再次复跑通过
   - `job-lens.vercel.app` 已被占用，无法绑定
   - 已成功绑定简洁别名 `https://jobtracker-lens.vercel.app`
 - 风险/备注：
-  - 兜底只在 Supabase 网络失败时启用；Supabase 正常可访问时仍使用真实云端数据
+  - 兜底只在 Supabase 网络失败或读取超时时启用；Supabase 正常可访问时仍使用真实云端数据
   - 简洁别名当前指向修复前部署，需在最新修复部署完成后重新指向最新生产部署并复验
 - 对应提交：
   - `2b6f977`

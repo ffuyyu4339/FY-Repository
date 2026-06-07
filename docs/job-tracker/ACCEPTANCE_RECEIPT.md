@@ -247,7 +247,7 @@
 - 本轮线上 JD Analyzer 证据：生产 `/jobs/new` 粘贴测试 JD 后点击“解析 JD”，页面显示“JD 解析完成”，并回填公司、岗位、城市、薪资和技能字段
 - 本轮 Vercel Git 构建兜底证据：已新增根目录 `vercel.json` 和代理 `package.json` / `package-lock.json`，在 Vercel Root Directory 仍为 `.` 时也会进入 `frontend/` 安装与构建；`frontend/next.config.ts` 已固定 `turbopack.root`，根目录 `npm run build` 与前端 `npm run lint` 均通过
 - 本轮生产错误复现证据：Chrome headless 访问 `/sources` 时 `source_links` Supabase REST 请求出现 `net::ERR_CONNECTION_CLOSED`；访问 `/dashboard` 时 `jobs` Supabase REST 请求出现 `net::ERR_CONNECTION_CLOSED`
-- 本轮生产错误修复证据：`frontend/src/lib/supabase-data.ts` 已在 Supabase 网络失败时返回本地演示入口、岗位和偏好兜底数据；`npm run lint`、`npm run test`、根目录 `npm run build` 均通过
+- 本轮生产错误修复证据：`frontend/src/lib/supabase-data.ts` 已在 Supabase 网络失败或读取超时时返回本地演示入口、岗位和偏好兜底数据，并设置 2.5 秒读取超时避免页面卡在加载态；`npm run lint`、`npm run test`、根目录 `npm run build` 均通过
 - 本轮简洁域名证据：`job-lens.vercel.app` 已被占用；已成功绑定可读性更好的 `https://jobtracker-lens.vercel.app`
 
 ---
