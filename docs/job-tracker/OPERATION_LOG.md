@@ -1484,7 +1484,7 @@
   - 兜底只在 Supabase 网络失败时启用；Supabase 正常可访问时仍使用真实云端数据
   - 简洁别名当前指向修复前部署，需在最新修复部署完成后重新指向最新生产部署并复验
 - 对应提交：
-  - `PENDING_COMMIT`
+  - `2b6f977`
 
 ## 提交记录
 
@@ -1525,7 +1525,7 @@
 | 033 | 2026-06-01 | 619713a | chore: remove unrelated project materials | S-04 | 清理与 Job Tracker + JD Analyzer 无关的仓库内容 |
 | 034 | 2026-06-07 14:03 | f6add03 | docs(deploy): record master cleanup verification | T-01 ~ T-07 | 记录 Vercel 错误部署回滚、本地质量验证和 GitHub master 清理部署准备 |
 | 035 | 2026-06-07 14:22 | ae8c537 | chore(deploy): configure vercel root build | T-06 ~ T-08 | 同步 GitHub master，完成 Vercel 生产部署和线上关键功能验收，并补充根目录 Vercel 构建配置 |
-| 036 | 2026-06-07 14:56 | PENDING_COMMIT | fix(frontend): fallback when supabase fetch fails | U-01 ~ U-06 | 修复生产入口库和数据看板 Supabase 网络失败报错，并绑定简洁 Vercel 别名 |
+| 036 | 2026-06-07 14:56 | 2b6f977 | fix(frontend): fallback when supabase fetch fails | U-01 ~ U-06 | 修复生产入口库和数据看板 Supabase 网络失败报错，并绑定简洁 Vercel 别名 |
 
 ---
 
